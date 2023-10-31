@@ -4,7 +4,7 @@ PYTHON := python
 PYTHONPATH := `pwd`
 
 #* Docker variables
-IMAGE := horiba_python_sdk
+IMAGE := horiba_sdk
 VERSION := latest
 
 #* Poetry
@@ -40,14 +40,14 @@ formatting: codestyle
 #* Linting
 .PHONY: test
 test:
-	PYTHONPATH=$(PYTHONPATH) poetry run pytest -c pyproject.toml --cov-report=html --cov=horiba_python_sdk tests/
+	PYTHONPATH=$(PYTHONPATH) poetry run pytest -c pyproject.toml --cov-report=html --cov=horiba_sdk tests/
 	poetry run coverage-badge -o assets/images/coverage.svg -f
 
 .PHONY: check-codestyle
 check-codestyle:
 	poetry run isort --diff --check-only --settings-path pyproject.toml ./
 	poetry run black --diff --check --config pyproject.toml ./
-	poetry run darglint --verbosity 2 horiba_python_sdk tests
+	poetry run darglint --verbosity 2 horiba_sdk tests
 
 .PHONY: mypy
 mypy:
@@ -57,7 +57,7 @@ mypy:
 check-safety:
 	poetry check
 	poetry run safety check --ignore=51457 --full-report
-	poetry run bandit -ll --recursive horiba_python_sdk tests
+	poetry run bandit -ll --recursive horiba_sdk tests
 
 .PHONY: lint
 lint: test check-codestyle mypy check-safety

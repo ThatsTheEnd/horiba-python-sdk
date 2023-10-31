@@ -1,7 +1,7 @@
 """Tests for hello function."""
 import pytest
 
-from horiba_python_sdk.example import hello
+from horiba_sdk.example import hello
 
 
 @pytest.mark.parametrize(

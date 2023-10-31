@@ -4,9 +4,9 @@ requires = ["poetry_core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "horiba-python-sdk"
+name = "horiba-sdk"
 version = "0.1.0"
-description = "'horiba-python-sdk' is a package that provides source code for the development with Horiba devices"
+description = "'horiba-sdk' is a package that provides source code for the development with Horiba devices"
 readme = "README.md"
 authors = ["ZühlkeEngineering <nikolaus.naredi-rainer@zuehlke.com>"]
 license = "MIT"
