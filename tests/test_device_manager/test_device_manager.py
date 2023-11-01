@@ -26,12 +26,10 @@ def is_icl_running() -> bool:
         return False
 
 
-#
-# def test_singleton_device_manager():
-#     device_manager_1 = DeviceManager(communicator_cls=MockedTelnetCommunicator, start_acl=False)
-#     device_manager_2 = DeviceManager(communicator_cls=MockedTelnetCommunicator, start_acl=False)
-#     assert device_manager_1 is device_manager_2
-#     device_manager_1.stop_acl()
+def test_singleton_device_manager():
+    device_manager_1 = DeviceManager(start_acl=False)
+    device_manager_2 = DeviceManager(start_acl=False)
+    assert device_manager_1 is device_manager_2
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
