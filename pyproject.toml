@@ -70,6 +70,7 @@ select = [
   "SIM",
   # isort
   "I",
+  "ARG"
 ]
 
 [tool.mypy]

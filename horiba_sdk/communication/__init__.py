@@ -29,5 +29,6 @@ await ws.disconnect()
 
 # Necessary to make Python treat the directory as a package
 from .abstracts import AbstractCommunicator
+from .websocket_communicator import WebsocketCommunicator
 
-__all__ = ['AbstractCommunicator']
+__all__ = ['AbstractCommunicator', 'WebsocketCommunicator']

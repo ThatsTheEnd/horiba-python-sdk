@@ -31,10 +31,11 @@ https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING
 """
 
 import logging
+import platform
 import subprocess
 from typing import TYPE_CHECKING
 
-from horiba_sdk.communication import AbstractCommunicator
+from horiba_sdk.communication import AbstractCommunicator, WebsocketCommunicator
 
 if TYPE_CHECKING:
     from horiba_sdk.devices.single_devices import AbstractDevice
@@ -47,7 +48,7 @@ class SingletonMeta(type):
     Metaclass to implement the Singleton pattern.
     """
 
-    _instances: dict[type, 'SingletonMeta'] = {}  # type: ignore
+    _instances: dict[type, 'SingletonMeta'] = {}
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
@@ -64,16 +65,16 @@ class DeviceManager(metaclass=SingletonMeta):
         devices (List[Device]): List of managed devices.
     """
 
-    def __init__(self, communicator_cls: type[AbstractCommunicator], start_acl: bool = True):
+    def __init__(self, start_acl: bool = True, websocket_ip: str = '127.0.0.1', websocket_port: str = '25010'):
         """
         Initializes the DeviceManager with the specified communicator class.
 
         Args:
-            communicator_cls (Type[AbstractCommunicator], optional): Communicator class to be used.
-            Defaults to TelNetCommunicator.
+            websocket_ip: str = '127.0.0.1': websocket IP
+            websocket_port: str = '25010': websocket port
         """
         self.devices: list['AbstractDevice'] = []
-        self._communicator = communicator_cls()
+        self._communicator: WebsocketCommunicator = WebsocketCommunicator(websocket_port, websocket_ip)
         if start_acl:
             self.start_acl()
 
@@ -83,7 +84,8 @@ class DeviceManager(metaclass=SingletonMeta):
         Starts the ACL software and establishes communication.
         """
         try:
-            subprocess.run(['C:\\Program Files\\Horiba Scientific\\SDK\\icl.exe'], check=True)
+            if platform.system() == 'Windows':
+                subprocess.Popen([r'C:\Program Files\HORIBA Scientific\SDK\icl.exe'])
         except subprocess.CalledProcessError:
             logging.error('Failed to start ACL software.')
         except Exception as e:  # pylint: disable=broad-exception-caught
@@ -93,7 +95,7 @@ class DeviceManager(metaclass=SingletonMeta):
         """
         Stops the communication and cleans up resources.
         """
-        self._communicator.close()
+        pass
 
     def discover_devices(self) -> None:
         """
