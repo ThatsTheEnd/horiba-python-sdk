@@ -16,4 +16,4 @@ def hello(name: str) -> str:
             >>> hello("Roman")
             'Hello Roman!'
     """
-    return f"Hello {name}!"
+    return f'Hello {name}!'
