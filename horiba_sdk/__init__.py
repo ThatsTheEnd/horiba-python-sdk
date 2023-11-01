@@ -3,10 +3,8 @@
 
 import sys
 
-if sys.version_info >= (3, 8):
-    from importlib import metadata as importlib_metadata
-else:
-    import importlib_metadata
+__version__ = "0.1.0"  # It MUST match the version in pyproject.toml file
+from importlib import metadata as importlib_metadata
 
 
 def get_version() -> str:
