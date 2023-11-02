@@ -27,15 +27,15 @@ def is_icl_running() -> bool:
 
 
 def test_singleton_device_manager():
-    device_manager_1 = DeviceManager(start_acl=False)
-    device_manager_2 = DeviceManager(start_acl=False)
+    device_manager_1 = DeviceManager(start_icl=False)
+    device_manager_2 = DeviceManager(start_icl=False)
     assert device_manager_1 is device_manager_2
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-def test_device_manager_start_acl():
-    device_manager = DeviceManager(start_acl=True) if platform.system() == 'Windows' else DeviceManager(start_acl=False)
-    assert is_icl_running(), 'ACL software is not running on the system'
+def test_device_manager_start_icl():
+    device_manager = DeviceManager(start_icl=True) if platform.system() == 'Windows' else DeviceManager(start_icl=False)
+    assert is_icl_running(), 'ICL software is not running on the system'
 
     print(device_manager)
-    # assert not is_acl_running(), "Failed to close ACL software"  # This only disconnects from the ACL, not stops it
+    # assert not is_icl_running(), "Failed to close ACL software"  # This only disconnects from the ICL, not stops it

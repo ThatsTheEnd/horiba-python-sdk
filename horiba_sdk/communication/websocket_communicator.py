@@ -1,6 +1,6 @@
 from typing import Union
 
-from .abstracts import AbstractCommunicator
+from .abstract_communicator import AbstractCommunicator
 
 
 class WebsocketCommunicator(AbstractCommunicator):

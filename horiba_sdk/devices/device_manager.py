@@ -65,7 +65,7 @@ class DeviceManager(metaclass=SingletonMeta):
         devices (List[Device]): List of managed devices.
     """
 
-    def __init__(self, start_acl: bool = True, websocket_ip: str = '127.0.0.1', websocket_port: str = '25010'):
+    def __init__(self, start_icl: bool = True, websocket_ip: str = '127.0.0.1', websocket_port: str = '25010'):
         """
         Initializes the DeviceManager with the specified communicator class.
 
@@ -75,23 +75,23 @@ class DeviceManager(metaclass=SingletonMeta):
         """
         self.devices: list['AbstractDevice'] = []
         self._communicator: WebsocketCommunicator = WebsocketCommunicator(websocket_ip, websocket_port)
-        if start_acl:
-            self.start_acl()
+        if start_icl:
+            self.start_icl()
 
     @staticmethod
-    def start_acl() -> None:
+    def start_icl() -> None:
         """
-        Starts the ACL software and establishes communication.
+        Starts the ICL software and establishes communication.
         """
         try:
             if platform.system() == 'Windows':
                 subprocess.Popen([r'C:\Program Files\HORIBA Scientific\SDK\icl.exe'])
         except subprocess.CalledProcessError:
-            logging.error('Failed to start ACL software.')
+            logging.error('Failed to start ICL software.')
         except Exception as e:  # pylint: disable=broad-exception-caught
             logging.error('Unexpected error: %s', e)
 
-    def stop_acl(self) -> None:
+    def stop_icl(self) -> None:
         """
         Stops the communication and cleans up resources.
         """
@@ -103,7 +103,6 @@ class DeviceManager(metaclass=SingletonMeta):
         (This is a placeholder and will need a proper implementation.)
         """
         # Placeholder implementation for discovering devices
-        # In reality, you'd likely use your communicator to search for devices and populate self.devices
         pass
 
     @staticmethod
