@@ -12,6 +12,7 @@
 [![Semantic Versions](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--versions-e10079.svg)](https://github.com/ThatsTheEnd/horiba-python-sdk/releases)
 [![License](https://img.shields.io/github/license/ThatsTheEnd/horiba-python-sdk)](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/LICENSE)
 ![Coverage Report](assets/images/coverage.svg)
+[![Documentation Status](https://readthedocs.org/projects/horiba-python-sdk/badge/?version=latest)](https://horiba-python-sdk.readthedocs.io/en/latest/?badge=latest)
 
 'horiba-python-sdk' is a package that provides source code for the development with Horiba devices
 
@@ -346,6 +347,22 @@ make cleanup
 
 </p>
 </details>
+
+## Documentation
+
+The latest documentation can be found at
+[horiba-python-sdk.readthedocs.io](https://horiba-python-sdk.readthedocs.io/en/latest/).
+In order to build it locally, run the following in the `docs/` folder:
+
+```bash
+make html
+```
+
+The documentation will then be built under `docs/build/html/`.
+
+Documentation is built each time a commit is pushed on `main` or for pull
+requests. When release tags are created in the repo, readthedocs will also tag
+the documentation accordingly
 
 ## 📈 Releases
 
