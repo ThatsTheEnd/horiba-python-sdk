@@ -5,7 +5,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "horiba-sdk"
-version = "0.1.0"
+version = "0.2.0"
 description = "'horiba-sdk' is a package that provides source code for the development with Horiba devices"
 readme = "README.md"
 authors = ["ZühlkeEngineering <nikolaus.naredi-rainer@zuehlke.com>"]
@@ -48,6 +48,13 @@ coverage-badge = "^1.1.0"
 pytest-html = "^3.1.1"
 pytest-cov = "^3.0.0"
 ruff = "^0.1.3"
+
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "^7.2.6"
+sphinx-autoapi = "^3.0.0"
+tomli = "^2.0.1"
+furo = "^2023.9.10"
 
 [tool.ruff]
 line-length = 120
