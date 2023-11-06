@@ -61,7 +61,7 @@ class DeviceManager(metaclass=SingletonMeta):
     DeviceManager class manages the lifecycle and interactions with devices.
 
     Attributes:
-        _communicator (AbstractCommunicator): The communicator class used to talk to devices.
+        _communicator (horiba_sdk.communication.AbstractCommunicator): The communicator class used to talk to devices.
         devices (List[Device]): List of managed devices.
     """
 
@@ -121,6 +121,6 @@ class DeviceManager(metaclass=SingletonMeta):
         Getter method for the communicator attribute.
 
         Returns:
-            AbstractCommunicator: Returns the internal communicator instance.
+            horiba_sdk.communication.AbstractCommunicator: Returns the internal communicator instance.
         """
         return self._communicator
