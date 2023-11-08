@@ -1,9 +1,12 @@
+import os
+
 import pytest
 
 from horiba_sdk.communication import WebsocketCommunicator  # Replace with the actual import for your client.
 
 
 @pytest.mark.asyncio
+@pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
 async def test_open_and_close_connection():
     """
     Test that opens the WebSocket connection to a server and then closes it.
@@ -17,6 +20,7 @@ async def test_open_and_close_connection():
 
 
 @pytest.mark.asyncio
+@pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
 async def test_send_command_and_receive_response():
     """
     Test that opens a WebSocket connection, sends a JSON string command,
