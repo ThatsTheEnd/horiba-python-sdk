@@ -35,7 +35,7 @@ import platform
 import subprocess
 from typing import TYPE_CHECKING
 
-from horiba_sdk.communication import AbstractCommunicator, WebsocketCommunicator
+from horiba_sdk.communication import WebsocketCommunicator
 
 if TYPE_CHECKING:
     from horiba_sdk.devices.single_devices import AbstractDevice
@@ -65,16 +65,15 @@ class DeviceManager(metaclass=SingletonMeta):
         devices (List[Device]): List of managed devices.
     """
 
-    def __init__(self, start_icl: bool = True, websocket_ip: str = '127.0.0.1', websocket_port: str = '25010'):
+    def __init__(self, start_icl: bool = True, websocket_uri: str = '127.0.0.1:25010'):
         """
         Initializes the DeviceManager with the specified communicator class.
 
         Args:
-            websocket_ip: str = '127.0.0.1': websocket IP
-            websocket_port: str = '25010': websocket port
+            websocket_uri: str = 127.0.0.1:25010: websocket IP:Port
         """
         self.devices: list['AbstractDevice'] = []
-        self._communicator: WebsocketCommunicator = WebsocketCommunicator(websocket_ip, websocket_port)
+        self._communicator: WebsocketCommunicator = WebsocketCommunicator(websocket_uri)
         if start_icl:
             self.start_icl()
 
@@ -116,7 +115,7 @@ class DeviceManager(metaclass=SingletonMeta):
         logging.error('Unexpected error: %s', error)
 
     @property
-    def communicator(self) -> AbstractCommunicator:
+    def communicator(self) -> WebsocketCommunicator:
         """
         Getter method for the communicator attribute.
 
