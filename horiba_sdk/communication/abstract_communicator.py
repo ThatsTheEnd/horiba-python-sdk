@@ -14,15 +14,15 @@ class AbstractCommunicator(ABC):
         """
         pass
 
-    @abstractmethod
-    def send(self, command: str) -> None:
-        """
-        Abstract method to send a command.
-
-        Args:
-            command (str): Command to be sent.
-        """
-        pass
+    # @abstractmethod
+    # def send(self, command: str) -> None:
+    #     """
+    #     Abstract method to send a command.
+    #
+    #     Args:
+    #         command (str): Command to be sent.
+    #     """
+    #     pass
 
     @abstractmethod
     def receive(self, timeout: int = 10) -> Union[str, list[str]]:
