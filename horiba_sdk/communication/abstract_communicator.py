@@ -17,7 +17,7 @@ class AbstractCommunicator(ABC):
     # @abstractmethod
     # def send(self, command: str) -> None:
     #     """
-    #     Abstract method to send a command.
+    #     Abstract  method to send a command.
     #
     #     Args:
     #         command (str): Command to be sent.
