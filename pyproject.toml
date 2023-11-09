@@ -5,7 +5,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "horiba-sdk"
-version = "0.2.0"
+version = "0.2.1"
 description = "'horiba-sdk' is a package that provides source code for the development with Horiba devices"
 readme = "README.md"
 authors = ["ZühlkeEngineering <nikolaus.naredi-rainer@zuehlke.com>"]
@@ -108,7 +108,7 @@ warn_return_any = true
 warn_unreachable = true
 warn_unused_configs = true
 warn_unused_ignores = true
-
+exclude = "(^docs/|^tests/)"
 
 [tool.pytest.ini_options]
 # https://docs.pytest.org/en/6.2.x/customize.html#pyproject-toml

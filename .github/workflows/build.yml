@@ -16,6 +16,13 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - name: Set up cache
+      id: cache-poetry
+      uses: actions/cache@v3
+      with:
+        path: .venv
+        key: venv-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('poetry.lock') }}
+
     - name: Install Poetry
       if: steps.cache-poetry.outputs.cache-hit != 'true'
       run: |
@@ -31,17 +38,15 @@ jobs:
       run: |
         python -m poetry config virtualenvs.in-project true
       shell: bash
-
-    - name: Set up cache
-      uses: actions/cache@v3
-      with:
-        path: .venv
-        key: venv-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('poetry.lock') }}
         
     - name: Install dependencies
       run: |
         poetry config virtualenvs.in-project true
         poetry install
+
+    - name: Run mypy
+      run: |
+        make mypy
 
     - name: Run style checks
       run: |

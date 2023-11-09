@@ -1,9 +1,10 @@
 import asyncio
 import contextlib
-from typing import Optional
+from typing import Any, Optional, Union
 
 import websockets
 from websockets.legacy.client import WebSocketClientProtocol
+from websockets.protocol import Close
 
 
 class WebsocketCommunicator:
@@ -24,7 +25,7 @@ class WebsocketCommunicator:
         """
         self.uri: str = uri
         self.websocket: Optional[WebSocketClientProtocol] = None
-        self.listen_task: Optional[asyncio.Task] = None
+        self.listen_task: Optional[asyncio.Task[Any]] = None
 
     async def open(self) -> None:
         """
@@ -33,15 +34,18 @@ class WebsocketCommunicator:
         self.websocket = await websockets.connect(self.uri)
         self.listen_task = asyncio.create_task(self._receive_binary_data())
 
-    async def send_command(self, command: str) -> str:
+    async def send_command(self, command: str) -> Union[str, bytes]:
         """
-        Sends a command to the WebSocket server and waits for the response.
+        Sends a command to the WebSocket server and waits for a response.
 
         Args:
-            command (str): The command to send to the server.
+            command (str): The command to be sent to the WebSocket server.
 
         Returns:
-            The response from the server as a string.
+            str: The response received from the WebSocket server.
+
+        Raises:
+            AssertionError: If the WebSocket is not connected.
         """
         assert self.websocket, 'WebSocket is not connected.'
         await self.websocket.send(command)
@@ -49,24 +53,30 @@ class WebsocketCommunicator:
 
     async def _receive_binary_data(self) -> None:
         """
-        Asynchronously listens for binary data from the WebSocket server.
+        Continuously listens for binary data from the WebSocket server until the connection is closed
+        or an error occurs.
+        Only processes messages that are instances of bytes.
         """
-        try:
-            while True:
-                message = await self.websocket.recv()
-                if isinstance(message, bytes):
-                    # Handle binary message
-                    self._process_binary_data(message)
-        except websockets.ConnectionClosedOK:
-            # Connection has been closed, exit the listener
-            return
-        except Exception as e:
-            # Handle other exceptions that could occur
-            print(f'Error receiving data: {e}')
+        if self.websocket is not None:
+            try:
+                while True:
+                    message = await self.websocket.recv()
+                    if isinstance(message, bytes):
+                        # Handle binary message
+                        self._process_binary_data(message)
+            except websockets.ConnectionClosedOK:
+                # Connection has been closed, exit the listener
+                return
+            except Exception as e:
+                # Handle other exceptions that could occur
+                print(f'Error receiving data: {e}')
+        else:
+            print('WebSocket is not connected.')
+            raise websockets.exceptions.ConnectionClosedError(Close(1006, 'WebSocket is not connected.'), None)
 
     def _process_binary_data(self, data: bytes) -> None:
         """
-        Processes the received binary data.
+        Prints the received binary data.
 
         Args:
             data (bytes): The binary data received from the WebSocket server.
@@ -75,7 +85,7 @@ class WebsocketCommunicator:
 
     async def close(self) -> None:
         """
-        Closes the WebSocket connection.
+        Closes the WebSocket connection if it is open.
         """
         if self.websocket:
             await self.websocket.close()
@@ -84,23 +94,3 @@ class WebsocketCommunicator:
             self.listen_task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
                 await self.listen_task
-
-
-# Usage example
-# async def main() -> None:
-#     client = WebSocketClient("ws://example.com")
-#     await client.open()
-#     try:
-#         # Send a command and get the response
-#         response = await client.send_command("your_command")
-#         print("Response from server:", response)
-#
-#         # The client will continue to listen for binary data in the background.
-#         # You can perform other tasks here, or sleep to keep the program running.
-#         await asyncio.sleep(10)
-#     finally:
-#         # Ensure the connection is properly closed when done.
-#         await client.close()
-#
-# # Run the event loop until the main coroutine completes.
-# asyncio.run(main())
