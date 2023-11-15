@@ -88,6 +88,8 @@ python_version = 3.9
 pretty = true
 show_traceback = true
 color_output = true
+# Exclude the folder docs from mypy checks
+exclude = "(docs|tests)/"
 #exclude = "tests"
 #disable_error_code = ["misc", "empty-body", "attr-defined"]
 #allow_redefinition = false
