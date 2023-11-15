@@ -8,14 +8,24 @@ class AbstractCommunicator(ABC):
     """
 
     @abstractmethod
-    def _connect(self):
+    async def open(self) -> None:
         """
         Abstract method to establish a connection.
         """
         pass
 
     @abstractmethod
-    def send(self, command: str) -> None:
+    def opened(self) -> bool:
+        """
+        Abstract method that says if the connection is open
+
+        Returns:
+            bool: True if the connection is open, False otherwise
+        """
+        pass
+
+    @abstractmethod
+    async def send(self, command: str) -> None:
         """
         Abstract method to send a command.
 
@@ -25,33 +35,30 @@ class AbstractCommunicator(ABC):
         pass
 
     @abstractmethod
-    def receive(self, timeout: int = 10) -> Union[str, list[str]]:
+    async def response(self) -> Union[str, bytes]:
         """
-        Abstract method to receive a response.
-
-        Args:
-            timeout (int, optional): Time in seconds to wait for a response. Defaults to 10.
+        Abstract method that fetches the next response.
 
         Returns:
-            str: The received response.
+            str: String containing the response
         """
         pass
 
     @abstractmethod
-    def send_and_receive(self, command: str) -> Union[str, list[str]]:
+    async def send_and_receive(self, command: str) -> Union[str, bytes]:
         """
-        Send a command and immediately attempt to receive a response.
+        Abstract method that sends a command to the WebSocket server and waits for the response.
 
         Args:
-            command (str): Command to be sent.
+            command (str): The command to send to the server.
 
         Returns:
-            List[str]: List of response lines.
+            Union[str, bytes]: The response from the server as a string or bytes.
+
         """
-        pass
 
     @abstractmethod
-    def close(self) -> None:
+    async def close(self) -> None:
         """
         Abstract method to close the connection.
         """

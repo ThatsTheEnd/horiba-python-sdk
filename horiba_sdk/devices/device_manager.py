@@ -74,7 +74,10 @@ class DeviceManager(metaclass=SingletonMeta):
             websocket_port: str = '25010': websocket port
         """
         self.devices: list['AbstractDevice'] = []
-        self._communicator: WebsocketCommunicator = WebsocketCommunicator(websocket_ip, websocket_port)
+        # self._communicator: WebsocketCommunicator = WebsocketCommunicator(websocket_ip, websocket_port)
+        self._communicator: WebsocketCommunicator = WebsocketCommunicator(
+            'ws://' + websocket_ip + ':' + str(websocket_port)
+        )
         if start_icl:
             self.start_icl()
 
