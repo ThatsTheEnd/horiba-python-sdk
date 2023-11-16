@@ -1,0 +1,19 @@
+// Command structure to send to the server as websocket payload
+{
+	"id": 1357,
+	"command": "string",
+	"parameters": {
+		"key1": "value",
+		"key2": "value"
+		}
+}
+// Reply structure received from the server as websocket payload
+{
+	"id": 1357,
+	"command": "string",
+	"results": {
+		"key1": "value",
+		"key2": "value"
+		}
+	"errors":[]
+}
