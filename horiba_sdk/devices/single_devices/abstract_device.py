@@ -1,6 +1,6 @@
-import logging
 from abc import ABC, abstractmethod
 
+from horiba_sdk.communication import WebsocketCommunicator
 from horiba_sdk.devices.device_manager import DeviceManager
 
 
@@ -13,14 +13,15 @@ class AbstractDevice(ABC):
     for each of the abstract methods.
     """
 
-    def __init__(self, device_manager: DeviceManager) -> None:
+    def __init__(self, device_manager: DeviceManager, device_id: int) -> None:
         # Assuming you might want some kind of initialization here.
         # This can be expanded as needed.
-        self.logger = logging.getLogger(type(self).__name__)
-        self._communicator = device_manager.communicator
+        self._device_manager: DeviceManager = device_manager
+        self._communicator: WebsocketCommunicator = device_manager.communicator
+        self._device_id = device_id
 
     @abstractmethod
-    def open(self) -> None:
+    def _open(self) -> None:
         """
         Open a connection to the device.
 
@@ -30,7 +31,7 @@ class AbstractDevice(ABC):
         pass
 
     @abstractmethod
-    def close(self) -> None:
+    def _close(self) -> None:
         """
         Close the connection to the device.
 

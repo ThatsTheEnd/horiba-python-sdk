@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Union
 
+from .messages import Command, Response
+
 
 class AbstractCommunicator(ABC):
     """
@@ -25,7 +27,7 @@ class AbstractCommunicator(ABC):
         pass
 
     @abstractmethod
-    async def send(self, command: str) -> None:
+    async def send(self, command: Command) -> None:
         """
         Abstract method to send a command.
 
@@ -35,7 +37,7 @@ class AbstractCommunicator(ABC):
         pass
 
     @abstractmethod
-    async def response(self) -> Union[str, bytes]:
+    async def response(self) -> Union[Response, bytes]:
         """
         Abstract method that fetches the next response.
 
@@ -45,7 +47,7 @@ class AbstractCommunicator(ABC):
         pass
 
     @abstractmethod
-    async def send_and_receive(self, command: str) -> Union[str, bytes]:
+    async def send_and_receive(self, command: Command) -> Union[Response, bytes]:
         """
         Abstract method that sends a command to the WebSocket server and waits for the response.
 

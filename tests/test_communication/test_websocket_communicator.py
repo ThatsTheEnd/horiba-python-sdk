@@ -3,7 +3,7 @@ import threading
 
 import pytest
 
-from horiba_sdk.communication import CommunicationException, WebsocketCommunicator
+from horiba_sdk.communication import Command, CommunicationException, WebsocketCommunicator
 from horiba_sdk.devices import FakeDeviceManager
 
 fake_icl_host: str = 'localhost'
@@ -64,8 +64,8 @@ async def test_websocket_can_send_command(_run_fake_icl_server):
 
     # act
     async with websocket_communicator:
-        request: str = '{"test": "some test"}'
-        await websocket_communicator.send(request)
+        command = Command('test', {'test': 'some test'})
+        await websocket_communicator.send(command)
 
 
 @pytest.mark.asyncio
@@ -76,8 +76,8 @@ async def test_websocket_fails_to_send_message_with_unsupported_type(_run_fake_i
     # act
     async with websocket_communicator:
         # assert
-        with pytest.raises(CommunicationException):
-            await websocket_communicator.send(123456)
+        with pytest.raises(AttributeError):
+            await websocket_communicator.send('123456')
 
 
 @pytest.mark.asyncio
@@ -87,12 +87,12 @@ async def test_websocket_can_receive(_run_fake_icl_server):
 
     # act
     async with websocket_communicator:
-        request: str = '{"test": "some test"}'
+        request: Command = Command('test', {'test': 'some test'})
         await websocket_communicator.send(request)
         response = await websocket_communicator.response()
 
         # assert
-        assert response is not None and response == request
+        assert response is not None and response == request.to_json()
 
 
 @pytest.mark.asyncio
@@ -102,11 +102,11 @@ async def test_websocket_can_send_andreceive(_run_fake_icl_server):
 
     # act
     async with websocket_communicator:
-        request: str = '{"test": "some test"}'
+        request: Command = Command('test', {'test': 'some test'})
         response = await websocket_communicator.send_and_receive(request)
 
         # assert
-        assert response is not None and response == request
+        assert response is not None and response == request.to_json()
 
 
 @pytest.mark.asyncio

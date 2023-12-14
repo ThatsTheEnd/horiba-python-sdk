@@ -1,21 +1,22 @@
 import asyncio
 import contextlib
-import logging
 from types import TracebackType
 from typing import Any, Optional, Union, final
 
 import websockets
+from loguru import logger
 from websockets.legacy.client import WebSocketClientProtocol
 
 from .abstract_communicator import AbstractCommunicator
 from .communication_exception import CommunicationException
+from .messages import Command, Response
 
 
 @final
 class WebsocketCommunicator(AbstractCommunicator):
     """
     The WebsocketCommunicator implements the `horiba_sdk.communication.AbstractCommunicator` via websockets.
-    A background task listens continuoulsy for incoming binary data.
+    A background task listens continuous for incoming binary data.
 
     It supports Asynchronous Context Managers and can be used like the following::
 
@@ -57,12 +58,13 @@ class WebsocketCommunicator(AbstractCommunicator):
 
         try:
             self.websocket = await websockets.connect(self.uri)
+            logger.info('websocket connection established to ' + self.uri)
         except websockets.WebSocketException as e:
             raise CommunicationException(None, 'websocket connection issue') from e
 
         self.listen_task = asyncio.create_task(self._receive_binary_data())
 
-    async def send(self, command: str) -> None:
+    async def send(self, command: Command) -> None:
         """
         Sends a command to the WebSocket server.
 
@@ -78,8 +80,9 @@ class WebsocketCommunicator(AbstractCommunicator):
             raise CommunicationException(None, 'WebSocket is not opened.')
 
         try:
+            logger.debug('sending command: ' + command.to_json())
             # mypy cannot infer the check from self.opened() done above
-            await self.websocket.send(command)  # type: ignore
+            await self.websocket.send(command.to_json())  # type: ignore
         except TypeError as e:
             raise CommunicationException(None, 'Trying to send unsupported type' + str(type(command))) from e
         except websockets.exceptions.ConnectionClosed as e:
@@ -94,7 +97,7 @@ class WebsocketCommunicator(AbstractCommunicator):
         """
         return self.websocket is not None and self.websocket.open
 
-    async def response(self) -> Union[str, bytes]:
+    async def response(self) -> Union[Response, bytes]:
         """
         Fetches the next response
 
@@ -106,11 +109,13 @@ class WebsocketCommunicator(AbstractCommunicator):
             or the binary data failed to be processed.
         """
         try:
-            return await self.message_queue.get()
+            message = Response(await self.message_queue.get())
+            logger.debug('received message: ' + str(message))
+            return message
         except asyncio.CancelledError as e:
             raise CommunicationException(None, 'Response reception was canceled') from e
 
-    async def send_and_receive(self, command: str) -> Union[str, bytes]:
+    async def send_and_receive(self, command: Command) -> Union[Response, bytes]:
         """
         Sends a command to the WebSocket server and waits for the response.
 
@@ -149,7 +154,7 @@ class WebsocketCommunicator(AbstractCommunicator):
                 message = await self.websocket.recv()  # type: ignore
                 await self.message_queue.put(message)
         except websockets.ConnectionClosedOK:
-            logging.debug('websocket connection terminated properly')
+            logger.debug('websocket connection terminated properly')
         except websockets.ConnectionClosedError as e:
             raise CommunicationException(None, 'connection terminated with error') from e
         except Exception as e:

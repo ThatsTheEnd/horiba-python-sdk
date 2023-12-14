@@ -35,7 +35,9 @@ import platform
 import subprocess
 from typing import TYPE_CHECKING
 
-from horiba_sdk.communication import AbstractCommunicator, WebsocketCommunicator
+from loguru import logger
+
+from horiba_sdk.communication import WebsocketCommunicator
 
 if TYPE_CHECKING:
     from horiba_sdk.devices.single_devices import AbstractDevice
@@ -80,6 +82,7 @@ class DeviceManager(metaclass=SingletonMeta):
         )
         if start_icl:
             self.start_icl()
+        logger.info('DeviceManager initialized.')
 
     @staticmethod
     def start_icl() -> None:
@@ -89,6 +92,7 @@ class DeviceManager(metaclass=SingletonMeta):
         try:
             if platform.system() == 'Windows':
                 subprocess.Popen([r'C:\Program Files\HORIBA Scientific\SDK\icl.exe'])
+                logger.info('ICL launched.')
         except subprocess.CalledProcessError:
             logging.error('Failed to start ICL software.')
         except Exception as e:  # pylint: disable=broad-exception-caught
@@ -119,11 +123,11 @@ class DeviceManager(metaclass=SingletonMeta):
         logging.error('Unexpected error: %s', error)
 
     @property
-    def communicator(self) -> AbstractCommunicator:
+    def communicator(self) -> WebsocketCommunicator:
         """
         Getter method for the communicator attribute.
 
         Returns:
-            horiba_sdk.communication.AbstractCommunicator: Returns the internal communicator instance.
+            horiba_sdk.communication.WebsocketCommunicator: Returns the internal communicator instance.
         """
         return self._communicator
