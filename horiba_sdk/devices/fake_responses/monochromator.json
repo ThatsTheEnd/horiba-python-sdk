@@ -1,0 +1,114 @@
+{
+  "mono_discover": {
+    "id": 1234,
+    "command": "mono_discover",
+    "results": {
+      "count": 1
+
+    },
+    "errors": []
+  },
+  "mono_list": {
+    "id": 1234,
+    "command": "mono_list",
+    "results": {
+      "list": [
+        "0;iHR550;sn12345",
+        "1;iHR320;snabscde"
+      ]
+    },
+    "errors": []
+  },
+  "mono_listCount": {
+    "id": 1234,
+    "command": "mono_listCount",
+    "results": {
+      "count": 2
+    },
+    "errors": []
+  },
+  "mono_open": {
+    "id": 1234,
+    "command": "mono_open",
+    "errors": []
+  },
+  "mono_close": {
+    "id": 1234,
+    "command": "mono_close",
+    "errors": []
+  },
+  "mono_isOpen": {
+    "id": 1234,
+    "command": "mono_isOpen",
+    "results":{
+      "open": true
+    },
+    "errors": []
+  },
+  "mono_isBusy": {
+    "id": 1234,
+    "command": "mono_isBusy",
+    "results":{
+      "busy": true
+    },
+    "errors": []
+  },
+  "mono_init": {
+    "id": 1234,
+    "command": "mono_init",
+    "errors": []
+  },
+  "mono_getConfig": {},
+  "mono_setConfig": {},
+  "mono_getPosition": {
+    "id": 1234,
+    "command": "mono_getPosition",
+    "results":{
+      "wavelength": 320.0
+    },
+    "errors": []
+  },
+  "mono_setPosition": {
+    "id": 1234,
+    "command": "mono_setPosition",
+    "errors": []
+  },
+  "mono_moveToPosition": {
+    "id": 1234,
+    "command": "mono_moveToPosition",
+    "errors": []
+  },
+  "mono_getGratingPosition": {
+    "id": 1234,
+    "command": "mono_getPosition",
+    "results":{
+      "position": 1
+    },
+    "errors": []
+  },
+  "mono_moveGrating": {
+    "id": 1234,
+    "command": "mono_getPosition",
+    "results":{
+      "position": 1
+    },
+    "errors": []
+  },
+  "mono_getFilterWheelPosition": {},
+  "mono_moveFilterWheel": {},
+  "mono_getMirrorPosition": {},
+  "mono_moveMirror": {},
+  "mono_getSlitPositionInMM": {},
+  "mono_moveSlitMM": {},
+  "mono_shutterOpen": {},
+  "mono_shutterClose": {},
+  "mono_getShutterStatus": {},
+  "mono_getSlitStepPosition": {},
+  "mono_moveSlit": {},
+  "mono_enableLaser": {},
+  "mono_getLaserStatus": {},
+  "mono_setLaserPower": {},
+  "mono_getLaserPower": {},
+  "mono_getLidStatus": {},
+  "mono_getSwitchStatus": {}
+}
