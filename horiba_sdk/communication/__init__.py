@@ -30,6 +30,15 @@ await ws.disconnect()
 # Necessary to make Python treat the directory as a package
 from .abstract_communicator import AbstractCommunicator
 from .communication_exception import CommunicationException
+from .messages import BinaryResponse, Command, JSONResponse, Response
 from .websocket_communicator import WebsocketCommunicator
 
-__all__ = ['AbstractCommunicator', 'WebsocketCommunicator', 'CommunicationException']
+__all__ = [
+    'AbstractCommunicator',
+    'WebsocketCommunicator',
+    'CommunicationException',
+    'Command',
+    'Response',
+    'JSONResponse',
+    'BinaryResponse',
+]

@@ -1,0 +1,29 @@
+{
+  "icl_info": {
+    "command": "icl_info",
+    "errors": [],
+    "id": 1234,
+    "results": {
+      "nodeAlias": "ICL",
+      "nodeApiVersion": 300,
+      "nodeBuilt": "Dec  5 2023-13:17:00",
+      "nodeDescription": "Instrument Control Library",
+      "nodeId": 1,
+      "nodeVersion": "2.0.0.108.d762232a"
+    }
+  },
+  "icl_shutdown": {
+    "id": 1234,
+    "command": "icl_shutdown",
+    "results": {
+      "state": "Shutting down"
+    },
+    "errors": []
+  },
+  "icl_binMode": {
+    "id": 1234,
+    "command": "icl_binMode",
+    "results": {},
+    "errors": []
+  }
+}

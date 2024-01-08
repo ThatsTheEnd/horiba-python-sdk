@@ -30,17 +30,17 @@ For more details on the TYPE_CHECKING constant and its usage, refer to:
 https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING
 """
 
-import logging
 import platform
 import subprocess
 from typing import TYPE_CHECKING
+
+import psutil
+from loguru import logger
 
 from horiba_sdk.communication import AbstractCommunicator, WebsocketCommunicator
 
 if TYPE_CHECKING:
     from horiba_sdk.devices.single_devices import AbstractDevice
-
-logging.basicConfig(level=logging.INFO)
 
 
 class SingletonMeta(type):
@@ -74,7 +74,6 @@ class DeviceManager(metaclass=SingletonMeta):
             websocket_port: str = '25010': websocket port
         """
         self.devices: list['AbstractDevice'] = []
-        # self._communicator: WebsocketCommunicator = WebsocketCommunicator(websocket_ip, websocket_port)
         self._communicator: WebsocketCommunicator = WebsocketCommunicator(
             'ws://' + websocket_ip + ':' + str(websocket_port)
         )
@@ -88,11 +87,14 @@ class DeviceManager(metaclass=SingletonMeta):
         """
         try:
             if platform.system() == 'Windows':
-                subprocess.Popen([r'C:\Program Files\HORIBA Scientific\SDK\icl.exe'])
+                icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
+                if not icl_running:
+                    logger.debug('icl not running, starting it...')
+                    subprocess.Popen([r'C:\Program Files\HORIBA Scientific\SDK\icl.exe'])
         except subprocess.CalledProcessError:
-            logging.error('Failed to start ICL software.')
+            logger.error('Failed to start ICL software.')
         except Exception as e:  # pylint: disable=broad-exception-caught
-            logging.error('Unexpected error: %s', e)
+            logger.error('Unexpected error: %s', e)
 
     def stop_icl(self) -> None:
         """
@@ -116,7 +118,7 @@ class DeviceManager(metaclass=SingletonMeta):
         Args:
             error (Exception): The exception or error to handle.
         """
-        logging.error('Unexpected error: %s', error)
+        logger.error('Unexpected error: %s', error)
 
     @property
     def communicator(self) -> AbstractCommunicator:
