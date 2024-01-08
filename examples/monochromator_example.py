@@ -1,7 +1,7 @@
 import asyncio
 
-from horiba_sdk.devices.single_devices.monochromator import Monochromator
 from horiba_sdk.devices.device_manager import DeviceManager
+from horiba_sdk.devices.single_devices.monochromator import Monochromator
 
 
 async def main():

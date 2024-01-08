@@ -32,9 +32,9 @@ https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING
 
 import platform
 import subprocess
-import psutil
 from typing import TYPE_CHECKING
 
+import psutil
 from loguru import logger
 
 from horiba_sdk.communication import AbstractCommunicator, WebsocketCommunicator
