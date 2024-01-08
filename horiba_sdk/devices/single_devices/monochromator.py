@@ -54,6 +54,14 @@ class Monochromator(AbstractDevice):
             Exception: When an error occured on the device side
         """
         await super().open()
+
+        command = Command('mono_discover', {})
+        await self._communicator.send(command)
+        _ignored_response = await self._communicator.response()
+
+        if _ignored_response.errors:
+            raise Exception(f'Monochromator encountered error: {_ignored_response.errors}')
+
         command = Command('mono_open', {'index': self._id})
         await self._communicator.send(command)
         _ignored_response = await self._communicator.response()

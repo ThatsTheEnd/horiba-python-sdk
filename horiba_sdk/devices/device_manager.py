@@ -32,6 +32,7 @@ https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING
 
 import platform
 import subprocess
+import psutil
 from typing import TYPE_CHECKING
 
 from loguru import logger
@@ -86,7 +87,10 @@ class DeviceManager(metaclass=SingletonMeta):
         """
         try:
             if platform.system() == 'Windows':
-                subprocess.Popen([r'C:\Program Files\HORIBA Scientific\SDK\icl.exe'])
+                icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
+                if not icl_running:
+                    logger.debug('icl not running, starting it...')
+                    subprocess.Popen([r'C:\Program Files\HORIBA Scientific\SDK\icl.exe'])
         except subprocess.CalledProcessError:
             logger.error('Failed to start ICL software.')
         except Exception as e:  # pylint: disable=broad-exception-caught
