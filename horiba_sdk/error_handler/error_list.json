@@ -1,0 +1,259 @@
+{
+    "errors": [
+      {
+        "number": -1,
+        "text": "ICL error: no parser found",
+        "level": "fatal"
+      },
+      {
+        "number": -2,
+        "text": "ICL error: unknown command",
+        "level": "fatal"
+      },
+      {
+        "number": -3,
+        "text": "ICL error: invalid bin mode",
+        "level": "fatal"
+      },
+      {
+        "number": -300,
+        "text": "CCD error: already initialized",
+        "level": "fatal"
+      },
+      {
+        "number": -301,
+        "text": "CCD error: already open",
+        "level": "fatal"
+      },
+      {
+        "number": -302,
+        "text": "CCD error: already closed",
+        "level": "fatal"
+      },
+      {
+        "number": -303,
+        "text": "CCD error: already uninitialized",
+        "level": "fatal"
+      },
+      {
+        "number": -304,
+        "text": "CCD error: not initialized",
+        "level": "fatal"
+      },
+      {
+        "number": -305,
+        "text": "CCD error: not open",
+        "level": "fatal"
+      },
+      {
+        "number": -306,
+        "text": "CCD error: not found",
+        "level": "fatal"
+      },
+      {
+        "number": -307,
+        "text": "CCD error: invalid device index",
+        "level": "fatal"
+      },
+      {
+        "number": -308,
+        "text": "CCD error: initialization failure",
+        "level": "fatal"
+      },
+      {
+        "number": -309,
+        "text": "CCD error: acquiring",
+        "level": "fatal"
+      },
+      {
+        "number": -310,
+        "text": "CCD error: acquisition preparation failed",
+        "level": "fatal"
+      },
+      {
+        "number": -311,
+        "text": "CCD error: not ready for acquisition",
+        "level": "fatal"
+      },
+      {
+        "number": -312,
+        "text": "CCD error: get spectra failed",
+        "level": "fatal"
+      },
+      {
+        "number": -313,
+        "text": "CCD error: go failed",
+        "level": "fatal"
+      },
+      {
+        "number": -314,
+        "text": "CCD error: no free packet",
+        "level": "fatal"
+      },
+      {
+        "number": -315,
+        "text": "CCD error: command not supported",
+        "level": "fatal"
+      },
+      {
+        "number": -316,
+        "text": "CCD error: command failed",
+        "level": "fatal"
+      },
+      {
+        "number": -317,
+        "text": "CCD error: invalid token",
+        "level": "fatal"
+      },
+      {
+        "number": -318,
+        "text": "CCD error: invalid value",
+        "level": "fatal"
+      },
+      {
+        "number": -319,
+        "text": "CCD error: capabilities read error",
+        "level": "fatal"
+      },
+      {
+        "number": -320,
+        "text": "CCD error: acquisition already running",
+        "level": "fatal"
+      },
+      {
+        "number": -321,
+        "text": "CCD error: acquisition data format error",
+        "level": "fatal"
+      },
+      {
+        "number": -322,
+        "text": "CCD error: unsupported acquisition format",
+        "level": "fatal"
+      },
+      {
+        "number": -323,
+        "text": "CCD error: command execution exception",
+        "level": "fatal"
+      },
+      {
+        "number": -324,
+        "text": "CCD error: missing parameter",
+        "level": "fatal"
+      },
+      {
+        "number": -500,
+        "text": "MONO error: already initialized",
+        "level": "fatal"
+      },
+      {
+        "number": -501,
+        "text": "MONO error: already open",
+        "level": "fatal"
+      },
+      {
+        "number": -502,
+        "text": "MONO error: already opening",
+        "level": "fatal"
+      },
+      {
+        "number": -503,
+        "text": "MONO error: already closed",
+        "level": "fatal"
+      },
+      {
+        "number": -504,
+        "text": "MONO error: already uninitialized",
+        "level": "fatal"
+      },
+      {
+        "number": -505,
+        "text": "MONO error: not initialized",
+        "level": "fatal"
+      },
+      {
+        "number": -506,
+        "text": "MONO error: not open",
+        "level": "fatal"
+      },
+      {
+        "number": -507,
+        "text": "MONO error: not found",
+        "level": "fatal"
+      },
+      {
+        "number": -508,
+        "text": "MONO error: invalid device index",
+        "level": "fatal"
+      },
+      {
+        "number": -509,
+        "text": "MONO error: initialization failure",
+        "level": "fatal"
+      },
+      {
+        "number": -510,
+        "text": "MONO error: command not supported",
+        "level": "fatal"
+      },
+      {
+        "number": -511,
+        "text": "MONO error: discovery",
+        "level": "fatal"
+      },
+      {
+        "number": -512,
+        "text": "MONO error: communication error",
+        "level": "fatal"
+      },
+      {
+        "number": -513,
+        "text": "MONO error: invalid parameter",
+        "level": "fatal"
+      },
+      {
+        "number": -514,
+        "text": "MONO error: lost USB connection",
+        "level": "fatal"
+      },
+      {
+        "number": -515,
+        "text": "MONO error: open error",
+        "level": "fatal"
+      },
+      {
+        "number": -516,
+        "text": "MONO error: error log",
+        "level": "fatal"
+      },
+      {
+        "number": -517,
+        "text": "MONO error: initialization error",
+        "level": "fatal"
+      },
+      {
+        "number": -518,
+        "text": "MONO error: get configuration",
+        "level": "fatal"
+      },
+      {
+        "number": -519,
+        "text": "MONO error: command error",
+        "level": "fatal"
+      },
+      {
+        "number": -520,
+        "text": "MONO error: communication failed",
+        "level": "fatal"
+      },
+      {
+        "number": -521,
+        "text": "MONO error: missing parameter",
+        "level": "fatal"
+      },
+      {
+        "number": -600,
+        "text": "SCD error: command not supported",
+        "level": "fatal"
+      }
+    ]
+  }
