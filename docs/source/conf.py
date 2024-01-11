@@ -26,8 +26,11 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
     'sphinx.ext.autodoc',
+    'sphinx.ext.todo',
     'autoapi.extension',
 ]
+
+todo_include_todos = True
 
 autodoc_typehints = 'description'
 autoapi_dirs = ['../../horiba_sdk']

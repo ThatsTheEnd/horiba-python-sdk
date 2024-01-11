@@ -1,5 +1,4 @@
 from .abstract_device import AbstractDevice
+from .monochromator import Monochromator
 
-# from .monochromator import Monochromator
-
-__all__ = ['AbstractDevice']
+__all__ = ['AbstractDevice', 'Monochromator']
