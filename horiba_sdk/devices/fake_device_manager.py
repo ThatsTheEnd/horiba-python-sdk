@@ -58,7 +58,7 @@ class FakeDeviceManager(AbstractDeviceManager):
         self.loop: Optional[AbstractEventLoop] = None
         self.server: Optional[Task[Any]] = None
 
-        current_directory = os.path.dirname(os.path.abspath(__file__))
+        current_directory = os.path.dirname(__file__)
         fake_responses_path = os.path.join(current_directory, 'fake_responses')
 
         icl_fake_responses_path = os.path.join(fake_responses_path, 'icl.json')
@@ -68,6 +68,10 @@ class FakeDeviceManager(AbstractDeviceManager):
         monochromator_fake_responses_path = os.path.join(fake_responses_path, 'monochromator.json')
         with open(monochromator_fake_responses_path) as json_file:
             self.monochromator_responses = json.load(json_file)
+
+        ccd_fake_responses_path = os.path.join(fake_responses_path, 'ccd.json')
+        with open(ccd_fake_responses_path) as json_file:
+            self.ccd_responses = json.load(json_file)
 
     async def _websocket_server(self) -> None:
         async with websockets.serve(self._echo_handler, self.host, self.port):
@@ -119,6 +123,9 @@ class FakeDeviceManager(AbstractDeviceManager):
                 await websocket.send(response)
             elif command['command'].startswith('mono_'):
                 response = json.dumps(self.monochromator_responses[command['command']])
+                await websocket.send(response)
+            elif command['command'].startswith('ccd_'):
+                response = json.dumps(self.ccd_responses[command['command']])
                 await websocket.send(response)
             else:
                 logger.info('unknown command, responding with message')
