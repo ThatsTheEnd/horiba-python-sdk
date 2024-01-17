@@ -77,6 +77,7 @@ class DeviceManager(metaclass=SingletonMeta):
         self._communicator: WebsocketCommunicator = WebsocketCommunicator(
             'ws://' + websocket_ip + ':' + str(websocket_port)
         )
+        logger.debug(f'Start ICL: {start_icl}')
         if start_icl:
             self.start_icl()
 
@@ -85,6 +86,7 @@ class DeviceManager(metaclass=SingletonMeta):
         """
         Starts the ICL software and establishes communication.
         """
+        logger.debug('Starting ICL software...')
         try:
             if platform.system() == 'Windows':
                 icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())

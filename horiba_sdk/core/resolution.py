@@ -26,6 +26,7 @@ class Resolution:
         self._width = width
         self._height = height
 
+    @property
     def width(self) -> int:
         """Width in pixels.
 
@@ -34,6 +35,7 @@ class Resolution:
         """
         return self._width
 
+    @property
     def height(self) -> int:
         """Height in pixels.
 
