@@ -2,8 +2,8 @@ from types import TracebackType
 from typing import Optional, Union, final
 
 import pint
-from overrides import override
 from loguru import logger
+from overrides import override
 
 from horiba_sdk import ureg
 from horiba_sdk.communication.messages import Command, Response
@@ -160,7 +160,7 @@ class ChargeCoupledDevice(AbstractDevice):
             raise Exception(f'ChargeCoupledDevice encountered error: {response.errors}')
 
         return ureg(response.results['info'])
-    
+
     async def get_exposure_time(self) -> Union[pint.Quantity, None]:
         """Returns the exposure time in ms
 
@@ -174,14 +174,14 @@ class ChargeCoupledDevice(AbstractDevice):
         response: Response = await self._communicator.response()
         if response.errors:
             raise Exception(f'ChargeCoupledDevice encountered error: {response.errors}')
-        
-        exposure = ureg.Quantity(response.results['time'], ureg.ms)
+
+        exposure = ureg.Quantity(response.results['time'], 'ms')
         logger.debug(f'CCD {self._id} exposure time: {exposure}')
         return exposure
 
     async def set_exposure_time(self, exposure_time_ms: int) -> None:
         """Sets the exposure time in ms
-        
+
         Args:
             exposure_time_ms (int): Exposure time in ms
         Raises:
@@ -192,7 +192,7 @@ class ChargeCoupledDevice(AbstractDevice):
         response: Response = await self._communicator.response()
         if response.errors:
             raise Exception(f'ChargeCoupledDevice encountered error: {response.errors}')
-        
+
     async def set_acquisition_start(self) -> None:
         """Starts the acquisition of the CCD
         Raises:
@@ -203,4 +203,3 @@ class ChargeCoupledDevice(AbstractDevice):
         response: Response = await self._communicator.response()
         if response.errors:
             raise Exception(f'ChargeCoupledDevice encountered error: {response.errors}')
-        

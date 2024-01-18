@@ -15,5 +15,6 @@ async def main():
         print(f'Exposure time: {await ccd.get_exposure_time()}')
         await ccd.set_acquisition_start()
 
+
 if __name__ == '__main__':
     asyncio.run(main())
