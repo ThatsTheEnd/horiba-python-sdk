@@ -18,7 +18,7 @@ async def main():
         except Exception as e:
             print(e)
 
-    device_manager.stop_icl()
+    await device_manager.stop_icl()
 
 
 if __name__ == '__main__':

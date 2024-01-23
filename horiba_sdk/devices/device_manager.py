@@ -30,7 +30,6 @@ For more details on the TYPE_CHECKING constant and its usage, refer to:
 https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING
 """
 
-import asyncio
 import importlib.resources
 import platform
 import subprocess
@@ -109,13 +108,15 @@ class DeviceManager(metaclass=SingletonMeta):
         except Exception as e:  # pylint: disable=broad-exception-caught
             logger.error('Unexpected error: %s', e)
 
-    def stop_icl(self) -> None:
+    async def stop_icl(self) -> None:
         """
         Stops the communication and cleans up resources.
         """
+        logger.info('Requesting shutdown of ICL...')
+
         command: Command = Command('icl_shutdown', {})
-        asyncio.run(self._communicator.send(command))
-        response: Response = asyncio.run(self._communicator.response())
+        await self._communicator.send(command)
+        response: Response = await self._communicator.response()
 
         if response.errors:
             self.handle_errors(response.errors)
