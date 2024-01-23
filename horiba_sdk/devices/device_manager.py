@@ -116,6 +116,9 @@ class DeviceManager(metaclass=SingletonMeta):
         """
         logger.info('Requesting shutdown of ICL...')
 
+        if not self._icl_communicator.opened():
+            await self._icl_communicator.open()
+
         command: Command = Command('icl_shutdown', {})
         await self._icl_communicator.send(command)
         response: Response = await self._icl_communicator.response()
