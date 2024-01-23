@@ -30,6 +30,7 @@ For more details on the TYPE_CHECKING constant and its usage, refer to:
 https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING
 """
 
+import asyncio
 import importlib.resources
 import platform
 import subprocess
@@ -39,7 +40,7 @@ from typing import TYPE_CHECKING, final
 import psutil
 from loguru import logger
 
-from horiba_sdk.communication import AbstractCommunicator, WebsocketCommunicator
+from horiba_sdk.communication import AbstractCommunicator, Command, Response, WebsocketCommunicator
 from horiba_sdk.icl_error.abstract_error import AbstractError
 from horiba_sdk.icl_error.abstract_error_db import AbstractErrorDB
 from horiba_sdk.icl_error.icl_error_db import ICLErrorDB
@@ -112,7 +113,24 @@ class DeviceManager(metaclass=SingletonMeta):
         """
         Stops the communication and cleans up resources.
         """
-        pass
+        command: Command = Command('icl_shutdown', {})
+        asyncio.run(self._communicator.send(command))
+        response: Response = asyncio.run(self._communicator.response())
+
+        if response.errors:
+            self.handle_errors(response.errors)
+
+        logger.info('icl shutdown command sent')
+
+        if platform.system() == 'Windows':
+            try:
+                icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
+                if not icl_running:
+                    return
+                subprocess.run(['taskkill', '/F', '/IM', 'icl.exe'], check=True)
+                logger.info("Process 'icl.exe' killed successfully.")
+            except subprocess.CalledProcessError as e:
+                logger.error(f"Error: Unable to kill process 'icl.exe' {e}")
 
     def discover_devices(self) -> None:
         """

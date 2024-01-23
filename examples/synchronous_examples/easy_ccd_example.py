@@ -22,6 +22,7 @@ def main():
 
     # Close the CCD
     ccd.close()
+    device_manager.stop_icl()
 
 
 if __name__ == '__main__':

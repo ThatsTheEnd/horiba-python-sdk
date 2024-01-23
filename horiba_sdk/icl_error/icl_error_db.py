@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from typing import final
 
+from loguru import logger
 from overrides import override
 
 from horiba_sdk.icl_error.abstract_error import AbstractError, Severity, StringAsSeverity
@@ -72,8 +73,11 @@ class ICLErrorDB(AbstractErrorDB):
         )
 
         if found_error is None:
-            raise Exception(f'Error with number #{error_code} not found in error db')
+            logger.error(f'Error with number #{error_code} not found in error db')
+            text: str = parsed_error[2]
+            return ICLError(error_code, f'Unknown error: {text}', Severity.CRITICAL)
 
-        level: str = found_error.get('text')
+        level: str = found_error.get('level')
         severity: Severity = StringAsSeverity(level).to_severity()
-        return ICLError(error_code, found_error.get('text'), severity)
+        message: str = found_error.get('text')
+        return ICLError(error_code, message, severity)

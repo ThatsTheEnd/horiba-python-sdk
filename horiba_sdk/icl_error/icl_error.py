@@ -18,7 +18,7 @@ class ICLError(AbstractError):
     @override
     def log(self) -> None:
         """Logs the error with the appropriate severity"""
-        logger.log(self._message, self._severity)
+        logger.log(self._severity.name, self._message)
 
     @override
     def message(self) -> str:
