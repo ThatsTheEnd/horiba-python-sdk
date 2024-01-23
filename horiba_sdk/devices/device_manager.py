@@ -67,7 +67,7 @@ class DeviceManager(metaclass=SingletonMeta):
     DeviceManager class manages the lifecycle and interactions with devices.
 
     Attributes:
-        _communicator (horiba_sdk.communication.AbstractCommunicator): The communicator class used to talk to devices.
+        _communicator (horiba_sdk.communication.AbstractCommunicator): The communicator class used to talk to the ICL.
         devices (List[Device]): List of managed devices.
     """
 
@@ -80,9 +80,11 @@ class DeviceManager(metaclass=SingletonMeta):
             websocket_port: str = '25010': websocket port
         """
         self.devices: list['AbstractDevice'] = []
-        self._communicator: WebsocketCommunicator = WebsocketCommunicator(
+        self._icl_communicator: WebsocketCommunicator = WebsocketCommunicator(
             'ws://' + websocket_ip + ':' + str(websocket_port)
         )
+        self._icl_websocket_ip: str = websocket_ip
+        self._icl_websocket_port: str = websocket_port
 
         error_list_path: Path = Path(str(importlib.resources.files('horiba_sdk.icl_error') / 'error_list.json'))
         self._icl_error_db: AbstractErrorDB = ICLErrorDB(error_list_path)
@@ -115,13 +117,13 @@ class DeviceManager(metaclass=SingletonMeta):
         logger.info('Requesting shutdown of ICL...')
 
         command: Command = Command('icl_shutdown', {})
-        await self._communicator.send(command)
-        response: Response = await self._communicator.response()
+        await self._icl_communicator.send(command)
+        response: Response = await self._icl_communicator.response()
 
         if response.errors:
             self.handle_errors(response.errors)
 
-        logger.info('icl shutdown command sent')
+        logger.info('icl_shutdown command sent')
 
         if platform.system() == 'Windows':
             try:
@@ -132,6 +134,11 @@ class DeviceManager(metaclass=SingletonMeta):
                 logger.info("Process 'icl.exe' killed successfully.")
             except subprocess.CalledProcessError as e:
                 logger.error(f"Error: Unable to kill process 'icl.exe' {e}")
+
+        logger.info('ICL is shutdown')
+
+        if self._icl_communicator.opened():
+            await self._icl_communicator.close()
 
     def discover_devices(self) -> None:
         """
@@ -158,6 +165,6 @@ class DeviceManager(metaclass=SingletonMeta):
         Getter method for the communicator attribute.
 
         Returns:
-            horiba_sdk.communication.AbstractCommunicator: Returns the internal communicator instance.
+            horiba_sdk.communication.AbstractCommunicator: Returns a new communicator instance.
         """
-        return self._communicator
+        return WebsocketCommunicator('ws://' + self._icl_websocket_ip + ':' + str(self._icl_websocket_port))
