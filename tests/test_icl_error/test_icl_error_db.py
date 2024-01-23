@@ -29,15 +29,16 @@ def test_icl_error_db_error_from_with_incorrect_string_throws():
         icl_error_db.error_from('incorrect formatted string')
 
 
-def test_icl_error_db_error_from_not_existing_error_throws():
+def test_icl_error_db_error_from_not_existing_error_labeled_unknown():
     # arrange
     error_list_path = importlib.resources.files('horiba_sdk.icl_error') / 'error_list.json'
     icl_error_db = ICLErrorDB(error_list_path)
 
     # act
+    icl_error = icl_error_db.error_from('[E];12345;some error string')
+
     # assert
-    with pytest.raises(Exception, match=re.compile('^Error with number')):
-        icl_error_db.error_from('[E];12345;some error string')
+    assert icl_error.message().startswith('Unknown')
 
 
 def test_icl_error_db_error_from():
