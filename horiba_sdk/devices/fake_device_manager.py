@@ -102,8 +102,7 @@ class FakeDeviceManager(AbstractDeviceManager):
         """
         pass
 
-    @staticmethod
-    def handle_error(error: Exception) -> None:
+    def handle_errors(self, errors: list[str]) -> None:
         """
         Does nothing.
         """

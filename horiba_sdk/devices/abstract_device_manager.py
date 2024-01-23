@@ -33,14 +33,13 @@ class AbstractDeviceManager(ABC):
         """
         pass
 
-    @staticmethod
     @abstractmethod
-    def handle_error(error: Exception) -> None:
+    def handle_errors(self, errors: list[str]) -> None:
         """
         Abstract method that handles errors, logs them, and may take corrective actions.
 
         Args:
-            error (Exception): The exception or error to handle.
+            errors (List[str]): The errors to handle.
         """
         pass
 

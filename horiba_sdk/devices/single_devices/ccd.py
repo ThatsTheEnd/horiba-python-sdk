@@ -31,10 +31,6 @@ class ChargeCoupledDevice(AbstractDevice):
         print(await charge coupled device.is_open)
         await charge coupled device.close()
 
-
-    .. todo:: Handle errors coming from the ICL. There may be more than one, in the format:
-       `"[E];<error code>;<error string>"`
-
     """
 
     def __init__(self, id: int, device_manager: AbstractDeviceManager) -> None:
@@ -63,6 +59,7 @@ class ChargeCoupledDevice(AbstractDevice):
         response = await self._communicator.response()
 
         if response.errors:
+            self._device_manager.handle_errors(response.errors)
             raise Exception(f'ChargeCoupledDevice encountered error: {response.errors}')
         if response.results['count'] == 0:
             raise Exception('No ChargeCoupledDevice connected')
@@ -72,6 +69,7 @@ class ChargeCoupledDevice(AbstractDevice):
         _ignored_response = await self._communicator.response()
 
         if _ignored_response.errors:
+            self._device_manager.handle_errors(_ignored_response.errors)
             raise Exception(f'ChargeCoupledDevice encountered error: {_ignored_response.errors}')
 
     @override
@@ -87,6 +85,7 @@ class ChargeCoupledDevice(AbstractDevice):
         await super().close()
 
         if _ignored_response.errors:
+            self._device_manager.handle_errors(_ignored_response.errors)
             raise Exception(f'ChargeCoupledDevice encountered error: {_ignored_response.errors}')
 
     @property
@@ -100,6 +99,7 @@ class ChargeCoupledDevice(AbstractDevice):
         await self._communicator.send(command)
         response: Response = await self._communicator.response()
         if response.errors:
+            self._device_manager.handle_errors(response.errors)
             raise Exception(f'ChargeCoupledDevice encountered error: {response.errors}')
         logger.debug(f'CCD {self._id} is open: {bool(response.results["open"])}')
         return bool(response.results['open'])
@@ -118,6 +118,7 @@ class ChargeCoupledDevice(AbstractDevice):
         await self._communicator.send(command)
         response: Response = await self._communicator.response()
         if response.errors:
+            self._device_manager.handle_errors(response.errors)
             raise Exception(f'ChargeCoupledDevice encountered error: {response.errors}')
 
         return ureg.Quantity(response.results['temperature'], ureg.degC)  # type: ignore
@@ -136,6 +137,7 @@ class ChargeCoupledDevice(AbstractDevice):
         await self._communicator.send(command)
         response: Response = await self._communicator.response()
         if response.errors:
+            self._device_manager.handle_errors(response.errors)
             raise Exception(f'ChargeCoupledDevice encountered error: {response.errors}')
 
         width: int = response.results['x']
@@ -157,6 +159,7 @@ class ChargeCoupledDevice(AbstractDevice):
         await self._communicator.send(command)
         response: Response = await self._communicator.response()
         if response.errors:
+            self._device_manager.handle_errors(response.errors)
             raise Exception(f'ChargeCoupledDevice encountered error: {response.errors}')
 
         return ureg(response.results['info'])
@@ -173,6 +176,7 @@ class ChargeCoupledDevice(AbstractDevice):
         await self._communicator.send(command)
         response: Response = await self._communicator.response()
         if response.errors:
+            self._device_manager.handle_errors(response.errors)
             raise Exception(f'ChargeCoupledDevice encountered error: {response.errors}')
 
         exposure = ureg.Quantity(response.results['time'], 'ms')
@@ -191,6 +195,7 @@ class ChargeCoupledDevice(AbstractDevice):
         await self._communicator.send(command)
         response: Response = await self._communicator.response()
         if response.errors:
+            self._device_manager.handle_errors(response.errors)
             raise Exception(f'ChargeCoupledDevice encountered error: {response.errors}')
 
     async def set_acquisition_start(self) -> None:
@@ -202,4 +207,5 @@ class ChargeCoupledDevice(AbstractDevice):
         await self._communicator.send(command)
         response: Response = await self._communicator.response()
         if response.errors:
+            self._device_manager.handle_errors(response.errors)
             raise Exception(f'ChargeCoupledDevice encountered error: {response.errors}')

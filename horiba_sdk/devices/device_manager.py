@@ -30,14 +30,19 @@ For more details on the TYPE_CHECKING constant and its usage, refer to:
 https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING
 """
 
+import importlib.resources
 import platform
 import subprocess
-from typing import TYPE_CHECKING
+from pathlib import Path
+from typing import TYPE_CHECKING, final
 
 import psutil
 from loguru import logger
 
 from horiba_sdk.communication import AbstractCommunicator, WebsocketCommunicator
+from horiba_sdk.icl_error.abstract_error import AbstractError
+from horiba_sdk.icl_error.abstract_error_db import AbstractErrorDB
+from horiba_sdk.icl_error.icl_error_db import ICLErrorDB
 
 if TYPE_CHECKING:
     from horiba_sdk.devices.single_devices import AbstractDevice
@@ -56,6 +61,7 @@ class SingletonMeta(type):
         return cls._instances[cls]
 
 
+@final
 class DeviceManager(metaclass=SingletonMeta):
     """
     DeviceManager class manages the lifecycle and interactions with devices.
@@ -77,6 +83,10 @@ class DeviceManager(metaclass=SingletonMeta):
         self._communicator: WebsocketCommunicator = WebsocketCommunicator(
             'ws://' + websocket_ip + ':' + str(websocket_port)
         )
+
+        error_list_path: Path = Path(str(importlib.resources.files('horiba_sdk.icl_error') / 'error_list.json'))
+        self._icl_error_db: AbstractErrorDB = ICLErrorDB(error_list_path)
+
         logger.debug(f'Start ICL: {start_icl}')
         if start_icl:
             self.start_icl()
@@ -112,15 +122,16 @@ class DeviceManager(metaclass=SingletonMeta):
         # Placeholder implementation for discovering devices
         pass
 
-    @staticmethod
-    def handle_error(error: Exception) -> None:
+    def handle_errors(self, errors: list[str]) -> None:
         """
         Handles errors, logs them, and may take corrective actions.
 
         Args:
             error (Exception): The exception or error to handle.
         """
-        logger.error('Unexpected error: %s', error)
+        for error in errors:
+            icl_error: AbstractError = self._icl_error_db.error_from(error)
+            icl_error.log()
 
     @property
     def communicator(self) -> AbstractCommunicator:
