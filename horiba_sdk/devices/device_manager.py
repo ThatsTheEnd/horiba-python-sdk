@@ -34,12 +34,14 @@ import importlib.resources
 import platform
 import subprocess
 from pathlib import Path
-from typing import TYPE_CHECKING, final
+from typing import TYPE_CHECKING, Any, Callable, Dict, Type, final
 
 import psutil
 from loguru import logger
+from mypy_extensions import KwArg, VarArg
 
 from horiba_sdk.communication import AbstractCommunicator, Command, Response, WebsocketCommunicator
+from horiba_sdk.devices.abstract_device_manager import AbstractDeviceManager
 from horiba_sdk.icl_error.abstract_error import AbstractError
 from horiba_sdk.icl_error.abstract_error_db import AbstractErrorDB
 from horiba_sdk.icl_error.icl_error_db import ICLErrorDB
@@ -48,21 +50,24 @@ if TYPE_CHECKING:
     from horiba_sdk.devices.single_devices import AbstractDevice
 
 
-class SingletonMeta(type):
+def singleton(cls: Type[Any]) -> Callable[[VarArg(Any), KwArg(Any)], Any]:
     """
-    Metaclass to implement the Singleton pattern.
+    Decorator to implement the Singleton pattern.
     """
 
-    _instances: dict[type, 'SingletonMeta'] = {}
+    _instances: Dict[Type[Any], Any] = {}
 
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super().__call__(*args, **kwargs)
-        return cls._instances[cls]
+    def get_instance(*args, **kwargs):
+        if cls not in _instances:
+            _instances[cls] = cls(*args, **kwargs)
+        return _instances[cls]
+
+    return get_instance
 
 
 @final
-class DeviceManager(metaclass=SingletonMeta):
+@singleton
+class DeviceManager(AbstractDeviceManager):
     """
     DeviceManager class manages the lifecycle and interactions with devices.
 
@@ -93,8 +98,7 @@ class DeviceManager(metaclass=SingletonMeta):
         if start_icl:
             self.start_icl()
 
-    @staticmethod
-    def start_icl() -> None:
+    def start_icl(self) -> None:
         """
         Starts the ICL software and establishes communication.
         """
@@ -126,22 +130,10 @@ class DeviceManager(metaclass=SingletonMeta):
         if response.errors:
             self.handle_errors(response.errors)
 
-        logger.info('icl_shutdown command sent')
-
-        if platform.system() == 'Windows':
-            try:
-                icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
-                if not icl_running:
-                    return
-                subprocess.run(['taskkill', '/F', '/IM', 'icl.exe'], check=True)
-                logger.info("Process 'icl.exe' killed successfully.")
-            except subprocess.CalledProcessError as e:
-                logger.error(f"Error: Unable to kill process 'icl.exe' {e}")
-
-        logger.info('ICL is shutdown')
-
         if self._icl_communicator.opened():
             await self._icl_communicator.close()
+
+        logger.info('icl_shutdown command sent')
 
     def discover_devices(self) -> None:
         """

@@ -17,8 +17,8 @@ class AbstractDevice(ABC):
         _device_manager (DeviceManager):
     """
 
-    def __init__(self, id: int, device_manager: AbstractDeviceManager) -> None:
-        self._id: int = id
+    def __init__(self, device_id: int, device_manager: AbstractDeviceManager) -> None:
+        self._id: int = device_id
         self._device_manager: AbstractDeviceManager = device_manager
         self._communicator: AbstractCommunicator = device_manager.communicator
 

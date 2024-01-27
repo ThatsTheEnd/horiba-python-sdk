@@ -33,8 +33,8 @@ class ChargeCoupledDevice(AbstractDevice):
 
     """
 
-    def __init__(self, id: int, device_manager: AbstractDeviceManager) -> None:
-        super().__init__(id, device_manager)
+    def __init__(self, ccd_id: int, device_manager: AbstractDeviceManager) -> None:
+        super().__init__(ccd_id, device_manager)
 
     async def __aenter__(self) -> 'ChargeCoupledDevice':
         await self.open()
@@ -123,15 +123,14 @@ class ChargeCoupledDevice(AbstractDevice):
 
         return ureg.Quantity(response.results['temperature'], ureg.degC)  # type: ignore
 
-    @property
-    async def resolution(self) -> Resolution:
+    async def get_resolution(self) -> Resolution:
         """Chip resolution of the CCD.
 
         Returns:
             Resolution: chip resolution (width, height)
 
         Raises:
-            Exception: When an error occured on the device side
+            Exception: When an error occurred on the device side
         """
         command = Command('ccd_getChipSize', {'index': self._id})
         await self._communicator.send(command)
@@ -143,6 +142,7 @@ class ChargeCoupledDevice(AbstractDevice):
         width: int = response.results['x']
         height: int = response.results['y']
         resolution: Resolution = Resolution(width, height)
+        logger.debug(f'CCD {self._id} resolution: {resolution.width} x {resolution.height}')
         return resolution
 
     @property
@@ -203,7 +203,8 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occured on the device side
         """
-        command = Command('ccd_setAcquisitionStart', {'index': self._id})
+        # command = Command('ccd_setAcquisitionStart', {'index': self._id})
+        command = Command('ccd_setAcquisitionStart', {'index': self._id, 'openShutter': True})
         await self._communicator.send(command)
         response: Response = await self._communicator.response()
         if response.errors:

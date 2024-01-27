@@ -55,7 +55,7 @@ async def test_ccd_resolution(fake_device_manager, _run_fake_icl_server):
     # act
     async with ChargeCoupledDevice(0, fake_device_manager) as ccd:
         # assert
-        resolution = await ccd.resolution
+        resolution = await ccd.get_resolution()
         assert resolution.width > 0 and resolution.height > 0
 
 

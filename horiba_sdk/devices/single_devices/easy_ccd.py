@@ -52,7 +52,7 @@ class EasyCCD:
         Returns:
             Resolution: The resolution of the CCD.
         """
-        return asyncio.run(self.ccd.resolution)
+        return asyncio.run(self.ccd.get_resolution())
 
     def get_exposure_time(self):
         """
@@ -63,17 +63,17 @@ class EasyCCD:
         """
         return asyncio.run(self.ccd.get_exposure_time())
 
-    def set_exposure_time(self, time):
+    def set_exposure_time(self, exposure_time_ms):
         """
-        Sets the exposure time of the CCD.
+        Sets the exposure time [ms] of the CCD.
 
         Args:
-            time (float): The exposure time to set.
+            exposure_time_ms (int): The exposure time in [ms] to set.
 
         Returns:
             None
         """
-        return asyncio.run(self.ccd.set_exposure_time(time))
+        return asyncio.run(self.ccd.set_exposure_time(exposure_time_ms))
 
     def set_acquisition_start(self):
         """

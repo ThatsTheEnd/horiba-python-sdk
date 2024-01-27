@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any
 
 from horiba_sdk.communication import AbstractCommunicator
 
@@ -20,7 +21,7 @@ class AbstractDeviceManager(ABC):
         pass
 
     @abstractmethod
-    def stop_icl(self) -> None:
+    def stop_icl(self) -> Any:
         """
         Abstract method that stops the communication and cleans up resources.
         """

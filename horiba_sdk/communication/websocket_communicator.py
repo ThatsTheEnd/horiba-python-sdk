@@ -65,6 +65,7 @@ class WebsocketCommunicator(AbstractCommunicator):
         except websockets.WebSocketException as e:
             raise CommunicationException(None, 'websocket connection issue') from e
 
+        logger.debug(f'Websocket connection established to {self.uri}')
         self.listen_task = asyncio.create_task(self._receive_binary_data())
 
     @override
@@ -84,6 +85,7 @@ class WebsocketCommunicator(AbstractCommunicator):
 
         try:
             # mypy cannot infer the check from self.opened() done above
+            logger.debug(f'Sending JSON command: {command.json()}')
             await self.websocket.send(command.json())  # type: ignore
         except websockets.exceptions.ConnectionClosed as e:
             raise CommunicationException(None, 'Trying to send data while websocket is closed') from e
@@ -110,6 +112,7 @@ class WebsocketCommunicator(AbstractCommunicator):
         """
         try:
             response: str = await self.json_message_queue.get()
+            logger.debug(f'Received JSON response: {response}')
             return JSONResponse(response)
         except asyncio.CancelledError as e:
             raise CommunicationException(None, 'Response reception was canceled') from e
@@ -127,6 +130,7 @@ class WebsocketCommunicator(AbstractCommunicator):
         """
         try:
             response: bytes = await self.binary_message_queue.get()
+            logger.debug(f'Received binary response: {response!r}')
             return BinaryResponse(response)
         except asyncio.CancelledError as e:
             raise CommunicationException(None, 'Response reception was canceled') from e
@@ -142,12 +146,17 @@ class WebsocketCommunicator(AbstractCommunicator):
         if not self.opened():
             raise CommunicationException(None, 'cannot close already closed websocket')
         if self.websocket:
+            logger.debug('Waiting websocket close...')
             await self.websocket.close()
             self.websocket = None
         if self.listen_task:
+            logger.debug('Canceling listening task...')
             self.listen_task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
+                logger.debug('Await listening task...')
                 await self.listen_task
+
+        logger.debug('Websocket connection closed')
 
     async def _receive_data(self) -> None:
         try:
