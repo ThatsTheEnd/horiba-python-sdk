@@ -97,28 +97,19 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side
         """
-        command = Command('ccd_close', {'index': self._id})
-        await self._communicator.send(command)
-        _ignored_response = await self._communicator.response()
+        await self._execute_command('ccd_close', {'index': self._id})
         await super().close()
-        self._handle_response_errors(_ignored_response, 'ChargeCoupledDevice_close()')
 
-    @property
     async def is_open(self) -> bool:
         """Checks if the connection to the charge coupled device is open.
 
         Raises:
             Exception: When an error occurred on the device side
         """
-        command = Command('ccd_isOpen', {'index': self._id})
-        await self._communicator.send(command)
-        response: Response = await self._communicator.response()
-        self._handle_response_errors(response, 'ChargeCoupledDevice_is_open()')
-        logger.debug(f'CCD {self._id} is open: {bool(response.results["open"])}')
+        response: Response = await self._execute_command('ccd_isOpen', {'index': self._id})
         return bool(response.results['open'])
 
-    @property
-    async def temperature(self) -> pint.Quantity:
+    async def get_temperature(self) -> pint.Quantity:
         """Chip temperature of the CCD.
 
         Returns:
@@ -127,10 +118,7 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side
         """
-        command = Command('ccd_getChipTemperature', {'index': self._id})
-        await self._communicator.send(command)
-        response: Response = await self._communicator.response()
-        self._handle_response_errors(response, 'ChargeCoupledDevice_temperature()')
+        response: Response = await self._execute_command('ccd_getChipTemperature', {'index': self._id})
         return ureg.Quantity(response.results['temperature'], ureg.degC)  # type: ignore
 
     async def get_get_chip_size(self) -> Resolution:
@@ -148,20 +136,16 @@ class ChargeCoupledDevice(AbstractDevice):
         resolution: Resolution = Resolution(width, height)
         return resolution
 
-    @property
-    async def speed(self) -> Union[pint.Quantity, None]:
+    async def get_speed(self) -> Union[pint.Quantity, None]:
         """Chip transfer speed in kHz
 
         Returns:
-            pint.Quantity: Transfer speed in kilo Herz
+            pint.Quantity: Transfer speed in kilo Hertz
 
         Raises:
-            Exception: When an error occured on the device side
+            Exception: When an error occurred on the device side
         """
-        command = Command('ccd_getSpeed', {'index': self._id})
-        await self._communicator.send(command)
-        response: Response = await self._communicator.response()
-        self._handle_response_errors(response, 'ChargeCoupledDevice_speed()')
+        response: Response = await self._execute_command('ccd_getSpeed', {'index': self._id})
         return ureg(response.results['info'])
 
     async def get_exposure_time(self) -> Union[pint.Quantity, None]:
@@ -172,10 +156,7 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side
         """
-        command = Command('ccd_getExposureTime', {'index': self._id})
-        await self._communicator.send(command)
-        response: Response = await self._communicator.response()
-        self._handle_response_errors(response, 'ChargeCoupledDevice_get_exposure_time()')
+        response: Response = await self._execute_command('ccd_getExposureTime', {'index': self._id})
         exposure = ureg.Quantity(response.results['time'], 'ms')
         return exposure
 
@@ -232,20 +213,17 @@ class ChargeCoupledDevice(AbstractDevice):
                                      'yBin': y_bin})
 
     async def get_acquisition_data(self) -> dict:
-        """Returns the acquisition data of the CCD"""
-        command = Command('ccd_getAcquisitionData', {'index': self._id})
-        await self._communicator.send(command)
-        response: Response = await self._communicator.response()
-        self._handle_response_errors(response, 'ChargeCoupledDevice_get_acquisition_data()')
+        """Returns the acquisition data of the CCD
+        ToDo: atm this returns data still formatted for telnet communication, not formatted as json"""
+        response: Response = await self._execute_command('ccd_getAcquisitionData', {'index': self._id})
         return response.results
 
     async def get_acquisition_busy(self) -> bool:
         """Returns true if the CCD is busy with the acquisition"""
-        command = Command('ccd_getAcquisitionBusy', {'index': self._id})
-        await self._communicator.send(command)
-        response: Response = await self._communicator.response()
+        response: Response = await self._execute_command('ccd_getAcquisitionBusy', {'index': self._id})
         return bool(response.results['isBusy'])
 
+    @staticmethod
     def _get_caller_name(self) -> str:
         # Get the current call stack
         stack: List[inspect.FrameInfo] = inspect.stack()
@@ -253,9 +231,8 @@ class ChargeCoupledDevice(AbstractDevice):
         if len(stack) < 3:
             return 'Unknown'  # Not enough depth to have a caller
         # The caller is two frames up:
-        # - index 0 is this function
-        # - index 1 is the function that called this function (get_caller_name)
-        # - index 2 is the actual caller
+        # - index 0 is this function (stack) - index 1 is the function that called this function (get_caller_name)
+        # - index 2 is the _execute_command caller - index 3 is the caller of _execute_command
         caller_frame: inspect.FrameInfo = stack[3]
         # Get the name of the caller function from the frame
         caller_name: str = caller_frame.function
@@ -264,4 +241,4 @@ class ChargeCoupledDevice(AbstractDevice):
     def _handle_response_errors(self, response, param):
         if response.errors:
             self._device_manager.handle_errors(response.errors)
-            raise Exception(f'{self._get_caller_name()} encountered error: {response.errors}')
+            raise Exception(f'{self._get_caller_name(self)} encountered error: {response.errors}')

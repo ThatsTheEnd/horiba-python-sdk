@@ -26,6 +26,7 @@ async def main():
         await ccd.get_exposure_time()
         await ccd.set_exposure_time(random.randint(1000, 5000))
         await ccd.get_exposure_time()
+        await ccd.get_temperature()
         await ccd.set_region_of_interest()  # Set default ROI
         if await ccd.get_acquisition_ready():
             await ccd.set_acquisition_start(open_shutter=False)
@@ -38,6 +39,7 @@ async def main():
                 logger.info("Acquisition busy")
 
             await ccd.get_acquisition_data()
+        await ccd.get_speed()
     finally:
         await ccd.close()
 

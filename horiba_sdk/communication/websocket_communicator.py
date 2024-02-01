@@ -113,7 +113,6 @@ class WebsocketCommunicator(AbstractCommunicator):
         """
         try:
             response: str = await self.json_message_queue.get()
-            logger.debug(f'Received JSON response: {response}')
             return JSONResponse(response)
         except asyncio.CancelledError as e:
             raise CommunicationException(None, 'Response reception was canceled') from e
