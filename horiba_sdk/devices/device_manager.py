@@ -72,7 +72,7 @@ class DeviceManager(AbstractDeviceManager):
     DeviceManager class manages the lifecycle and interactions with devices.
 
     Attributes:
-        _communicator (horiba_sdk.communication.AbstractCommunicator): The communicator class used to talk to the ICL.
+        _icl_communicator (horiba_sdk.communication.AbstractCommunicator): The communicator class used to talk to the ICL.
         devices (List[Device]): List of managed devices.
     """
 

@@ -7,18 +7,12 @@ from horiba_sdk.devices.device_manager import DeviceManager
 from horiba_sdk.devices.single_devices.ccd import ChargeCoupledDevice
 
 
-async def binary_message_handler(message: bytes):
-    # Process the binary message here
-    logger.warning(f"Received binary message: {message}")
-
-
 async def main():
     device_manager = DeviceManager(start_icl=False)
     # Register the binary message handler as the callback for incoming binary messages
 
     ccd = ChargeCoupledDevice(1, device_manager)
     await ccd.open()
-    device_manager.communicator.register_binary_message_callback(binary_message_handler)
 
     try:
         await ccd.do_enable_binary_message()

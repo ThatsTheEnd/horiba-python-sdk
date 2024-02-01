@@ -3,7 +3,6 @@ from typing import List, Optional, Union, final
 
 import inspect
 import pint
-from loguru import logger
 from overrides import override
 
 from horiba_sdk import ureg
@@ -224,7 +223,7 @@ class ChargeCoupledDevice(AbstractDevice):
         return bool(response.results['isBusy'])
 
     @staticmethod
-    def _get_caller_name(self) -> str:
+    def _get_caller_name() -> str:
         # Get the current call stack
         stack: List[inspect.FrameInfo] = inspect.stack()
         # Check if the call stack has enough depth
@@ -237,8 +236,3 @@ class ChargeCoupledDevice(AbstractDevice):
         # Get the name of the caller function from the frame
         caller_name: str = caller_frame.function
         return caller_name
-
-    def _handle_response_errors(self, response, param):
-        if response.errors:
-            self._device_manager.handle_errors(response.errors)
-            raise Exception(f'{self._get_caller_name(self)} encountered error: {response.errors}')
