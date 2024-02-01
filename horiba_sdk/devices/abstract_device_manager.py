@@ -12,6 +12,8 @@ class AbstractDeviceManager(ABC):
         _communicator (AbstractCommunicator): The communicator class used to talk to devices.
         devices (List[Device]): List of managed devices.
     """
+    def __init__(self):
+        self.binary_messages_enabled: bool = False
 
     @abstractmethod
     def start_icl(self) -> None:

@@ -84,6 +84,7 @@ class DeviceManager(AbstractDeviceManager):
             websocket_ip: str = '127.0.0.1': websocket IP
             websocket_port: str = '25010': websocket port
         """
+        super().__init__()
         self.devices: list['AbstractDevice'] = []
         self._icl_communicator: WebsocketCommunicator = WebsocketCommunicator(
             'ws://' + websocket_ip + ':' + str(websocket_port)
@@ -94,20 +95,21 @@ class DeviceManager(AbstractDeviceManager):
         error_list_path: Path = Path(str(importlib.resources.files('horiba_sdk.icl_error') / 'error_list.json'))
         self._icl_error_db: AbstractErrorDB = ICLErrorDB(error_list_path)
 
-        logger.debug(f'Start ICL: {start_icl}')
+        logger.info(f'Start ICL: {start_icl}')
         if start_icl:
             self.start_icl()
+        logger.debug('Do NOT forget to enable binary messages in the ICL software!')
 
     def start_icl(self) -> None:
         """
         Starts the ICL software and establishes communication.
         """
-        logger.debug('Starting ICL software...')
+        logger.info('Starting ICL software...')
         try:
             if platform.system() == 'Windows':
                 icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
                 if not icl_running:
-                    logger.debug('icl not running, starting it...')
+                    logger.info('icl not running, starting it...')
                     subprocess.Popen([r'C:\Program Files\HORIBA Scientific\SDK\icl.exe'])
         except subprocess.CalledProcessError:
             logger.error('Failed to start ICL software.')
@@ -148,7 +150,7 @@ class DeviceManager(AbstractDeviceManager):
         Handles errors, logs them, and may take corrective actions.
 
         Args:
-            error (Exception): The exception or error to handle.
+            errors (Exception): The exception or error to handle.
         """
         for error in errors:
             icl_error: AbstractError = self._icl_error_db.error_from(error)

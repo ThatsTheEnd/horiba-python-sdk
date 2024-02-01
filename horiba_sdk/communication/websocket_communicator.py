@@ -1,7 +1,7 @@
 import asyncio
 import contextlib
 from types import TracebackType
-from typing import Any, Optional, final
+from typing import Any, Optional, final, Callable
 
 import websockets
 from loguru import logger
@@ -38,6 +38,7 @@ class WebsocketCommunicator(AbstractCommunicator):
         self.listen_task: Optional[asyncio.Task[Any]] = None
         self.json_message_queue: asyncio.Queue[str] = asyncio.Queue()
         self.binary_message_queue: asyncio.Queue[bytes] = asyncio.Queue()
+        self.binary_message_callback: Optional[Callable[[bytes], Any]] = None
 
     async def __aenter__(self) -> 'WebsocketCommunicator':
         await self.open()
@@ -158,14 +159,23 @@ class WebsocketCommunicator(AbstractCommunicator):
 
         logger.debug('Websocket connection closed')
 
+    def register_binary_message_callback(self, callback: Callable[[bytes], Any]) -> None:
+        """Registers a callback to be called with every incoming binary message."""
+        logger.info("Binary message callback registered.")
+        self.binary_message_callback = callback
+
     async def _receive_data(self) -> None:
         try:
             while True:
                 message = await self.websocket.recv()  # type: ignore
+                logger.info(f'Received message: {message}')
                 if isinstance(message, str):
                     await self.json_message_queue.put(message)
                 elif isinstance(message, bytes):
                     await self.binary_message_queue.put(message)
+                    logger.debug(f"Callback before if statement: {self.binary_message_callback}")
+                    if self.binary_message_callback:
+                        await asyncio.create_task(self.binary_message_callback(message))  # Call the callback
                 else:
                     raise CommunicationException(None, f'Unknown type of message {type(message)}')
         except websockets.ConnectionClosedOK:
