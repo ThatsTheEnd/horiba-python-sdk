@@ -186,3 +186,23 @@ class WebsocketCommunicator(AbstractCommunicator):
 
     async def _receive_binary_data(self) -> None:
         await self._receive_data()
+
+    async def execute_command(self, command_name: str, parameters: dict) -> Response:
+        """
+        Creates a command from the command name, and it's parameters
+        Executes a command and handles the response.
+
+        Args:
+            command_name (str): The name of the command to execute.
+            parameters (dict): The parameters for the command.
+
+        Returns:
+            Response: The response from the device.
+
+        Raises:
+            Exception: When an error occurred on the device side.
+        """
+        command = Command(command_name, parameters)  # create command
+        await self.send(command)  # send command
+        response = await self.response()  # get response
+        return response

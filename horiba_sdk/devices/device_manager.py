@@ -85,6 +85,8 @@ class DeviceManager(AbstractDeviceManager):
             websocket_port: str = '25010': websocket port
         """
         super().__init__()
+        self.ccd_list: dict[int, 'str'] = {}
+        self.mono_list: dict[int, 'str'] = {}
         self.devices: list['AbstractDevice'] = []
         self._icl_communicator: WebsocketCommunicator = WebsocketCommunicator(
             'ws://' + websocket_ip + ':' + str(websocket_port)
@@ -137,13 +139,22 @@ class DeviceManager(AbstractDeviceManager):
 
         logger.info('icl_shutdown command sent')
 
-    def discover_devices(self) -> None:
+    async def discover_devices(self, error_on_no_device: bool = False) -> None:
         """
-        Discovers and registers devices.
-        (This is a placeholder and will need a proper implementation.)
+        Discovers the connected devices and saves them internally.
+        Args:
+            error_on_no_device (bool): If True, an exception is raised if no device is connected.
         """
-        # Placeholder implementation for discovering devices
-        pass
+        # repeat the following lines of code for each device type: mono and ccd
+        # nina
+        response: Response = await self._icl_communicator.execute_command('ccd_discover', {})
+        if response.results['count'] == 0 and error_on_no_device:
+            raise Exception('No ChargeCoupledDevice connected')
+        response: Response = await self._icl_communicator.execute_command('ccd_list', {})
+        # The response is a dictionary with the entries as strings. This has to be converted to a list of strings
+        # and saved internally in the class as well as returned to the caller
+        self.ccd_list = list(response.results.values())
+        logger.info(f'Found {len(self.ccd_list)} CCD devices: {self.ccd_list}')
 
     def handle_errors(self, errors: list[str]) -> None:
         """
@@ -164,4 +175,4 @@ class DeviceManager(AbstractDeviceManager):
         Returns:
             horiba_sdk.communication.AbstractCommunicator: Returns a new communicator instance.
         """
-        return WebsocketCommunicator('ws://' + self._icl_websocket_ip + ':' + str(self._icl_websocket_port))
+        return self._icl_communicator

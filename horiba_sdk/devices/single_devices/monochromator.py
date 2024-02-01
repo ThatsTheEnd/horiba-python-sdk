@@ -34,8 +34,8 @@ class Monochromator(AbstractDevice):
 
     """
 
-    def __init__(self, id: int, device_manager: AbstractDeviceManager) -> None:
-        super().__init__(id, device_manager)
+    def __init__(self, device_manager: AbstractDeviceManager) -> None:
+        super().__init__(device_manager)
 
     async def __aenter__(self) -> 'Monochromator':
         await self.open()
@@ -47,13 +47,13 @@ class Monochromator(AbstractDevice):
         await self.close()
 
     @override
-    async def open(self) -> None:
+    async def open(self, device_id: int) -> None:
         """Opens the connection to the Monochromator
 
         Raises:
             Exception: When an error occured on the device side
         """
-        await super().open()
+        await super().open(device_id)
 
         command = Command('mono_discover', {})
         await self._communicator.send(command)

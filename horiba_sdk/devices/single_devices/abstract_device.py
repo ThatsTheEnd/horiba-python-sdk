@@ -17,19 +17,20 @@ class AbstractDevice(ABC):
         _device_manager (DeviceManager):
     """
 
-    def __init__(self, device_id: int, device_manager: AbstractDeviceManager) -> None:
-        self._id: int = device_id
+    def __init__(self, device_manager: AbstractDeviceManager) -> None:
+        self._id: int = -1
         self._device_manager: AbstractDeviceManager = device_manager
         self._communicator: AbstractCommunicator = device_manager.communicator
 
     @abstractmethod
-    async def open(self) -> None:
+    async def open(self, device_id: int) -> None:
         """
         Open a connection to the device.
 
         Returns:
             Result: Result object indicating success or failure.
         """
+        self._id = device_id
         if not self._communicator.opened():
             await self._communicator.open()
 

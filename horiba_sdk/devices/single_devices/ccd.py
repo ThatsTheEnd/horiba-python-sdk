@@ -33,8 +33,9 @@ class ChargeCoupledDevice(AbstractDevice):
 
     """
 
-    def __init__(self, ccd_id: int, device_manager: AbstractDeviceManager) -> None:
-        super().__init__(ccd_id, device_manager)
+    def __init__(self, device_manager: AbstractDeviceManager) -> None:
+        super().__init__(device_manager)
+        self.device_list: list[str] = []
 
     async def __aenter__(self) -> 'ChargeCoupledDevice':
         await self.open()
@@ -60,6 +61,7 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side.
         """
+        # nina: this has to be refactored to a call to the communicator and the error handling then here
         command = Command(command_name, parameters)  # create command
         await self._communicator.send(command)  # send command
         response = await self._communicator.response()  # get response
@@ -69,7 +71,7 @@ class ChargeCoupledDevice(AbstractDevice):
         return response
 
     @override
-    async def open(self) -> None:
+    async def open(self, device_id: int) -> None:
         """Opens the connection to the Charge Coupled Device
         and also sends the command to enable binary messages.
         This is necessary because atm the measurement results
@@ -78,10 +80,7 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side
         """
-        await super().open()
-        response: Response = await self._execute_command('ccd_discover', {})
-        if response.results['count'] == 0:
-            raise Exception('No ChargeCoupledDevice connected')
+        await super().open(device_id)
         await self._execute_command('ccd_open', {'index': self._id})
 
     async def do_enable_binary_message(self) -> None:
