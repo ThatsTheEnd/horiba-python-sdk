@@ -28,7 +28,7 @@ async def main():
         await ccd.get_exposure_time()
         await ccd.set_region_of_interest()  # Set default ROI
         if await ccd.get_acquisition_ready():
-            await ccd.set_acquisition_start()
+            await ccd.set_acquisition_start(open_shutter=False)
             time.sleep(1)  # Wait a short period for the acquisition to start
             # Poll for acquisition status
             acquisition_busy = True

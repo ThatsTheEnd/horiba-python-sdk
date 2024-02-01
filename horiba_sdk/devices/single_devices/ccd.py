@@ -1,6 +1,7 @@
 from types import TracebackType
-from typing import Optional, Union, final
+from typing import List, Optional, Union, final
 
+import inspect
 import pint
 from loguru import logger
 from overrides import override
@@ -45,13 +46,14 @@ class ChargeCoupledDevice(AbstractDevice):
     ) -> None:
         await self.close()
 
-    async def _execute_command(self, command_name: str, parameters: dict, context_message: str) -> Response:
-        """Executes a command and handles the response.
+    async def _execute_command(self, command_name: str, parameters: dict) -> Response:
+        """
+        Creates a command from the command name, and it's parameters
+        Executes a command and handles the response.
 
         Args:
             command_name (str): The name of the command to execute.
             parameters (dict): The parameters for the command.
-            context_message (str): Context message for potential errors.
 
         Returns:
             Response: The response from the device.
@@ -59,12 +61,12 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side.
         """
-        command = Command(command_name, parameters)
-        await self._communicator.send(command)
-        response = await self._communicator.response()
-        if response.errors:
+        command = Command(command_name, parameters)  # create command
+        await self._communicator.send(command)  # send command
+        response = await self._communicator.response()  # get response
+        if response.errors:  # handle errors
             self._device_manager.handle_errors(response.errors)
-            raise Exception(f'{context_message} encountered error: {response.errors}')
+            raise Exception(f'{self._get_caller_name()} encountered error: {response.errors}')
         return response
 
     @override
@@ -78,27 +80,15 @@ class ChargeCoupledDevice(AbstractDevice):
             Exception: When an error occurred on the device side
         """
         await super().open()
-        command = Command('ccd_discover', {})
-        await self._communicator.send(command)
-        response = await self._communicator.response()
-        self._handle_response_errors(response, 'ChargeCoupledDevice_open()')
-        await self._execute_command('ccd_discover',{}, 'ChargeCoupledDevice_open()')
-
+        response: Response = await self._execute_command('ccd_discover', {})
         if response.results['count'] == 0:
             raise Exception('No ChargeCoupledDevice connected')
-
-        command = Command('ccd_open', {'index': self._id})
-        await self._communicator.send(command)
-        _ignored_response = await self._communicator.response()
-        self._handle_response_errors(_ignored_response, 'ChargeCoupledDevice_open()')
+        await self._execute_command('ccd_open', {'index': self._id})
 
     async def do_enable_binary_message(self) -> None:
         """Requests the ICL to include binary messages into the communication
         """
-        command = Command('icl_binMode', {'mode': 'all'})
-        await self._communicator.send(command)
-        response = await self._communicator.response()
-        self._handle_response_errors(response, 'ChargeCoupledDevice_enable_binary_message()')
+        await self._execute_command('icl_binMode', {'mode': 'all'})
 
     @override
     async def close(self) -> None:
@@ -152,10 +142,7 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side
         """
-        command = Command('ccd_getChipSize', {'index': self._id})
-        await self._communicator.send(command)
-        response: Response = await self._communicator.response()
-        self._handle_response_errors(response, 'ChargeCoupledDevice_get_chip_size()')
+        response: Response = await self._execute_command('ccd_getChipSize', {'index': self._id})
         width: int = response.results['x']
         height: int = response.results['y']
         resolution: Resolution = Resolution(width, height)
@@ -183,7 +170,7 @@ class ChargeCoupledDevice(AbstractDevice):
         Returns:
             pint.Quantity: Exposure time in ms
         Raises:
-            Exception: When an error occured on the device side
+            Exception: When an error occurred on the device side
         """
         command = Command('ccd_getExposureTime', {'index': self._id})
         await self._communicator.send(command)
@@ -198,12 +185,11 @@ class ChargeCoupledDevice(AbstractDevice):
         Args:
             exposure_time_ms (int): Exposure time in ms
         Raises:
-            Exception: When an error occured on the device side
+            Exception: When an error occurred on the device side
         """
-        command = Command('ccd_setExposureTime', {'index': self._id, 'time': exposure_time_ms})
-        await self._communicator.send(command)
-        response: Response = await self._communicator.response()
-        self._handle_response_errors(response, 'ChargeCoupledDevice_set_exposure_time()')
+
+        await self._execute_command('ccd_setExposureTime',
+                                    {'index': self._id, 'time': exposure_time_ms})
 
     async def get_acquisition_ready(self) -> bool:
         """Returns true if the CCD is ready to acquire
@@ -213,40 +199,20 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side
         """
-        command = Command('ccd_getAcquisitionReady', {'index': self._id})
-        await self._communicator.send(command)
-        response: Response = await self._communicator.response()
-        self._handle_response_errors(response, 'ChargeCoupledDevice_get_acquisition_ready()')
+        response: Response = await self._execute_command('ccd_getAcquisitionReady', {'index': self._id})
         return bool(response.results['size'])
 
-    async def set_acquisition_start(self) -> None:
+    async def set_acquisition_start(self, open_shutter) -> None:
         """Starts the acquisition of the CCD
         Raises:
             Exception: When an error occurred on the device side
         """
-        # command = Command('ccd_setAcquisitionStart', {'index': self._id})
-        command = Command('ccd_setAcquisitionStart', {'index': self._id, 'openShutter': True})
-        await self._communicator.send(command)
-        response: Response = await self._communicator.response()
-        self._handle_response_errors(response, 'ChargeCoupledDevice_set_acquisition_start()')
+        await self._execute_command('ccd_setAcquisitionStart', {'index': self._id, 'openShutter': open_shutter})
 
     async def set_region_of_interest(self, roi_index: int = 1, x_origin: int = 0, y_origin: int = 0, x_size: int = 1024,
                                      y_size: int = 256, x_bin: int = 1, y_bin: int = 256) -> None:
         """Sets the region of interest of the CCD
         an example json command looks like this:
-        {
-        "command": "ccd_setRoi",
-        "parameters": {
-            "index": 1,
-            "roiIndex": 1,
-            "xOrigin":0,
-            "yOrigin":0,
-            "xSize":1024,
-            "ySize":256,
-            "xBin":1,
-            "yBin":256
-            }
-        }
 
         Args:
             roi_index (int, optional): Index of the region of interest. Defaults to 1.
@@ -260,12 +226,10 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side
         """
-        command = Command('ccd_setRoi', {'index': self._id, 'roiIndex': roi_index, 'xOrigin': x_origin,
-                                         'yOrigin': y_origin, 'xSize': x_size, 'ySize': y_size, 'xBin': x_bin,
-                                         'yBin': y_bin})
-        await self._communicator.send(command)
-        response: Response = await self._communicator.response()
-        self._handle_response_errors(response, 'ChargeCoupledDevice_set_region_of_interest()')
+        await self._execute_command('ccd_setRoi',
+                                    {'index': self._id, 'roiIndex': roi_index, 'xOrigin': x_origin,
+                                     'yOrigin': y_origin, 'xSize': x_size, 'ySize': y_size, 'xBin': x_bin,
+                                     'yBin': y_bin})
 
     async def get_acquisition_data(self) -> dict:
         """Returns the acquisition data of the CCD"""
@@ -282,3 +246,22 @@ class ChargeCoupledDevice(AbstractDevice):
         response: Response = await self._communicator.response()
         return bool(response.results['isBusy'])
 
+    def _get_caller_name(self) -> str:
+        # Get the current call stack
+        stack: List[inspect.FrameInfo] = inspect.stack()
+        # Check if the call stack has enough depth
+        if len(stack) < 3:
+            return 'Unknown'  # Not enough depth to have a caller
+        # The caller is two frames up:
+        # - index 0 is this function
+        # - index 1 is the function that called this function (get_caller_name)
+        # - index 2 is the actual caller
+        caller_frame: inspect.FrameInfo = stack[3]
+        # Get the name of the caller function from the frame
+        caller_name: str = caller_frame.function
+        return caller_name
+
+    def _handle_response_errors(self, response, param):
+        if response.errors:
+            self._device_manager.handle_errors(response.errors)
+            raise Exception(f'{self._get_caller_name()} encountered error: {response.errors}')
