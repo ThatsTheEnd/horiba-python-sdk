@@ -214,7 +214,7 @@ class ChargeCoupledDevice(AbstractDevice):
 
     async def get_acquisition_data(self) -> dict:
         """Returns the acquisition data of the CCD
-        ToDo: atm this returns data still formatted for telnet communication, not formatted as json"""
+        nina: atm this returns data still formatted for telnet communication, not formatted as json"""
         response: Response = await self._execute_command('ccd_getAcquisitionData', {'index': self._id})
         return response.results
 
