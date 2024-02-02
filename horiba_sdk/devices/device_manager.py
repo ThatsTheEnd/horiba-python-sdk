@@ -145,16 +145,24 @@ class DeviceManager(AbstractDeviceManager):
         Args:
             error_on_no_device (bool): If True, an exception is raised if no device is connected.
         """
-        # repeat the following lines of code for each device type: mono and ccd
-        # nina
-        response: Response = await self._icl_communicator.execute_command('ccd_discover', {})
-        if response.results['count'] == 0 and error_on_no_device:
-            raise Exception('No ChargeCoupledDevice connected')
-        response: Response = await self._icl_communicator.execute_command('ccd_list', {})
-        # The response is a dictionary with the entries as strings. This has to be converted to a list of strings
-        # and saved internally in the class as well as returned to the caller
-        self.ccd_list = list(response.results.values())
-        logger.info(f'Found {len(self.ccd_list)} CCD devices: {self.ccd_list}')
+        # Define the commands and device types in a list of tuples for iteration
+        commands_and_types = [
+            ('ccd_discover', 'ccd_list', 'CCD'),
+            ('mono_discover', 'mono_list', 'Monochromator')
+        ]
+
+        for discover_command, list_command, device_type in commands_and_types:
+            response: Response = await self._icl_communicator.execute_command(discover_command, {})
+            if response.results.get('count', 0) == 0 and error_on_no_device:
+                raise Exception(f'No {device_type} connected')
+            response: Response = await self._icl_communicator.execute_command(list_command, {})
+            device_list = list(response.results.values())
+            logger.info(f'Found {len(device_list)} {device_type} devices: {device_list}')
+
+            if device_type == 'CCD':
+                self.ccd_list = device_list
+            elif device_type == 'Monochromator':
+                self.mono_list = device_list
 
     def handle_errors(self, errors: list[str]) -> None:
         """
