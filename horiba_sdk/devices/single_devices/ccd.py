@@ -1,12 +1,12 @@
+import inspect
 from types import TracebackType
 from typing import List, Optional, Union, final
 
-import inspect
 import pint
 from overrides import override
 
 from horiba_sdk import ureg
-from horiba_sdk.communication.messages import Command, Response
+from horiba_sdk.communication.messages import Response
 from horiba_sdk.core.resolution import Resolution
 from horiba_sdk.devices.device_manager import DeviceManager
 
@@ -87,8 +87,7 @@ class ChargeCoupledDevice(AbstractDevice):
             await self.do_enable_binary_message()
 
     async def do_enable_binary_message(self) -> None:
-        """Requests the ICL to include binary messages into the communication
-        """
+        """Requests the ICL to include binary messages into the communication"""
         await self._execute_command('icl_binMode', {'mode': 'all'})
 
     @override
@@ -170,8 +169,7 @@ class ChargeCoupledDevice(AbstractDevice):
             Exception: When an error occurred on the device side
         """
 
-        await self._execute_command('ccd_setExposureTime',
-                                    {'index': self._id, 'time': exposure_time_ms})
+        await self._execute_command('ccd_setExposureTime', {'index': self._id, 'time': exposure_time_ms})
 
     async def get_acquisition_ready(self) -> bool:
         """Returns true if the CCD is ready to acquire
@@ -191,8 +189,16 @@ class ChargeCoupledDevice(AbstractDevice):
         """
         await self._execute_command('ccd_setAcquisitionStart', {'index': self._id, 'openShutter': open_shutter})
 
-    async def set_region_of_interest(self, roi_index: int = 1, x_origin: int = 0, y_origin: int = 0, x_size: int = 1024,
-                                     y_size: int = 256, x_bin: int = 1, y_bin: int = 256) -> None:
+    async def set_region_of_interest(
+        self,
+        roi_index: int = 1,
+        x_origin: int = 0,
+        y_origin: int = 0,
+        x_size: int = 1024,
+        y_size: int = 256,
+        x_bin: int = 1,
+        y_bin: int = 256,
+    ) -> None:
         """Sets the region of interest of the CCD
         an example json command looks like this:
 
@@ -208,10 +214,19 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side
         """
-        await self._execute_command('ccd_setRoi',
-                                    {'index': self._id, 'roiIndex': roi_index, 'xOrigin': x_origin,
-                                     'yOrigin': y_origin, 'xSize': x_size, 'ySize': y_size, 'xBin': x_bin,
-                                     'yBin': y_bin})
+        await self._execute_command(
+            'ccd_setRoi',
+            {
+                'index': self._id,
+                'roiIndex': roi_index,
+                'xOrigin': x_origin,
+                'yOrigin': y_origin,
+                'xSize': x_size,
+                'ySize': y_size,
+                'xBin': x_bin,
+                'yBin': y_bin,
+            },
+        )
 
     async def get_acquisition_data(self) -> dict:
         """Returns the acquisition data of the CCD

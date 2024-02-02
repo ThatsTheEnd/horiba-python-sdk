@@ -1,7 +1,7 @@
 import asyncio
 import contextlib
 from types import TracebackType
-from typing import Any, Optional, final, Callable
+from typing import Any, Callable, Optional, final
 
 import websockets
 from loguru import logger
@@ -160,7 +160,7 @@ class WebsocketCommunicator(AbstractCommunicator):
 
     def register_binary_message_callback(self, callback: Callable[[bytes], Any]) -> None:
         """Registers a callback to be called with every incoming binary message."""
-        logger.info("Binary message callback registered.")
+        logger.info('Binary message callback registered.')
         self.binary_message_callback = callback
 
     async def _receive_data(self) -> None:
@@ -172,7 +172,7 @@ class WebsocketCommunicator(AbstractCommunicator):
                     await self.json_message_queue.put(message)
                 elif isinstance(message, bytes):
                     await self.binary_message_queue.put(message)
-                    logger.debug(f"Callback before if statement: {self.binary_message_callback}")
+                    logger.debug(f'Callback before if statement: {self.binary_message_callback}')
                     if self.binary_message_callback:
                         await asyncio.create_task(self.binary_message_callback(message))  # Call the callback
                 else:

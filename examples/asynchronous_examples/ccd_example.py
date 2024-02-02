@@ -3,6 +3,7 @@ import random
 import time
 
 from loguru import logger
+
 from horiba_sdk.devices.device_manager import DeviceManager
 from horiba_sdk.devices.single_devices.ccd import ChargeCoupledDevice
 
@@ -30,7 +31,7 @@ async def main():
             while acquisition_busy:
                 acquisition_busy = await ccd.get_acquisition_busy()
                 await asyncio.sleep(0.3)
-                logger.info("Acquisition busy")
+                logger.info('Acquisition busy')
 
             await ccd.get_acquisition_data()
         await ccd.get_speed()

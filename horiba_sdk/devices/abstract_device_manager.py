@@ -9,6 +9,7 @@ class AbstractDeviceManager(ABC):
     DeviceManager class manages the lifecycle and interactions with devices.
 
     """
+
     def __init__(self, start_icl: bool = True):
         self.binary_messages_enabled: bool = False
         self._start_icl: bool = start_icl

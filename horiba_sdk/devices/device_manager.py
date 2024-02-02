@@ -34,20 +34,17 @@ import importlib.resources
 import platform
 import subprocess
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Dict, Type, final
+from typing import Any, Callable, Dict, Type, final
 
 import psutil
 from loguru import logger
 from mypy_extensions import KwArg, VarArg
 
-from horiba_sdk.communication import AbstractCommunicator, Command, Response, WebsocketCommunicator
+from horiba_sdk.communication import Command, Response, WebsocketCommunicator
 from horiba_sdk.devices.abstract_device_manager import AbstractDeviceManager
 from horiba_sdk.icl_error.abstract_error import AbstractError
 from horiba_sdk.icl_error.abstract_error_db import AbstractErrorDB
 from horiba_sdk.icl_error.icl_error_db import ICLErrorDB
-
-if TYPE_CHECKING:
-    from horiba_sdk.devices.single_devices import AbstractDevice
 
 
 def singleton(cls: Type[Any]) -> Callable[[VarArg(Any), KwArg(Any)], Any]:
@@ -145,10 +142,7 @@ class DeviceManager(AbstractDeviceManager):
             error_on_no_device (bool): If True, an exception is raised if no device is connected.
         """
         # Define the commands and device types in a list of tuples for iteration
-        commands_and_types = [
-            ('ccd_discover', 'ccd_list', 'CCD'),
-            ('mono_discover', 'mono_list', 'Monochromator')
-        ]
+        commands_and_types = [('ccd_discover', 'ccd_list', 'CCD'), ('mono_discover', 'mono_list', 'Monochromator')]
 
         for discover_command, list_command, device_type in commands_and_types:
             response: Response = await self._icl_communicator.execute_command(discover_command, {})
