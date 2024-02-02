@@ -38,7 +38,6 @@ class ChargeCoupledDevice(AbstractDevice):
         self.device_list: list[str] = []
 
     async def __aenter__(self) -> 'ChargeCoupledDevice':
-        await self.open()
         return self
 
     async def __aexit__(

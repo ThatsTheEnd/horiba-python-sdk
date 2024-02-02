@@ -10,13 +10,14 @@ from horiba_sdk.devices.single_devices.ccd import ChargeCoupledDevice
 async def main():
     device_manager = DeviceManager(start_icl=False)
 
-    async with ChargeCoupledDevice(1, device_manager) as ccd:
+    async with ChargeCoupledDevice(device_manager) as ccd:
         try:
-            resolution = await ccd.get_resolution()
+            await ccd.open(1, enable_binary_messages=True)
+            resolution = await ccd.get_get_chip_size()
             logger.info(f'Resolution: {resolution}')
             await ccd.get_exposure_time()
             await ccd.set_exposure_time(5000)
-            await ccd.set_acquisition_start()
+            await ccd.set_acquisition_start(False)
             time.sleep(6)
         except Exception as e:
             logger.error(e)
