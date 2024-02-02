@@ -33,9 +33,10 @@ def _run_fake_icl_server(fake_device_manager):
 async def test_ccd_opens(fake_device_manager, _run_fake_icl_server):
     # arrange
     # act
-    async with ChargeCoupledDevice(0, fake_device_manager) as ccd:
+    async with ChargeCoupledDevice(fake_device_manager) as ccd:
         # assert
-        assert await ccd.is_open is True
+        await ccd.open(1, enable_binary_messages=True)
+        assert await ccd.is_open() is True
 
 
 @pytest.mark.asyncio
