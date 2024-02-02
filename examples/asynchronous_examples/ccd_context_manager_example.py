@@ -9,6 +9,8 @@ from horiba_sdk.devices.single_devices.ccd import ChargeCoupledDevice
 
 async def main():
     device_manager = DeviceManager(start_icl=False)
+    await device_manager.communicator.open()
+    await device_manager.discover_devices()
 
     async with ChargeCoupledDevice(device_manager) as ccd:
         try:
