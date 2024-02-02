@@ -202,7 +202,7 @@ class WebsocketCommunicator(AbstractCommunicator):
         Raises:
             Exception: When an error occurred on the device side.
         """
-        command = Command(command_name, parameters)  # create command
+        command: Command = Command(command_name, parameters)  # create command
         await self.send(command)  # send command
-        response = await self.response()  # get response
+        response: Response = await self.response()  # get response
         return response

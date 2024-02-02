@@ -1,19 +1,17 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from horiba_sdk.communication import AbstractCommunicator
+from horiba_sdk.communication import WebsocketCommunicator
 
 
 class AbstractDeviceManager(ABC):
     """
     DeviceManager class manages the lifecycle and interactions with devices.
 
-    Attributes:
-        _communicator (AbstractCommunicator): The communicator class used to talk to devices.
-        devices (List[Device]): List of managed devices.
     """
-    def __init__(self):
+    def __init__(self, start_icl: bool = True):
         self.binary_messages_enabled: bool = False
+        self._start_icl: bool = start_icl
 
     @abstractmethod
     def start_icl(self) -> None:
@@ -48,7 +46,7 @@ class AbstractDeviceManager(ABC):
 
     @property
     @abstractmethod
-    def communicator(self) -> AbstractCommunicator:
+    def communicator(self) -> WebsocketCommunicator:
         """
         Abstract method to get the communicator attribute.
 

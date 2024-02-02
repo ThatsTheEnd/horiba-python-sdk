@@ -13,10 +13,9 @@ async def main():
     await device_manager.discover_devices()
 
     ccd = ChargeCoupledDevice(device_manager)
-    await ccd.open(1)
+    await ccd.open(1, enable_binary_messages=True)
 
     try:
-        await ccd.do_enable_binary_message()
         await ccd.get_get_chip_size()
         await ccd.get_exposure_time()
         await ccd.set_exposure_time(random.randint(1000, 5000))

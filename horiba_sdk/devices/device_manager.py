@@ -72,8 +72,9 @@ class DeviceManager(AbstractDeviceManager):
     DeviceManager class manages the lifecycle and interactions with devices.
 
     Attributes:
-        _icl_communicator (horiba_sdk.communication.AbstractCommunicator): The communicator class used to talk to the ICL.
-        devices (List[Device]): List of managed devices.
+        _icl_communicator: The communicator class used to talk to the ICL.
+        ccd_list (Dict[int, str]): List of CCD devices discovered.
+        mono_list (Dict[int, str]): List of Monochromator devices discovered.
     """
 
     def __init__(self, start_icl: bool = True, websocket_ip: str = '127.0.0.1', websocket_port: str = '25010'):
@@ -87,7 +88,6 @@ class DeviceManager(AbstractDeviceManager):
         super().__init__()
         self.ccd_list: dict[int, 'str'] = {}
         self.mono_list: dict[int, 'str'] = {}
-        self.devices: list['AbstractDevice'] = []
         self._icl_communicator: WebsocketCommunicator = WebsocketCommunicator(
             'ws://' + websocket_ip + ':' + str(websocket_port)
         )
@@ -100,7 +100,6 @@ class DeviceManager(AbstractDeviceManager):
         logger.info(f'Start ICL: {start_icl}')
         if start_icl:
             self.start_icl()
-        logger.debug('Do NOT forget to enable binary messages in the ICL software!')
 
     def start_icl(self) -> None:
         """
@@ -176,7 +175,7 @@ class DeviceManager(AbstractDeviceManager):
             icl_error.log()
 
     @property
-    def communicator(self) -> AbstractCommunicator:
+    def communicator(self) -> WebsocketCommunicator:
         """
         Getter method for the communicator attribute.
 

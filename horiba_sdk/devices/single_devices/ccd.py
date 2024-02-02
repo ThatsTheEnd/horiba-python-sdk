@@ -8,7 +8,7 @@ from overrides import override
 from horiba_sdk import ureg
 from horiba_sdk.communication.messages import Command, Response
 from horiba_sdk.core.resolution import Resolution
-from horiba_sdk.devices.abstract_device_manager import AbstractDeviceManager
+from horiba_sdk.devices.device_manager import DeviceManager
 
 from .abstract_device import AbstractDevice
 
@@ -33,7 +33,7 @@ class ChargeCoupledDevice(AbstractDevice):
 
     """
 
-    def __init__(self, device_manager: AbstractDeviceManager) -> None:
+    def __init__(self, device_manager: DeviceManager) -> None:
         super().__init__(device_manager)
         self.device_list: list[str] = []
 
@@ -62,16 +62,17 @@ class ChargeCoupledDevice(AbstractDevice):
             Exception: When an error occurred on the device side.
         """
         # nina: this has to be refactored to a call to the communicator and the error handling then here
-        command = Command(command_name, parameters)  # create command
-        await self._communicator.send(command)  # send command
-        response = await self._communicator.response()  # get response
+        response: Response = await self._communicator.execute_command(command_name, parameters)
+        # command = Command(command_name, parameters)  # create command
+        # await self._communicator.send(command)  # send command
+        # response = await self._communicator.response()  # get response
         if response.errors:  # handle errors
             self._device_manager.handle_errors(response.errors)
             raise Exception(f'{self._get_caller_name()} encountered error: {response.errors}')
         return response
 
     @override
-    async def open(self, device_id: int) -> None:
+    async def open(self, device_id: int, enable_binary_messages: bool = True) -> None:
         """Opens the connection to the Charge Coupled Device
         and also sends the command to enable binary messages.
         This is necessary because atm the measurement results
@@ -82,6 +83,8 @@ class ChargeCoupledDevice(AbstractDevice):
         """
         await super().open(device_id)
         await self._execute_command('ccd_open', {'index': self._id})
+        if enable_binary_messages:
+            await self.do_enable_binary_message()
 
     async def do_enable_binary_message(self) -> None:
         """Requests the ICL to include binary messages into the communication

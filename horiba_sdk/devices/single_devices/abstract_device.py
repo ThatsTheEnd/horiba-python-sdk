@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-from horiba_sdk.communication.abstract_communicator import AbstractCommunicator
-from horiba_sdk.devices.abstract_device_manager import AbstractDeviceManager
+from horiba_sdk.communication.websocket_communicator import WebsocketCommunicator
+from horiba_sdk.devices.device_manager import DeviceManager
 
 
 class AbstractDevice(ABC):
@@ -17,10 +17,10 @@ class AbstractDevice(ABC):
         _device_manager (DeviceManager):
     """
 
-    def __init__(self, device_manager: AbstractDeviceManager) -> None:
+    def __init__(self, device_manager: DeviceManager) -> None:
         self._id: int = -1
-        self._device_manager: AbstractDeviceManager = device_manager
-        self._communicator: AbstractCommunicator = device_manager.communicator
+        self._device_manager: DeviceManager = device_manager
+        self._communicator: WebsocketCommunicator = device_manager.communicator
 
     @abstractmethod
     async def open(self, device_id: int) -> None:
