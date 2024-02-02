@@ -33,17 +33,17 @@ class EasyCCD:
             device_id (int): The ID of the device.
             device_manager (DeviceManager): The device manager instance.
         """
-        self.ccd = ChargeCoupledDevice(device_id, device_manager)
-        self._open()
+        self.ccd = ChargeCoupledDevice(device_manager)
+        self._open(device_id)
 
-    def _open(self):
+    def _open(self, device_id):
         """
         Opens the connection to the ChargeCoupledDevice.
 
         Returns:
             None
         """
-        return asyncio.run(self.ccd.open())
+        return asyncio.run(self.ccd.open(device_id))
 
     def get_resolution(self):
         """
@@ -52,7 +52,7 @@ class EasyCCD:
         Returns:
             Resolution: The resolution of the CCD.
         """
-        return asyncio.run(self.ccd.get_resolution())
+        return asyncio.run(self.ccd.get_get_chip_size())
 
     def get_exposure_time(self):
         """
@@ -75,14 +75,23 @@ class EasyCCD:
         """
         return asyncio.run(self.ccd.set_exposure_time(exposure_time_ms))
 
-    def set_acquisition_start(self):
+    def set_acquisition_start(self, shutter_open):
         """
         Starts the acquisition of the CCD.
 
         Returns:
             None
         """
-        return asyncio.run(self.ccd.set_acquisition_start())
+        return asyncio.run(self.ccd.set_acquisition_start(shutter_open))
+
+    def get_acquisition_data(self) -> dict:
+        """
+        Gets the acquisition data from the CCD.
+
+        Returns:
+            dict: The acquisition data from the CCD.
+        """
+        return asyncio.run(self.ccd.get_acquisition_data())
 
     def close(self):
         """
