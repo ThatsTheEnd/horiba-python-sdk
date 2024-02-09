@@ -167,7 +167,7 @@ class WebsocketCommunicator(AbstractCommunicator):
         try:
             while True:
                 message = await self.websocket.recv()  # type: ignore
-                logger.info(f'Received message: {message}')
+                logger.info(f'Received message: {message!r}')
                 if isinstance(message, str):
                     await self.json_message_queue.put(message)
                 elif isinstance(message, bytes):
@@ -187,7 +187,7 @@ class WebsocketCommunicator(AbstractCommunicator):
     async def _receive_binary_data(self) -> None:
         await self._receive_data()
 
-    async def execute_command(self, command_name: str, parameters: dict) -> Response:
+    async def execute_command(self, command_name: str, parameters: dict[Any, Any]) -> Response:
         """
         Creates a command from the command name, and it's parameters
         Executes a command and handles the response.

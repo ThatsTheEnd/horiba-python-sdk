@@ -9,7 +9,6 @@ import websockets
 from loguru import logger
 from websockets.legacy.server import WebSocketServerProtocol
 
-from horiba_sdk.communication.abstract_communicator import AbstractCommunicator
 from horiba_sdk.communication.websocket_communicator import WebsocketCommunicator
 
 from .abstract_device_manager import AbstractDeviceManager
@@ -96,7 +95,7 @@ class FakeDeviceManager(AbstractDeviceManager):
         """
         pass
 
-    def discover_devices(self) -> None:
+    async def discover_devices(self, error_on_no_device: bool = False) -> None:
         """
         Does nothing.
         """
@@ -109,7 +108,7 @@ class FakeDeviceManager(AbstractDeviceManager):
         pass
 
     @property
-    def communicator(self) -> AbstractCommunicator:
+    def communicator(self) -> WebsocketCommunicator:
         """Communicator"""
         return WebsocketCommunicator('ws://' + self.host + ':' + str(self.port))
 

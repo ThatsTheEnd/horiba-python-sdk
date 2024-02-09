@@ -29,9 +29,12 @@ class AbstractDeviceManager(ABC):
         pass
 
     @abstractmethod
-    def discover_devices(self) -> None:
+    async def discover_devices(self, error_on_no_device: bool = False) -> None:
         """
         Abstract method that discovers and registers devices.
+
+        Args:
+            error_on_no_device (bool): If True, an exception is raised if no device is connected.
         """
         pass
 

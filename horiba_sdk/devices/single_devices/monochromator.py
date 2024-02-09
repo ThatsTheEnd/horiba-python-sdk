@@ -1,10 +1,9 @@
-from types import TracebackType
-from typing import Optional, final
+from typing import final
 
 from numericalunits import nm
 from overrides import override
 
-from horiba_sdk.communication.messages import Command, Response
+from horiba_sdk.communication import Response
 from horiba_sdk.devices.abstract_device_manager import AbstractDeviceManager
 
 from .abstract_device import AbstractDevice
@@ -37,15 +36,6 @@ class Monochromator(AbstractDevice):
     def __init__(self, device_manager: AbstractDeviceManager) -> None:
         super().__init__(device_manager)
 
-    async def __aenter__(self) -> 'Monochromator':
-        await self.open()
-        return self
-
-    async def __aexit__(
-        self, exc_type: type[BaseException], exc_value: BaseException, traceback: Optional[TracebackType]
-    ) -> None:
-        await self.close()
-
     @override
     async def open(self, device_id: int) -> None:
         """Opens the connection to the Monochromator
@@ -54,20 +44,7 @@ class Monochromator(AbstractDevice):
             Exception: When an error occured on the device side
         """
         await super().open(device_id)
-
-        command = Command('mono_discover', {})
-        await self._communicator.send(command)
-        _ignored_response = await self._communicator.response()
-
-        if _ignored_response.errors:
-            raise Exception(f'Monochromator encountered error: {_ignored_response.errors}')
-
-        command = Command('mono_open', {'index': self._id})
-        await self._communicator.send(command)
-        _ignored_response = await self._communicator.response()
-
-        if _ignored_response.errors:
-            raise Exception(f'Monochromator encountered error: {_ignored_response.errors}')
+        await super()._execute_command('mono_open', {'index': self._id})
 
     @override
     async def close(self) -> None:
@@ -76,13 +53,8 @@ class Monochromator(AbstractDevice):
         Raises:
             Exception: When an error occured on the device side
         """
-        command = Command('mono_close', {'index': self._id})
-        await self._communicator.send(command)
-        _ignored_response = await self._communicator.response()
+        await super()._execute_command('mono_close', {'index': self._id})
         await super().close()
-
-        if _ignored_response.errors:
-            raise Exception(f'Monochromator encountered error: {_ignored_response.errors}')
 
     @property
     async def is_open(self) -> bool:
@@ -91,12 +63,7 @@ class Monochromator(AbstractDevice):
         Raises:
             Exception: When an error occured on the device side
         """
-        command = Command('mono_isOpen', {'index': self._id})
-        await self._communicator.send(command)
-        response: Response = await self._communicator.response()
-        if response.errors:
-            raise Exception(f'Monochromator encountered error: {response.errors}')
-
+        response: Response = await super()._execute_command('mono_isOpen', {'index': self._id})
         return bool(response.results['open'])
 
     @property
@@ -106,12 +73,7 @@ class Monochromator(AbstractDevice):
         Raises:
             Exception: When an error occured on the device side
         """
-        command = Command('mono_isBusy', {'index': self._id})
-        await self._communicator.send(command)
-        response: Response = await self._communicator.response()
-        if response.errors:
-            raise Exception(f'Monochromator encountered error: {response.errors}')
-
+        response: Response = await super()._execute_command('mono_isBusy', {'index': self._id})
         return bool(response.results['busy'])
 
     async def home(self) -> None:
@@ -122,12 +84,7 @@ class Monochromator(AbstractDevice):
         Raises:
             Exception: When an error occured on the device side
         """
-        command = Command('mono_init', {'index': self._id})
-        await self._communicator.send(command)
-        _ignored_response = await self._communicator.response()
-
-        if _ignored_response.errors:
-            raise Exception(f'Monochromator encountered error: {_ignored_response.errors}')
+        await super()._execute_command('mono_init', {'index': self._id})
 
     @property
     async def wavelength(self) -> nm:
@@ -136,12 +93,7 @@ class Monochromator(AbstractDevice):
         Raises:
             Exception: When an error occured on the device side
         """
-        command = Command('mono_getPosition', {'index': self._id})
-        await self._communicator.send(command)
-        response: Response = await self._communicator.response()
-        if response.errors:
-            raise Exception(f'Monochromator encountered error: {response.errors}')
-
+        response = await super()._execute_command('mono_getPosition', {'index': self._id})
         return float(response.results['wavelength']) * nm
 
     async def set_current_wavelength(self, wavelength: nm) -> None:
@@ -156,12 +108,7 @@ class Monochromator(AbstractDevice):
         Raises:
             Exception: When an error occured on the device side
         """
-        command = Command('mono_setPosition', {'index': self._id, 'wavelength': wavelength / nm})
-        await self._communicator.send(command)
-        _ignored_response = await self._communicator.response()
-
-        if _ignored_response.errors:
-            raise Exception(f'Monochromator encountered error: {_ignored_response.errors}')
+        await super()._execute_command('mono_setPosition', {'index': self._id, 'wavelength': wavelength / nm})
 
     async def move_to_wavelength(self, wavelength: nm) -> None:
         """Orders the monochromator to move to the requested wavelength.
@@ -174,12 +121,7 @@ class Monochromator(AbstractDevice):
         Raises:
             Exception: When an error occured on the device side
         """
-        command = Command('mono_moveToPosition', {'index': self._id, 'wavelength': wavelength / nm})
-        await self._communicator.send(command)
-        _ignored_response = await self._communicator.response()
-
-        if _ignored_response.errors:
-            raise Exception(f'Monochromator encountered error: {_ignored_response.errors}')
+        await super()._execute_command('mono_moveToPosition', {'index': self._id, 'wavelength': wavelength / nm})
 
     @property
     async def turret_grating_position(self) -> int:
@@ -191,12 +133,7 @@ class Monochromator(AbstractDevice):
         Raises:
             Exception: When an error occured on the device side
         """
-        command = Command('mono_getGratingPosition', {'index': self._id})
-        await self._communicator.send(command)
-        response: Response = await self._communicator.response()
-        if response.errors:
-            raise Exception(f'Monochromator encountered error: {response.errors}')
-
+        response: Response = await super()._execute_command('mono_getGratingPosition', {'index': self._id})
         return int(response.results['position'])
 
     async def move_turret_to_grating(self, position: int) -> None:
@@ -210,9 +147,4 @@ class Monochromator(AbstractDevice):
         Raises:
             Exception: When an error occured on the device side
         """
-        command = Command('mono_getPosition', {'index': self._id, 'position': position})
-        await self._communicator.send(command)
-        _ignored_response = await self._communicator.response()
-
-        if _ignored_response.errors:
-            raise Exception(f'Monochromator encountered error: {_ignored_response.errors}')
+        await super()._execute_command('mono_getPosition', {'index': self._id, 'position': position})

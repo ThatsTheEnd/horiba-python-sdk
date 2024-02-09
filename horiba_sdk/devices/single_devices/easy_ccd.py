@@ -1,4 +1,5 @@
 import asyncio
+from typing import Any
 
 from .ccd import ChargeCoupledDevice
 
@@ -84,7 +85,7 @@ class EasyCCD:
         """
         return asyncio.run(self.ccd.set_acquisition_start(shutter_open))
 
-    def get_acquisition_data(self) -> dict:
+    def get_acquisition_data(self) -> dict[Any, Any]:
         """
         Gets the acquisition data from the CCD.
 

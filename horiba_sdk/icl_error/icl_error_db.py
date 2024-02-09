@@ -5,9 +5,7 @@ from typing import final
 from loguru import logger
 from overrides import override
 
-from horiba_sdk.icl_error.abstract_error import AbstractError, Severity, StringAsSeverity
-from horiba_sdk.icl_error.abstract_error_db import AbstractErrorDB
-from horiba_sdk.icl_error.icl_error import ICLError
+from horiba_sdk.icl_error import AbstractError, AbstractErrorDB, ICLError, Severity, StringAsSeverity
 
 
 @final

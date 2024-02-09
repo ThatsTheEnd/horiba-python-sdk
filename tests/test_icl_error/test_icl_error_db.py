@@ -5,7 +5,7 @@ import re
 
 import pytest
 
-from horiba_sdk.icl_error.icl_error_db import ICLErrorDB
+from horiba_sdk.icl_error import ICLErrorDB
 
 
 def test_icl_error_db_non_existing_file_throws():

@@ -34,25 +34,24 @@ import importlib.resources
 import platform
 import subprocess
 from pathlib import Path
-from typing import Any, Callable, Dict, Type, final
+from typing import Any, Callable, final
 
 import psutil
 from loguru import logger
 from mypy_extensions import KwArg, VarArg
+from overrides import override
 
 from horiba_sdk.communication import Command, Response, WebsocketCommunicator
 from horiba_sdk.devices.abstract_device_manager import AbstractDeviceManager
-from horiba_sdk.icl_error.abstract_error import AbstractError
-from horiba_sdk.icl_error.abstract_error_db import AbstractErrorDB
-from horiba_sdk.icl_error.icl_error_db import ICLErrorDB
+from horiba_sdk.icl_error import AbstractError, AbstractErrorDB, ICLErrorDB
 
 
-def singleton(cls: Type[Any]) -> Callable[[VarArg(Any), KwArg(Any)], Any]:
+def singleton(cls: type[Any]) -> Callable[[VarArg(Any), KwArg(Any)], Any]:
     """
     Decorator to implement the Singleton pattern.
     """
 
-    _instances: Dict[Type[Any], Any] = {}
+    _instances: dict[type[Any], Any] = {}
 
     def get_instance(*args, **kwargs):
         if cls not in _instances:
@@ -70,8 +69,8 @@ class DeviceManager(AbstractDeviceManager):
 
     Attributes:
         _icl_communicator: The communicator class used to talk to the ICL.
-        ccd_list (Dict[int, str]): List of CCD devices discovered.
-        mono_list (Dict[int, str]): List of Monochromator devices discovered.
+        ccds (Dict[int, str]): CCD devices discovered.
+        monos (Dict[int, str]): Monochromator devices discovered.
     """
 
     def __init__(self, start_icl: bool = True, websocket_ip: str = '127.0.0.1', websocket_port: str = '25010'):
@@ -83,8 +82,8 @@ class DeviceManager(AbstractDeviceManager):
             websocket_port: str = '25010': websocket port
         """
         super().__init__()
-        self.ccd_list: dict[int, 'str'] = {}
-        self.mono_list: dict[int, 'str'] = {}
+        self.ccds: dict[int, 'str'] = {}
+        self.monos: dict[int, 'str'] = {}
         self._icl_communicator: WebsocketCommunicator = WebsocketCommunicator(
             'ws://' + websocket_ip + ':' + str(websocket_port)
         )
@@ -98,6 +97,7 @@ class DeviceManager(AbstractDeviceManager):
         if start_icl:
             self.start_icl()
 
+    @override
     def start_icl(self) -> None:
         """
         Starts the ICL software and establishes communication.
@@ -114,6 +114,7 @@ class DeviceManager(AbstractDeviceManager):
         except Exception as e:  # pylint: disable=broad-exception-caught
             logger.error('Unexpected error: %s', e)
 
+    @override
     async def stop_icl(self) -> None:
         """
         Stops the communication and cleans up resources.
@@ -135,6 +136,7 @@ class DeviceManager(AbstractDeviceManager):
 
         logger.info('icl_shutdown command sent')
 
+    @override
     async def discover_devices(self, error_on_no_device: bool = False) -> None:
         """
         Discovers the connected devices and saves them internally.
@@ -148,15 +150,19 @@ class DeviceManager(AbstractDeviceManager):
             response: Response = await self._icl_communicator.execute_command(discover_command, {})
             if response.results.get('count', 0) == 0 and error_on_no_device:
                 raise Exception(f'No {device_type} connected')
-            response: Response = await self._icl_communicator.execute_command(list_command, {})
-            device_list = list(response.results.values())
-            logger.info(f'Found {len(device_list)} {device_type} devices: {device_list}')
+            response = await self._icl_communicator.execute_command(list_command, {})
+            raw_device_list = response.results['list']
+            parsed_devices: dict[int, str] = {
+                int(device_string.split(';')[0]): device_string.split(';')[1] for device_string in raw_device_list
+            }
+            logger.info(f'Found {len(parsed_devices)} {device_type} devices: {parsed_devices}')
 
             if device_type == 'CCD':
-                self.ccd_list = device_list
+                self.ccds = parsed_devices
             elif device_type == 'Monochromator':
-                self.mono_list = device_list
+                self.monos = parsed_devices
 
+    @override
     def handle_errors(self, errors: list[str]) -> None:
         """
         Handles errors, logs them, and may take corrective actions.

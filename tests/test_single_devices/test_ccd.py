@@ -43,9 +43,10 @@ async def test_ccd_opens(fake_device_manager, _run_fake_icl_server):
 async def test_ccd_temperature(fake_device_manager, _run_fake_icl_server):
     # arrange
     # act
-    async with ChargeCoupledDevice(0, fake_device_manager) as ccd:
+    async with ChargeCoupledDevice(fake_device_manager) as ccd:
+        await ccd.open(1, enable_binary_messages=True)
         # assert
-        temperature = await ccd.temperature
+        temperature = await ccd.get_temperature()
         zero = ureg.Quantity(0, ureg.degC)
         assert temperature != zero
 
@@ -54,9 +55,10 @@ async def test_ccd_temperature(fake_device_manager, _run_fake_icl_server):
 async def test_ccd_resolution(fake_device_manager, _run_fake_icl_server):
     # arrange
     # act
-    async with ChargeCoupledDevice(0, fake_device_manager) as ccd:
+    async with ChargeCoupledDevice(fake_device_manager) as ccd:
+        await ccd.open(1, enable_binary_messages=True)
         # assert
-        resolution = await ccd.get_resolution()
+        resolution = await ccd.get_chip_size()
         assert resolution.width > 0 and resolution.height > 0
 
 
@@ -64,8 +66,9 @@ async def test_ccd_resolution(fake_device_manager, _run_fake_icl_server):
 async def test_ccd_speed(fake_device_manager, _run_fake_icl_server):
     # arrange
     # act
-    async with ChargeCoupledDevice(0, fake_device_manager) as ccd:
+    async with ChargeCoupledDevice(fake_device_manager) as ccd:
+        await ccd.open(1, enable_binary_messages=True)
         # assert
-        speed = await ccd.speed
+        speed = await ccd.get_speed()
         zero = ureg.Quantity(0, ureg.kHz)
         assert speed != zero

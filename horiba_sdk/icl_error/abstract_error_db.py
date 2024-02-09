@@ -3,7 +3,7 @@ from typing import final
 
 from overrides import override
 
-from horiba_sdk.icl_error.abstract_error import AbstractError, FakeError
+from horiba_sdk.icl_error import AbstractError, FakeError
 
 
 class AbstractErrorDB(ABC):

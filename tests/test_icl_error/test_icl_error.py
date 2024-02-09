@@ -1,7 +1,7 @@
 # pylint: skip-file
 
 
-from horiba_sdk.icl_error.abstract_error import Severity, StringAsSeverity
+from horiba_sdk.icl_error import Severity, StringAsSeverity
 
 
 def test_string_as_severity_parses():
