@@ -1,11 +1,10 @@
-from horiba_sdk.devices.device_manager import DeviceManager
+from horiba_sdk.devices import EasyDeviceManager
 from horiba_sdk.devices.single_devices.easy_ccd import EasyCCD
 
 
-async def main():
+def main():
     # Start the ICL to allow communication with the devices.
-    device_manager = DeviceManager(start_icl=False)
-    # nina wrap the device manager class into an easy device manager without async calls
+    device_manager = EasyDeviceManager(start_icl=False)
     device_manager.discover_devices()
     print(f'CCD list: {device_manager.ccd_list}')
     # ToDo: replace the hardcoded "1" in the next call with the first item of the list of discovered devices

@@ -11,7 +11,7 @@ from horiba_sdk.devices.single_devices import ChargeCoupledDevice
 
 
 @pytest.fixture(scope='session')
-def event_loop(_request):
+def event_loop(request):  # noqa: ARG001
     loop = asyncio.new_event_loop()
     yield loop
     loop.close()
