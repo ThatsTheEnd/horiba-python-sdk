@@ -14,8 +14,8 @@ async def main():
 
     async with ChargeCoupledDevice(device_manager) as ccd:
         try:
-            await ccd.open(1, enable_binary_messages=True)
-            resolution = await ccd.get_get_chip_size()
+            await ccd.open(0, enable_binary_messages=True)
+            resolution = await ccd.get_chip_size()
             logger.info(f'Resolution: {resolution}')
             await ccd.get_exposure_time()
             await ccd.set_exposure_time(5000)

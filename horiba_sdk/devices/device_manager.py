@@ -32,6 +32,7 @@ https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING
 
 import importlib.resources
 import platform
+import re
 import subprocess
 from pathlib import Path
 from typing import Any, Callable, final
@@ -151,16 +152,22 @@ class DeviceManager(AbstractDeviceManager):
             if response.results.get('count', 0) == 0 and error_on_no_device:
                 raise Exception(f'No {device_type} connected')
             response = await self._icl_communicator.execute_command(list_command, {})
-            raw_device_list = response.results['list']
-            parsed_devices: dict[int, str] = {
-                int(device_string.split(';')[0]): device_string.split(';')[1] for device_string in raw_device_list
-            }
-            logger.info(f'Found {len(parsed_devices)} {device_type} devices: {parsed_devices}')
 
             if device_type == 'CCD':
-                self.ccds = parsed_devices
+                raw_device_list = response.results
+                self.ccds = {
+                    int(key.split(':')[0].replace('index', '').strip()): re.search(r'deviceType: (.*?),', value)
+                    .group(1)
+                    .strip()
+                    for key, value in raw_device_list.items()
+                }
+                logger.info(f'Found {len(self.ccds)} {device_type} devices: {self.ccds}')
             elif device_type == 'Monochromator':
-                self.monos = parsed_devices
+                raw_device_list = response.results['list']
+                self.monos = {
+                    int(device_string.split(';')[0]): device_string.split(';')[1] for device_string in raw_device_list
+                }
+                logger.info(f'Found {len(self.monos)} {device_type} devices: {self.monos}')
 
     @override
     def handle_errors(self, errors: list[str]) -> None:
