@@ -1,33 +1,40 @@
 # pylint: skip-file
+import asyncio
 import os
 
 import pytest
+import pytest_asyncio
 
 from horiba_sdk import ureg
 from horiba_sdk.devices import DeviceManager
 from horiba_sdk.devices.single_devices import ChargeCoupledDevice
 
 
-@pytest.fixture(scope='module')
-def device_manager():
+@pytest.fixture(scope='session')
+def event_loop(_request):
+    loop = asyncio.new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest_asyncio.fixture(scope='module')
+async def device_manager_instance():
     device_manager = DeviceManager(start_icl=True)
-    return device_manager
 
+    await device_manager.communicator.open()
+    await device_manager.discover_devices()
 
-@pytest.fixture(scope='module')
-def _startup_and_teardown(device_manager):
-    # startup before all tests
-    yield
-    # teardown after all tests
-    device_manager.stop_icl()
+    yield device_manager
+
+    await device_manager.stop_icl()
 
 
 @pytest.mark.asyncio
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-async def test_ccd_opens(device_manager):
+async def test_ccd_opens(device_manager_instance):
     # arrange
     # act
-    async with ChargeCoupledDevice(device_manager) as ccd:
+    async with ChargeCoupledDevice(device_manager_instance) as ccd:
         # assert
         await ccd.open(0, enable_binary_messages=True)
         assert await ccd.is_open() is True
@@ -35,10 +42,10 @@ async def test_ccd_opens(device_manager):
 
 @pytest.mark.asyncio
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-async def test_ccd_temperature(device_manager, _startup_and_teardown):
+async def test_ccd_temperature(device_manager_instance):
     # arrange
     # act
-    async with ChargeCoupledDevice(device_manager) as ccd:
+    async with ChargeCoupledDevice(device_manager_instance) as ccd:
         await ccd.open(0, enable_binary_messages=True)
         # assert
         temperature = await ccd.get_temperature()
@@ -48,10 +55,10 @@ async def test_ccd_temperature(device_manager, _startup_and_teardown):
 
 @pytest.mark.asyncio
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-async def test_ccd_resolution(device_manager, _startup_and_teardown):
+async def test_ccd_resolution(device_manager_instance):
     # arrange
     # act
-    async with ChargeCoupledDevice(device_manager) as ccd:
+    async with ChargeCoupledDevice(device_manager_instance) as ccd:
         await ccd.open(0, enable_binary_messages=True)
         # assert
         resolution = await ccd.get_chip_size()
@@ -60,10 +67,10 @@ async def test_ccd_resolution(device_manager, _startup_and_teardown):
 
 @pytest.mark.asyncio
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-async def test_ccd_speed(device_manager, _startup_and_teardown):
+async def test_ccd_speed(device_manager_instance):
     # arrange
     # act
-    async with ChargeCoupledDevice(device_manager) as ccd:
+    async with ChargeCoupledDevice(device_manager_instance) as ccd:
         await ccd.open(0, enable_binary_messages=True)
         # assert
         speed = await ccd.get_speed()

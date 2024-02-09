@@ -153,21 +153,36 @@ class DeviceManager(AbstractDeviceManager):
                 raise Exception(f'No {device_type} connected')
             response = await self._icl_communicator.execute_command(list_command, {})
 
+            # as the responses of ccd_list and mono_list differ, we need to parse them separately
             if device_type == 'CCD':
                 raw_device_list = response.results
-                self.ccds = {
-                    int(key.split(':')[0].replace('index', '').strip()): re.search(r'deviceType: (.*?),', value)
-                    .group(1)
-                    .strip()
-                    for key, value in raw_device_list.items()
-                }
-                logger.info(f'Found {len(self.ccds)} {device_type} devices: {self.ccds}')
+                self.ccds = self._parse_ccds(raw_device_list)
+                logger.info(f'Found {len(self.ccds)} CCD devices: {self.ccds}')
             elif device_type == 'Monochromator':
                 raw_device_list = response.results['list']
-                self.monos = {
-                    int(device_string.split(';')[0]): device_string.split(';')[1] for device_string in raw_device_list
-                }
-                logger.info(f'Found {len(self.monos)} {device_type} devices: {self.monos}')
+                self.monos = self._parse_monos(raw_device_list)
+                logger.info(f'Found {len(self.monos)} Monochromator devices: {self.monos}')
+
+    def _parse_ccds(self, raw_device_list: dict[str, Any]) -> dict[int, str]:
+        parsed_ccds = {}
+        for key, value in raw_device_list.items():
+            ccd_index: int = int(key.split(':')[0].replace('index', '').strip())
+            ccd_type_match = re.search(r'deviceType: (.*?),', value)
+            if not ccd_type_match:
+                raise Exception(f'Failed to find ccd type "deviceType" in string "{value}"')
+            ccd_type: str = str(ccd_type_match.group(1).strip())
+            parsed_ccds[ccd_index] = ccd_type
+
+        return parsed_ccds
+
+    def _parse_monos(self, raw_device_list: dict[str, Any]) -> dict[int, str]:
+        parsed_monos = {}
+        for device_string in raw_device_list:
+            mono_index: int = int(device_string.split(';')[0])
+            mono_type: str = device_string.split(';')[1]
+            parsed_monos[mono_index] = mono_type
+
+        return parsed_monos
 
     @override
     def handle_errors(self, errors: list[str]) -> None:
