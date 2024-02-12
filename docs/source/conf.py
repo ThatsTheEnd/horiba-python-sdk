@@ -27,6 +27,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
+    'myst_parser',
     'autoapi.extension',
 ]
 
@@ -45,7 +46,7 @@ templates_path = ['_templates']
 
 # -- Options for HTML output
 
-html_theme = 'furo'
+html_theme = 'sphinx_book_theme'
 
 # -- Options for EPUB output
 epub_show_urls = 'footnote'
