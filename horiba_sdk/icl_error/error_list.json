@@ -254,6 +254,12 @@
         "number": -600,
         "text": "SCD error: command not supported",
         "level": "fatal"
+      },
+      {
+        "number": -729,
+        "text": "CCD error: Missing parameter argument: openShutter",
+        "level": "fatal"
       }
+      
     ]
   }
