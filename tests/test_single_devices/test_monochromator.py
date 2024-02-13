@@ -32,54 +32,84 @@ def _run_fake_icl_server(fake_device_manager):
 @pytest.mark.asyncio
 async def test_monochromator_opens(fake_device_manager, _run_fake_icl_server):
     # arrange
+    monochromator = Monochromator(fake_device_manager)
+
     # act
-    async with Monochromator(0, fake_device_manager) as monochromator:
-        # assert
-        assert await monochromator.is_open is True
+    await monochromator.open(1)
+
+    # assert
+    assert await monochromator.is_open is True
+
+    await monochromator.close()
 
 
 @pytest.mark.asyncio
 async def test_monochromator_busy(fake_device_manager, _run_fake_icl_server):
     # arrange
+    monochromator = Monochromator(fake_device_manager)
+
     # act
-    async with Monochromator(0, fake_device_manager) as monochromator:
-        # assert
-        assert await monochromator.is_busy is True
+    await monochromator.open(1)
+
+    # assert
+    assert await monochromator.is_busy is True
+
+    await monochromator.close()
 
 
 @pytest.mark.asyncio
 async def test_monochromator_wavelength(fake_device_manager, _run_fake_icl_server):
     # arrange
+    monochromator = Monochromator(fake_device_manager)
+
     # act
-    async with Monochromator(0, fake_device_manager) as monochromator:
-        # assert
-        assert await monochromator.wavelength > 0
+    await monochromator.open(1)
+
+    # assert
+    assert await monochromator.wavelength > 0
+
+    await monochromator.close()
 
 
 @pytest.mark.asyncio
 async def test_monochromator_can_move_to_wavelength(fake_device_manager, _run_fake_icl_server):
     # arrange
+    monochromator = Monochromator(fake_device_manager)
+
     # act
-    async with Monochromator(0, fake_device_manager) as monochromator:
-        await monochromator.move_to_wavelength(350 * nm)
-        # assert
-        assert await monochromator.wavelength > 0
+    await monochromator.open(1)
+    await monochromator.move_to_wavelength(350 * nm)
+
+    # assert
+    assert await monochromator.wavelength > 0
+
+    await monochromator.close()
 
 
 @pytest.mark.asyncio
 async def test_monochromator_turret_grating_position(fake_device_manager, _run_fake_icl_server):
     # arrange
+    monochromator = Monochromator(fake_device_manager)
+
     # act
-    async with Monochromator(0, fake_device_manager) as monochromator:
-        # assert
-        assert await monochromator.turret_grating_position > 0
+    await monochromator.open(1)
+
+    # assert
+    assert await monochromator.turret_grating_position > 0
+
+    await monochromator.close()
 
 
 @pytest.mark.asyncio
 async def test_monochromator_can_move_turret_grating_position(fake_device_manager, _run_fake_icl_server):
     # arrange
+    monochromator = Monochromator(fake_device_manager)
+
     # act
-    async with Monochromator(0, fake_device_manager) as monochromator:
-        await monochromator.move_turret_to_grating(50)
-        # assert
-        assert await monochromator.turret_grating_position > 0
+    await monochromator.open(1)
+    await monochromator.move_turret_to_grating(50)
+
+    # assert
+    assert await monochromator.turret_grating_position > 0
+
+    await monochromator.close()

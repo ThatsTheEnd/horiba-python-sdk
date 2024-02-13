@@ -1,7 +1,7 @@
 import asyncio
 import contextlib
 from types import TracebackType
-from typing import Any, Optional, final
+from typing import Any, Callable, Optional, final
 
 import websockets
 from loguru import logger
@@ -38,6 +38,7 @@ class WebsocketCommunicator(AbstractCommunicator):
         self.listen_task: Optional[asyncio.Task[Any]] = None
         self.json_message_queue: asyncio.Queue[str] = asyncio.Queue()
         self.binary_message_queue: asyncio.Queue[bytes] = asyncio.Queue()
+        self.binary_message_callback: Optional[Callable[[bytes], Any]] = None
 
     async def __aenter__(self) -> 'WebsocketCommunicator':
         await self.open()
@@ -65,6 +66,7 @@ class WebsocketCommunicator(AbstractCommunicator):
         except websockets.WebSocketException as e:
             raise CommunicationException(None, 'websocket connection issue') from e
 
+        logger.debug(f'Websocket connection established to {self.uri}')
         self.listen_task = asyncio.create_task(self._receive_binary_data())
 
     @override
@@ -84,6 +86,7 @@ class WebsocketCommunicator(AbstractCommunicator):
 
         try:
             # mypy cannot infer the check from self.opened() done above
+            logger.debug(f'Sending JSON command: {command.json()}')
             await self.websocket.send(command.json())  # type: ignore
         except websockets.exceptions.ConnectionClosed as e:
             raise CommunicationException(None, 'Trying to send data while websocket is closed') from e
@@ -127,6 +130,7 @@ class WebsocketCommunicator(AbstractCommunicator):
         """
         try:
             response: bytes = await self.binary_message_queue.get()
+            logger.debug(f'Received binary response: {response!r}')
             return BinaryResponse(response)
         except asyncio.CancelledError as e:
             raise CommunicationException(None, 'Response reception was canceled') from e
@@ -142,21 +146,36 @@ class WebsocketCommunicator(AbstractCommunicator):
         if not self.opened():
             raise CommunicationException(None, 'cannot close already closed websocket')
         if self.websocket:
+            logger.debug('Waiting websocket close...')
             await self.websocket.close()
             self.websocket = None
         if self.listen_task:
+            logger.debug('Canceling listening task...')
             self.listen_task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
+                logger.debug('Await listening task...')
                 await self.listen_task
+
+        logger.debug('Websocket connection closed')
+
+    def register_binary_message_callback(self, callback: Callable[[bytes], Any]) -> None:
+        """Registers a callback to be called with every incoming binary message."""
+        logger.info('Binary message callback registered.')
+        self.binary_message_callback = callback
 
     async def _receive_data(self) -> None:
         try:
             while True:
                 message = await self.websocket.recv()  # type: ignore
+                logger.info(f'Received message: {message!r}')
                 if isinstance(message, str):
                     await self.json_message_queue.put(message)
                 elif isinstance(message, bytes):
-                    await self.binary_message_queue.put(message)
+                    # TODO: [saga] is this still needed?
+                    # await self.binary_message_queue.put(message)
+                    # logger.debug(f'Callback before if statement: {self.binary_message_callback}')
+                    if self.binary_message_callback:
+                        await asyncio.create_task(self.binary_message_callback(message))  # Call the callback
                 else:
                     raise CommunicationException(None, f'Unknown type of message {type(message)}')
         except websockets.ConnectionClosedOK:
@@ -168,3 +187,23 @@ class WebsocketCommunicator(AbstractCommunicator):
 
     async def _receive_binary_data(self) -> None:
         await self._receive_data()
+
+    async def execute_command(self, command_name: str, parameters: dict[Any, Any]) -> Response:
+        """
+        Creates a command from the command name, and it's parameters
+        Executes a command and handles the response.
+
+        Args:
+            command_name (str): The name of the command to execute.
+            parameters (dict): The parameters for the command.
+
+        Returns:
+            Response: The response from the device.
+
+        Raises:
+            Exception: When an error occurred on the device side.
+        """
+        command: Command = Command(command_name, parameters)  # create command
+        await self.send(command)  # send command
+        response: Response = await self.response()  # get response
+        return response

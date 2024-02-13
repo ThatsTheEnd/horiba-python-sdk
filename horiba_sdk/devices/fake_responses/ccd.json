@@ -1,0 +1,171 @@
+{
+  "ccd_discover": {
+    "id": 1234,
+    "command": "ccd_discover",
+    "results": {
+      "count": 1
+    },
+    "errors": []
+  },
+  "ccd_list": {
+    "id": 1234,
+    "command": "ccd_list",
+    "results": {
+      "list": [
+        "0;iHR550;sn12345",
+        "1;iHR320;snabscde"
+      ]
+    },
+    "errors": []
+  },
+  "ccd_listCount": {
+    "id": 1234,
+    "command": "ccd_listCount",
+    "results": {
+      "count": 2
+    },
+    "errors": []
+  },
+  "ccd_open": {
+    "id": 1234,
+    "command": "ccd_open",
+    "errors": [
+    ]
+  },
+  "ccd_close": {
+    "id": 1234,
+    "command": "ccd_close",
+    "errors": [
+    ]
+  },
+  "ccd_isOpen": {
+    "id": 1234,
+    "command": "ccd_isOpen",
+    "results":{
+      "open": true
+    },
+    "errors": [
+    ]
+  },
+  "ccd_restart": {},
+  "ccd_getConfig": {},
+  "ccd_getChipSize": {
+    "id": 1234,
+    "command": "ccd_getChipSize",
+    "errors": [],
+    "results": {
+      "x": 1024,
+      "y": 256
+    }
+  },
+  "ccd_getChipTemperature": {
+    "id": 1234,
+    "command": "ccd_getChipTemperature",
+    "errors": [],
+    "results": {
+      "temperature": -31.219999313354492
+    }
+  },
+  "ccd_getNumberOfAvgs": {},
+  "ccd_setNumberOfAvgs": {},
+  "ccd_getGain": {
+    "id": 1234,
+    "command": "ccd_getGain",
+    "errors": [],
+    "results": {
+      "info": "High Light",
+      "token": 0
+    }
+  },
+  "ccd_setGain": {},
+  "ccd_getSpeed": {
+    "id": 1234,
+    "command": "ccd_getSpeed",
+    "errors": [],
+    "results": {
+      "info": "45 kHz       ",
+      "token": 0
+    }
+  },
+  "ccd_setSpeed": {},
+  "ccd_getFitParams": {
+    "id": 1234,
+    "command": "ccd_getFitParams",
+    "errors": [],
+    "results": {
+      "params": "0,1,0,0,0"
+    }
+  },
+  "ccd_setFitParams": {},
+  "ccd_getExposureTime": {
+    "id": 1234,
+    "command": "ccd_getExposureTime",
+    "errors": [],
+    "results": {
+      "time": 0
+    }
+  },
+  "ccd_setExposureTime": {},
+  "ccd_getTimerResolution": {
+    "id": 1234,
+    "command": "ccd_getTimerResolution",
+    "errors": [],
+    "results": {
+      "resolution": 1000
+    }
+  },
+  "ccd_setTimerResolution": {},
+  "ccd_setAcqFormat": {},
+  "ccd_setRoi": {},
+  "ccd_getXAxisConversionType": {
+    "command": "ccd_getXAxisConversionType",
+    "errors": [],
+    "id": 0,
+    "results": {
+      "type": 0
+    }
+  },
+  "ccd_setXAxisConversionType": {},
+  "ccd_getDataRetrievalMethod": {},
+  "ccd_setDataRetrievalMethod": {},
+  "ccd_getAcqCount": {
+    "command": "ccd_getAcqCount",
+    "errors": [],
+    "id": 0,
+    "results": {
+      "count": 1
+    }
+  },
+  "ccd_setAcqCount": {},
+  "ccd_getCleanCount": {
+    "command": "ccd_getCleanCount",
+    "errors": [],
+    "id": 0,
+    "results": {
+      "count": 1,
+      "mode": 238
+    }
+  },
+  "ccd_setCleanCount": {},
+  "ccd_getDataSize": {
+    "command": "ccd_getDataSize",
+    "errors": [],
+    "id": 0,
+    "results": {
+      "size": 1024
+    }
+  },
+  "ccd_getTriggerIn": {
+    "command": "ccd_getTriggerIn",
+    "errors": [],
+    "id": 0,
+    "results": {
+      "addressWhere": -1,
+      "eventWhen": -1,
+      "sigTypeHow": -1
+    }
+  },
+  "ccd_setTriggerIn": {},
+  "ccd_getSignalOut": {},
+  "ccd_setSignalOut": {}
+}
