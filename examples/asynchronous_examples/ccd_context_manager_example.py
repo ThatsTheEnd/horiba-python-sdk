@@ -18,8 +18,8 @@ async def main():
             resolution = await ccd.get_chip_size()
             logger.info(f'Resolution: {resolution}')
             await ccd.get_exposure_time()
-            await ccd.set_exposure_time(5000)
-            await ccd.set_acquisition_start(False)
+            await ccd.set_exposure_time(500)
+            await ccd.set_acquisition_start(True)
             time.sleep(6)
         except Exception as e:
             logger.error(e)

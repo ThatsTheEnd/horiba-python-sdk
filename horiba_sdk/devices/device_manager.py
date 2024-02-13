@@ -59,6 +59,11 @@ def singleton(cls: type[Any]) -> Callable[[VarArg(Any), KwArg(Any)], Any]:
             _instances[cls] = cls(*args, **kwargs)
         return _instances[cls]
 
+    def clear_instances():
+        _instances.clear()
+
+    get_instance.clear_instances = clear_instances
+
     return get_instance
 
 
@@ -88,6 +93,7 @@ class DeviceManager(AbstractDeviceManager):
         self._icl_communicator: WebsocketCommunicator = WebsocketCommunicator(
             'ws://' + websocket_ip + ':' + str(websocket_port)
         )
+        self._icl_communicator.register_binary_message_callback(self._binary_message_callback)
         self._icl_websocket_ip: str = websocket_ip
         self._icl_websocket_port: str = websocket_port
 
@@ -105,11 +111,14 @@ class DeviceManager(AbstractDeviceManager):
         """
         logger.info('Starting ICL software...')
         try:
-            if platform.system() == 'Windows':
-                icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
-                if not icl_running:
-                    logger.info('icl not running, starting it...')
-                    subprocess.Popen([r'C:\Program Files\HORIBA Scientific\SDK\icl.exe'])
+            if platform.system() != 'Windows':
+                logger.log('Only Windows is supported for ICL software. Skip starting of ICL...')
+                return
+
+            icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
+            if not icl_running:
+                logger.info('icl not running, starting it...')
+                subprocess.Popen([r'C:\Program Files\HORIBA Scientific\SDK\icl.exe'])
         except subprocess.CalledProcessError:
             logger.error('Failed to start ICL software.')
         except Exception as e:  # pylint: disable=broad-exception-caught
@@ -136,6 +145,25 @@ class DeviceManager(AbstractDeviceManager):
             await self._icl_communicator.close()
 
         logger.info('icl_shutdown command sent')
+
+    def _format_icl_binary_to_string(self, message: bytes) -> str:
+        return ' '.join(format(byte, '02x') for byte in message[::-1])
+
+    async def _binary_message_callback(self, message: bytes) -> None:
+        hex_data = ' '.join(format(byte, '02x') for byte in message)
+        if len(message) < 18:
+            logger.warning(f'binary message not valid: {len(message)} < 16')
+        logger.info(f'Received binary message: {hex_data}')
+        logger.info(f'magic number: {self._format_icl_binary_to_string(message[:2])}')
+        logger.info(f'message type: {self._format_icl_binary_to_string(message[2:4])}')
+        logger.info(f'element type: {self._format_icl_binary_to_string(message[4:6])}')
+        logger.info(f'element count: {self._format_icl_binary_to_string(message[6:10])}')
+        logger.info(f'tag 1: {self._format_icl_binary_to_string(message[10:12])}')
+        logger.info(f'tag 2: {self._format_icl_binary_to_string(message[12:14])}')
+        logger.info(f'tag 3: {self._format_icl_binary_to_string(message[14:16])}')
+        logger.info(f'tag 4: {self._format_icl_binary_to_string(message[16:18])}')
+        logger.info(f'payload: {self._format_icl_binary_to_string(message[18:])}')
+        logger.info(f'payload as string: {str(message[18:])}')
 
     @override
     async def discover_devices(self, error_on_no_device: bool = False) -> None:

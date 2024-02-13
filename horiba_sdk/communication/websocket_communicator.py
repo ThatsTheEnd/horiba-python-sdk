@@ -171,8 +171,9 @@ class WebsocketCommunicator(AbstractCommunicator):
                 if isinstance(message, str):
                     await self.json_message_queue.put(message)
                 elif isinstance(message, bytes):
-                    await self.binary_message_queue.put(message)
-                    logger.debug(f'Callback before if statement: {self.binary_message_callback}')
+                    # TODO: [saga] is this still needed?
+                    # await self.binary_message_queue.put(message)
+                    # logger.debug(f'Callback before if statement: {self.binary_message_callback}')
                     if self.binary_message_callback:
                         await asyncio.create_task(self.binary_message_callback(message))  # Call the callback
                 else:

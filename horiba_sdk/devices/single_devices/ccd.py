@@ -1,7 +1,9 @@
+from enum import Enum
 from types import TracebackType
 from typing import Any, Optional, Union, final
 
 import pint
+from loguru import logger
 from overrides import override
 
 from horiba_sdk import ureg
@@ -32,6 +34,12 @@ class ChargeCoupledDevice(AbstractDevice):
 
     """
 
+    @final
+    class XAxisConversionType(Enum):
+        NONE = 0
+        FROM_CCD_FIRMWARE = 1
+        FROM_ICL_SETTINGS_INI = 2
+
     def __init__(self, device_manager: DeviceManager) -> None:
         super().__init__(device_manager)
         self.device_list: list[str] = []
@@ -42,6 +50,11 @@ class ChargeCoupledDevice(AbstractDevice):
     async def __aexit__(
         self, exc_type: type[BaseException], exc_value: BaseException, traceback: Optional[TracebackType]
     ) -> None:
+        is_open = await self.is_open()
+        if not is_open:
+            logger.debug('CCD is already closed')
+            return
+
         await self.close()
 
     @override
@@ -54,6 +67,7 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side
         """
+        self._id = device_id
         await super().open(device_id)
         await super()._execute_command('ccd_open', {'index': self._id})
         if enable_binary_messages:
@@ -153,7 +167,7 @@ class ChargeCoupledDevice(AbstractDevice):
             Exception: When an error occurred on the device side
         """
         response: Response = await super()._execute_command('ccd_getAcquisitionReady', {'index': self._id})
-        return bool(response.results['size'])
+        return bool(response.results['ready'])
 
     async def set_acquisition_start(self, open_shutter: bool) -> None:
         """Starts the acquisition of the CCD
@@ -214,3 +228,12 @@ class ChargeCoupledDevice(AbstractDevice):
         """Returns true if the CCD is busy with the acquisition"""
         response: Response = await super()._execute_command('ccd_getAcquisitionBusy', {'index': self._id})
         return bool(response.results['isBusy'])
+
+    async def set_x_axis_conversion_type(self, conversion_type: XAxisConversionType) -> None:
+        """Sets the conversion type of the x axis"""
+        await super()._execute_command('ccd_setXAxisConversionType', {'index': self._id, 'type': conversion_type.value})
+
+    async def get_x_axis_conversion_type(self) -> XAxisConversionType:
+        """Gets the conversion type of the x axis"""
+        response: Response = await super()._execute_command('ccd_getXAxisConversionType', {'index': self._id})
+        return self.XAxisConversionType(response.results['type'])

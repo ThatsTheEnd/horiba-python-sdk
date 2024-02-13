@@ -76,3 +76,29 @@ async def test_ccd_speed(device_manager_instance):
         speed = await ccd.get_speed()
         zero = ureg.Quantity(0, ureg.kHz)
         assert speed != zero
+
+
+@pytest.mark.asyncio
+@pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
+async def test_ccd_exposure_time(device_manager_instance):
+    # arrange
+    # act
+    async with ChargeCoupledDevice(device_manager_instance) as ccd:
+        await ccd.open(0, enable_binary_messages=True)
+        await ccd.set_exposure_time(400)
+        exposure_time = await ccd.get_exposure_time()
+        # assert
+        assert exposure_time == 400 * ureg.milliseconds
+
+
+@pytest.mark.asyncio
+@pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
+async def test_ccd_x_axis_conversion_type(device_manager_instance):
+    # arrange
+    # act
+    async with ChargeCoupledDevice(device_manager_instance) as ccd:
+        await ccd.open(0, enable_binary_messages=True)
+        await ccd.set_x_axis_conversion_type(ChargeCoupledDevice.XAxisConversionType.FROM_ICL_SETTINGS_INI)
+        x_axis_conversion_type = await ccd.get_x_axis_conversion_type()
+        # assert
+        assert x_axis_conversion_type == ChargeCoupledDevice.XAxisConversionType.FROM_ICL_SETTINGS_INI

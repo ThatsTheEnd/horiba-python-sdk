@@ -9,7 +9,7 @@ from horiba_sdk.devices.single_devices.ccd import ChargeCoupledDevice
 
 
 async def main():
-    device_manager = DeviceManager(start_icl=False)
+    device_manager = DeviceManager(start_icl=True)
     await device_manager.communicator.open()
     await device_manager.discover_devices()
 
@@ -24,7 +24,7 @@ async def main():
         await ccd.get_temperature()
         await ccd.set_region_of_interest()  # Set default ROI, if you want a custom ROI, pass the parameters
         if await ccd.get_acquisition_ready():
-            await ccd.set_acquisition_start(open_shutter=False)
+            await ccd.set_acquisition_start(open_shutter=True)
             time.sleep(1)  # Wait a short period for the acquisition to start
             # Poll for acquisition status
             acquisition_busy = True

@@ -10,9 +10,8 @@ class AbstractDeviceManager(ABC):
 
     """
 
-    def __init__(self, start_icl: bool = True):
+    def __init__(self):
         self.binary_messages_enabled: bool = False
-        self._start_icl: bool = start_icl
 
     @abstractmethod
     def start_icl(self) -> None:
