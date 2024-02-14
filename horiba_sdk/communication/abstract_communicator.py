@@ -46,12 +46,27 @@ class AbstractCommunicator(ABC):
         pass
 
     @abstractmethod
+    async def response_from(self, command: Command) -> Response:
+        """
+        Abstract method to fetch a response from a command.
+
+        Args:
+            command (Command): Command for which a response is desired
+
+        Returns:
+            Response: The response corresponding to the sent command.
+        """
+        pass
+
+    @abstractmethod
     async def binary_response(self) -> BinaryResponse:
         """
         Abstract method that fetches the next binary response.
 
         Returns:
             BinaryResponse: The binary response from the server
+
+        .. todo:: `[saga]` is this still needed?
         """
         pass
 

@@ -5,16 +5,15 @@ import time
 from loguru import logger
 
 from horiba_sdk.devices.device_manager import DeviceManager
-from horiba_sdk.devices.single_devices.ccd import ChargeCoupledDevice
 
 
 async def main():
-    device_manager = DeviceManager(start_icl=True)
+    device_manager = DeviceManager()
     await device_manager.communicator.open()
     await device_manager.discover_devices()
 
-    ccd = ChargeCoupledDevice(device_manager)
-    await ccd.open(0, enable_binary_messages=True)
+    ccd = device_manager.charged_coupled_devices[0]
+    await ccd.open()
 
     try:
         await ccd.get_chip_size()

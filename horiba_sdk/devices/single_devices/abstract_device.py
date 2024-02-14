@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from horiba_sdk.communication import Response, WebsocketCommunicator
-from horiba_sdk.devices.abstract_device_manager import AbstractDeviceManager
+from horiba_sdk.communication import AbstractCommunicator, Command, Response
+from horiba_sdk.icl_error import AbstractError, AbstractErrorDB
 
 
 class AbstractDevice(ABC):
@@ -15,23 +15,21 @@ class AbstractDevice(ABC):
     Attributes:
         _id (int):
         _communicator (WebsocketCommunicator):
-        _device_manager (DeviceManager):
     """
 
-    def __init__(self, device_manager: AbstractDeviceManager) -> None:
-        self._id: int = -1
-        self._device_manager: AbstractDeviceManager = device_manager
-        self._communicator: WebsocketCommunicator = device_manager.communicator
+    def __init__(self, device_id: int, communicator: AbstractCommunicator, error_db: AbstractErrorDB) -> None:
+        self._id: int = device_id
+        self._error_db: AbstractErrorDB = error_db
+        self._communicator: AbstractCommunicator = communicator
 
     @abstractmethod
-    async def open(self, device_id: int) -> None:
+    async def open(self) -> None:
         """
         Open a connection to the device.
 
         Returns:
             Result: Result object indicating success or failure.
         """
-        self._id = device_id
         if not self._communicator.opened():
             await self._communicator.open()
 
@@ -61,8 +59,20 @@ class AbstractDevice(ABC):
         Raises:
             Exception: When an error occurred on the device side.
         """
-        response: Response = await self._communicator.execute_command(command_name, parameters)
+        response: Response = await self._communicator.response_from(Command(command_name, parameters))
         if response.errors:
-            self._device_manager.handle_errors(response.errors)
-            raise Exception(f'Encountered error: {response.errors}')
+            self._handle_errors(response.errors)
         return response
+
+    def _handle_errors(self, errors: list[str]) -> None:
+        """
+        Handles errors, logs them, and may take corrective actions.
+
+        Args:
+            errors (Exception): The exception or error to handle.
+        """
+        for error in errors:
+            icl_error: AbstractError = self._error_db.error_from(error)
+            icl_error.log()
+            # TODO: [saga] only throw depending on the log level, tbd
+            raise Exception(f'Error from the ICL: {icl_error.message()}')

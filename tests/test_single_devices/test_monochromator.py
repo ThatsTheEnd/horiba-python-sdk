@@ -7,7 +7,6 @@ import pytest
 from numericalunits import nm
 
 from horiba_sdk.devices import FakeDeviceManager
-from horiba_sdk.devices.single_devices import Monochromator
 
 fake_icl_host: str = 'localhost'
 fake_icl_port: int = 8766
@@ -32,13 +31,13 @@ def _run_fake_icl_server(fake_device_manager):
 @pytest.mark.asyncio
 async def test_monochromator_opens(fake_device_manager, _run_fake_icl_server):
     # arrange
-    monochromator = Monochromator(fake_device_manager)
+    monochromator = fake_device_manager.monochromators[0]
 
     # act
-    await monochromator.open(1)
+    await monochromator.open()
 
     # assert
-    assert await monochromator.is_open is True
+    assert await monochromator.is_open() is True
 
     await monochromator.close()
 
@@ -46,10 +45,10 @@ async def test_monochromator_opens(fake_device_manager, _run_fake_icl_server):
 @pytest.mark.asyncio
 async def test_monochromator_busy(fake_device_manager, _run_fake_icl_server):
     # arrange
-    monochromator = Monochromator(fake_device_manager)
+    monochromator = fake_device_manager.monochromators[0]
 
     # act
-    await monochromator.open(1)
+    await monochromator.open()
 
     # assert
     assert await monochromator.is_busy is True
@@ -60,10 +59,10 @@ async def test_monochromator_busy(fake_device_manager, _run_fake_icl_server):
 @pytest.mark.asyncio
 async def test_monochromator_wavelength(fake_device_manager, _run_fake_icl_server):
     # arrange
-    monochromator = Monochromator(fake_device_manager)
+    monochromator = fake_device_manager.monochromators[0]
 
     # act
-    await monochromator.open(1)
+    await monochromator.open()
 
     # assert
     assert await monochromator.wavelength > 0
@@ -74,10 +73,10 @@ async def test_monochromator_wavelength(fake_device_manager, _run_fake_icl_serve
 @pytest.mark.asyncio
 async def test_monochromator_can_move_to_wavelength(fake_device_manager, _run_fake_icl_server):
     # arrange
-    monochromator = Monochromator(fake_device_manager)
+    monochromator = fake_device_manager.monochromators[0]
 
     # act
-    await monochromator.open(1)
+    await monochromator.open()
     await monochromator.move_to_wavelength(350 * nm)
 
     # assert
@@ -89,10 +88,10 @@ async def test_monochromator_can_move_to_wavelength(fake_device_manager, _run_fa
 @pytest.mark.asyncio
 async def test_monochromator_turret_grating_position(fake_device_manager, _run_fake_icl_server):
     # arrange
-    monochromator = Monochromator(fake_device_manager)
+    monochromator = fake_device_manager.monochromators[0]
 
     # act
-    await monochromator.open(1)
+    await monochromator.open()
 
     # assert
     assert await monochromator.turret_grating_position > 0
@@ -103,10 +102,10 @@ async def test_monochromator_turret_grating_position(fake_device_manager, _run_f
 @pytest.mark.asyncio
 async def test_monochromator_can_move_turret_grating_position(fake_device_manager, _run_fake_icl_server):
     # arrange
-    monochromator = Monochromator(fake_device_manager)
+    monochromator = fake_device_manager.monochromators[0]
 
     # act
-    await monochromator.open(1)
+    await monochromator.open()
     await monochromator.move_turret_to_grating(50)
 
     # assert

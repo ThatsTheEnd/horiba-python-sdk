@@ -34,9 +34,8 @@ async def device_manager_instance():
 async def test_ccd_opens(device_manager_instance):
     # arrange
     # act
-    async with ChargeCoupledDevice(device_manager_instance) as ccd:
+    async with device_manager_instance.charge_coupled_devices[0] as ccd:
         # assert
-        await ccd.open(0, enable_binary_messages=True)
         assert await ccd.is_open() is True
 
 
@@ -45,8 +44,7 @@ async def test_ccd_opens(device_manager_instance):
 async def test_ccd_temperature(device_manager_instance):
     # arrange
     # act
-    async with ChargeCoupledDevice(device_manager_instance) as ccd:
-        await ccd.open(0, enable_binary_messages=True)
+    async with device_manager_instance.charge_coupled_devices[0] as ccd:
         # assert
         temperature = await ccd.get_temperature()
         zero = ureg.Quantity(0, ureg.degC)
@@ -58,8 +56,7 @@ async def test_ccd_temperature(device_manager_instance):
 async def test_ccd_resolution(device_manager_instance):
     # arrange
     # act
-    async with ChargeCoupledDevice(device_manager_instance) as ccd:
-        await ccd.open(0, enable_binary_messages=True)
+    async with device_manager_instance.charge_coupled_devices[0] as ccd:
         # assert
         resolution = await ccd.get_chip_size()
         assert resolution.width > 0 and resolution.height > 0
@@ -70,8 +67,7 @@ async def test_ccd_resolution(device_manager_instance):
 async def test_ccd_speed(device_manager_instance):
     # arrange
     # act
-    async with ChargeCoupledDevice(device_manager_instance) as ccd:
-        await ccd.open(0, enable_binary_messages=True)
+    async with device_manager_instance.charge_coupled_devices[0] as ccd:
         # assert
         speed = await ccd.get_speed()
         zero = ureg.Quantity(0, ureg.kHz)
@@ -83,8 +79,7 @@ async def test_ccd_speed(device_manager_instance):
 async def test_ccd_exposure_time(device_manager_instance):
     # arrange
     # act
-    async with ChargeCoupledDevice(device_manager_instance) as ccd:
-        await ccd.open(0, enable_binary_messages=True)
+    async with device_manager_instance.charge_coupled_devices[0] as ccd:
         await ccd.set_exposure_time(400)
         exposure_time = await ccd.get_exposure_time()
         # assert
@@ -96,8 +91,7 @@ async def test_ccd_exposure_time(device_manager_instance):
 async def test_ccd_x_axis_conversion_type(device_manager_instance):
     # arrange
     # act
-    async with ChargeCoupledDevice(device_manager_instance) as ccd:
-        await ccd.open(0, enable_binary_messages=True)
+    async with device_manager_instance.charge_coupled_devices[0] as ccd:
         await ccd.set_x_axis_conversion_type(ChargeCoupledDevice.XAxisConversionType.FROM_ICL_SETTINGS_INI)
         x_axis_conversion_type = await ccd.get_x_axis_conversion_type()
         # assert

@@ -127,6 +127,8 @@ class WebsocketCommunicator(AbstractCommunicator):
         Raises:
             CommunicationException: When the connection terminated with an error
             or the binary data failed to be processed.
+
+        .. todo:: `[saga]` is this still needed?
         """
         try:
             response: bytes = await self.binary_message_queue.get()
@@ -188,22 +190,20 @@ class WebsocketCommunicator(AbstractCommunicator):
     async def _receive_binary_data(self) -> None:
         await self._receive_data()
 
-    async def execute_command(self, command_name: str, parameters: dict[Any, Any]) -> Response:
+    @override
+    async def response_from(self, command: Command) -> Response:
         """
-        Creates a command from the command name, and it's parameters
-        Executes a command and handles the response.
+        Abstract method to fetch a response from a command.
 
         Args:
-            command_name (str): The name of the command to execute.
-            parameters (dict): The parameters for the command.
+            command (Command): Command for which a response is desired
 
         Returns:
-            Response: The response from the device.
+            Response: The response corresponding to the sent command.
 
         Raises:
-            Exception: When an error occurred on the device side.
+            Exception: When an error occurred with the communication channel
         """
-        command: Command = Command(command_name, parameters)  # create command
-        await self.send(command)  # send command
-        response: Response = await self.response()  # get response
+        await self.send(command)
+        response: Response = await self.response()
         return response

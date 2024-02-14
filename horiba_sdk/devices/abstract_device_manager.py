@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 from horiba_sdk.communication import WebsocketCommunicator
+from horiba_sdk.devices.single_devices import ChargeCoupledDevice, Monochromator
 
 
 class AbstractDeviceManager(ABC):
@@ -10,13 +11,13 @@ class AbstractDeviceManager(ABC):
 
     """
 
-    def __init__(self):
-        self.binary_messages_enabled: bool = False
-
     @abstractmethod
     def start_icl(self) -> None:
         """
         Abstract method that starts the ICL software and establishes communication.
+
+        Args:
+            enable_binary_messages (bool): Turn on binary messages from the ICL
         """
         pass
 
@@ -37,16 +38,6 @@ class AbstractDeviceManager(ABC):
         """
         pass
 
-    @abstractmethod
-    def handle_errors(self, errors: list[str]) -> None:
-        """
-        Abstract method that handles errors, logs them, and may take corrective actions.
-
-        Args:
-            errors (List[str]): The errors to handle.
-        """
-        pass
-
     @property
     @abstractmethod
     def communicator(self) -> WebsocketCommunicator:
@@ -55,5 +46,27 @@ class AbstractDeviceManager(ABC):
 
         Returns:
             AbstractCommunicator: Returns the internal communicator instance.
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def monochromators(self) -> list[Monochromator]:
+        """
+        Abstract method to get the detected monochromators.
+
+        Returns:
+            List[Monochromator]: The detected monochromators
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def charge_coupled_devices(self) -> list[ChargeCoupledDevice]:
+        """
+        Abstract method to get the detected CCDs.
+
+        Returns:
+            List[ChargeCoupledDevice]: The detected CCDS.
         """
         pass

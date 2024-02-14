@@ -7,9 +7,12 @@ from typing import Any, Optional, final
 
 import websockets
 from loguru import logger
+from overrides import override
 from websockets.legacy.server import WebSocketServerProtocol
 
 from horiba_sdk.communication.websocket_communicator import WebsocketCommunicator
+from horiba_sdk.devices.single_devices import ChargeCoupledDevice, Monochromator
+from horiba_sdk.icl_error import FakeErrorDB
 
 from .abstract_device_manager import AbstractDeviceManager
 
@@ -56,6 +59,7 @@ class FakeDeviceManager(AbstractDeviceManager):
         self.websocket: Optional[WebSocketServerProtocol] = None
         self.loop: Optional[AbstractEventLoop] = None
         self.server: Optional[Task[Any]] = None
+        self.error_db: FakeErrorDB = FakeErrorDB()
 
         current_directory = os.path.dirname(__file__)
         fake_responses_path = os.path.join(current_directory, 'fake_responses')
@@ -76,6 +80,7 @@ class FakeDeviceManager(AbstractDeviceManager):
         async with websockets.serve(self._echo_handler, self.host, self.port):
             await asyncio.Future()
 
+    @override
     def start_icl(self) -> None:
         """
         Starts a local websocket server as an asyncio task in a new async loop.
@@ -89,28 +94,47 @@ class FakeDeviceManager(AbstractDeviceManager):
 
         self.loop.close()
 
+    @override
     def stop_icl(self) -> None:
         """
         Does nothing.
         """
         pass
 
+    @override
     async def discover_devices(self, error_on_no_device: bool = False) -> None:
         """
         Does nothing.
         """
         pass
 
-    def handle_errors(self, errors: list[str]) -> None:
-        """
-        Does nothing.
-        """
-        pass
-
     @property
+    @override
     def communicator(self) -> WebsocketCommunicator:
         """Communicator"""
         return WebsocketCommunicator('ws://' + self.host + ':' + str(self.port))
+
+    @property
+    @override
+    def monochromators(self) -> list[Monochromator]:
+        """
+        Abstract method to get the detected monochromators.
+
+        Returns:
+            List[Monochromator]: The detected monochromators
+        """
+        return [Monochromator(0, self.communicator, self.error_db)]
+
+    @property
+    @override
+    def charge_coupled_devices(self) -> list[ChargeCoupledDevice]:
+        """
+        Abstract method to get the detected CCDs.
+
+        Returns:
+            List[ChargeCoupledDevice]: The detected CCDS.
+        """
+        return [ChargeCoupledDevice(0, self.communicator, self.error_db)]
 
     async def _echo_handler(self, websocket: WebSocketServerProtocol) -> None:
         async for message in websocket:

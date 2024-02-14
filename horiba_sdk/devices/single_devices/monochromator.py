@@ -1,10 +1,12 @@
-from typing import final
+from types import TracebackType
+from typing import Optional, final
 
+from loguru import logger
 from numericalunits import nm
 from overrides import override
 
-from horiba_sdk.communication import Response
-from horiba_sdk.devices.abstract_device_manager import AbstractDeviceManager
+from horiba_sdk.communication import AbstractCommunicator, Response
+from horiba_sdk.icl_error import AbstractErrorDB
 
 from .abstract_device import AbstractDevice
 
@@ -13,37 +15,35 @@ from .abstract_device import AbstractDevice
 class Monochromator(AbstractDevice):
     """Monochromator device
 
-    Example usage::
-
-        from horiba_sdk.devices.monochromator import Monochromator
-
-        # using the context manager:
-        with Monochromator(0, device_manager) as monochromator:
-            print(await monochromator.is_open)
-
-        # alternative usage
-        monochromator: Monochromator = Monochromator(0, device_manager)
-        await monochromator.open()
-        print(await monochromator.is_open)
-        await monochromator.close()
-
-
-    .. todo:: Handle errors coming from the ICL. There may be more than one, in the format:
-       `"[E];<error code>;<error string>"`
-
+    This class should not be instanced by the end user. Instead, the :class:`horiba_sdk.devices.DeviceManager`
+    should be used to access the detected Monochromators on the system.
     """
 
-    def __init__(self, device_manager: AbstractDeviceManager) -> None:
-        super().__init__(device_manager)
+    def __init__(self, device_id: int, communicator: AbstractCommunicator, error_db: AbstractErrorDB) -> None:
+        super().__init__(device_id, communicator, error_db)
+
+    async def __aenter__(self) -> 'Monochromator':
+        await self.open()
+        return self
+
+    async def __aexit__(
+        self, exc_type: type[BaseException], exc_value: BaseException, traceback: Optional[TracebackType]
+    ) -> None:
+        is_open = await self.is_open()
+        if not is_open:
+            logger.debug('Monochromator is already closed')
+            return
+
+        await self.close()
 
     @override
-    async def open(self, device_id: int) -> None:
+    async def open(self) -> None:
         """Opens the connection to the Monochromator
 
         Raises:
             Exception: When an error occured on the device side
         """
-        await super().open(device_id)
+        await super().open()
         await super()._execute_command('mono_open', {'index': self._id})
 
     @override
@@ -56,7 +56,6 @@ class Monochromator(AbstractDevice):
         await super()._execute_command('mono_close', {'index': self._id})
         await super().close()
 
-    @property
     async def is_open(self) -> bool:
         """Checks if the connection to the monochromator is open.
 
