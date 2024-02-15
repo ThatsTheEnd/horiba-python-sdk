@@ -25,28 +25,9 @@ class AbstractCommunicator(ABC):
         """
         pass
 
-    @abstractmethod
-    async def send(self, command: Command) -> None:
-        """
-        Abstract method to send a command.
-
-        Args:
-            command (Command): Command to be sent.
-        """
-        pass
 
     @abstractmethod
-    async def response(self) -> Response:
-        """
-        Abstract method that fetches the next response.
-
-        Returns:
-            Response: The response from the server
-        """
-        pass
-
-    @abstractmethod
-    async def response_from(self, command: Command) -> Response:
+    async def request_with_response(self, command: Command) -> Response:
         """
         Abstract method to fetch a response from a command.
 

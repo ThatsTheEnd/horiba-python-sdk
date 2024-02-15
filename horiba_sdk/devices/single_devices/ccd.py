@@ -63,7 +63,6 @@ class ChargeCoupledDevice(AbstractDevice):
             Exception: When an error occurred on the device side
         """
         await super()._execute_command('ccd_close', {'index': self._id})
-        await super().close()
 
     async def is_open(self) -> bool:
         """Checks if the connection to the charge coupled device is open.

@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Any
 
-from horiba_sdk.communication import WebsocketCommunicator
+from horiba_sdk.communication import AbstractCommunicator
 from horiba_sdk.devices.single_devices import ChargeCoupledDevice, Monochromator
 
 
@@ -12,19 +11,16 @@ class AbstractDeviceManager(ABC):
     """
 
     @abstractmethod
-    def start_icl(self) -> None:
+    async def start(self) -> None:
         """
-        Abstract method that starts the ICL software and establishes communication.
-
-        Args:
-            enable_binary_messages (bool): Turn on binary messages from the ICL
+        Abstract method to start the device manager.
         """
         pass
 
     @abstractmethod
-    def stop_icl(self) -> Any:
+    async def stop(self) -> None:
         """
-        Abstract method that stops the communication and cleans up resources.
+        Abstract method to stop the device manager.
         """
         pass
 
@@ -40,7 +36,7 @@ class AbstractDeviceManager(ABC):
 
     @property
     @abstractmethod
-    def communicator(self) -> WebsocketCommunicator:
+    def communicator(self) -> AbstractCommunicator:
         """
         Abstract method to get the communicator attribute.
 

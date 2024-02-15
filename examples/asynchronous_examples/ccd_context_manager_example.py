@@ -9,10 +9,13 @@ from horiba_sdk.devices.device_manager import DeviceManager
 
 async def main():
     device_manager = DeviceManager()
-    await device_manager.communicator.open()
-    await device_manager.discover_devices()
+    await device_manager.start()
 
-    async with device_manager.charged_coupled_devices[0] as ccd:
+    if not device_manager.charge_coupled_devices:
+        logger.error('No CCDs found, exiting...')
+        return
+
+    async with device_manager.charge_coupled_devices[0] as ccd:  # ChargeCoupledDevice
         await ccd.get_chip_size()
         await ccd.get_exposure_time()
         await ccd.set_exposure_time(random.randint(1000, 5000))
@@ -32,6 +35,7 @@ async def main():
             await ccd.get_acquisition_data()
         await ccd.get_speed()
 
+    await device_manager.stop()
 
 if __name__ == '__main__':
     asyncio.run(main())

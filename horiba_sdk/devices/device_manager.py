@@ -29,8 +29,6 @@ circular dependencies.
 For more details on the TYPE_CHECKING constant and its usage, refer to:
 https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING
 """
-
-import asyncio
 import importlib.resources
 import platform
 import subprocess
@@ -43,7 +41,13 @@ from loguru import logger
 from mypy_extensions import KwArg, VarArg
 from overrides import override
 
-from horiba_sdk.communication import Command, Response, WebsocketCommunicator
+from horiba_sdk.communication import (
+    AbstractCommunicator,
+    Command,
+    CommunicationException,
+    Response,
+    WebsocketCommunicator,
+)
 from horiba_sdk.devices import AbstractDeviceManager, DeviceDiscovery
 from horiba_sdk.devices.single_devices import ChargeCoupledDevice, Monochromator
 from horiba_sdk.icl_error import AbstractError, AbstractErrorDB, ICLErrorDB
@@ -72,11 +76,6 @@ def singleton(cls: type[Any]) -> Callable[[VarArg(Any), KwArg(Any)], Any]:
 class DeviceManager(AbstractDeviceManager):
     """
     DeviceManager class manages the lifecycle and interactions with devices.
-
-    Attributes:
-        _icl_communicator: The communicator class used to talk to the ICL.
-        ccds (Dict[int, str]): CCD devices discovered.
-        monos (Dict[int, str]): Monochromator devices discovered.
     """
 
     def __init__(
@@ -90,33 +89,49 @@ class DeviceManager(AbstractDeviceManager):
         Initializes the DeviceManager with the specified communicator class.
 
         Args:
-            websocket_ip: str = '127.0.0.1': websocket IP
-            websocket_port: str = '25010': websocket port
+            start_icl (bool) = True: If True, the ICL software is started and communication is established.
+            websocket_ip (str) = '127.0.0.1': websocket IP
+            websocket_port (str) = '25010': websocket port
+            enable_binary_messages (bool) = True: If True, binary messages are enabled.
         """
         super().__init__()
-        self.ccds: dict[int, 'str'] = {}
-        self.monos: dict[int, 'str'] = {}
+        self._start_icl = start_icl
         self._icl_communicator: WebsocketCommunicator = WebsocketCommunicator(
             'ws://' + websocket_ip + ':' + str(websocket_port)
         )
         self._icl_communicator.register_binary_message_callback(self._binary_message_callback)
         self._icl_websocket_ip: str = websocket_ip
         self._icl_websocket_port: str = websocket_port
+        self._binary_messages: bool = enable_binary_messages
+        self._charge_coupled_devices: list[ChargeCoupledDevice] = []
+        self._monochromators: list[Monochromator] = []
 
         error_list_path: Path = Path(str(importlib.resources.files('horiba_sdk.icl_error') / 'error_list.json'))
         self._icl_error_db: AbstractErrorDB = ICLErrorDB(error_list_path)
 
-        logger.info(f'Start ICL: {start_icl}')
-        if start_icl:
-            self.start_icl(enable_binary_messages)
+    @override
+    async def start(self) -> None:
+        if self._start_icl:
+            self.start_icl()
+
+        await self._icl_communicator.open()
+
+        icl_info: Response = await self._icl_communicator.request_with_response(Command('icl_info', {}))
+        logger.info(f'ICL info: {icl_info.results}')
+
+        if self._binary_messages:
+            await self._enable_binary_messages()
+
+        await self.discover_devices()
 
     @override
-    def start_icl(self, enable_binary_messages: bool = True) -> None:
+    async def stop(self) -> None:
+        await self.stop_icl()
+
+    @staticmethod
+    def start_icl() -> None:
         """
         Starts the ICL software and establishes communication.
-
-        Args:
-            enable_binary_messages (bool): Turn on binary messages from the ICL
         """
         logger.info('Starting ICL software...')
         try:
@@ -134,16 +149,10 @@ class DeviceManager(AbstractDeviceManager):
         except Exception as e:  # pylint: disable=broad-exception-caught
             logger.error('Unexpected error: %s', e)
 
-        if enable_binary_messages:
-            # TODO: [saga] is this the best way to do it?
-            asyncio.run(self._enable_binary_messages())
-
     async def _enable_binary_messages(self) -> None:
-        if not self._icl_communicator.opened():
-            await self._icl_communicator.open()
 
         bin_mode_command: Command = Command('icl_binMode', {'mode': 'all'})
-        response: Response = await self._icl_communicator.response_from(bin_mode_command)
+        response: Response = await self._icl_communicator.request_with_response(bin_mode_command)
 
         if response.errors:
             self._handle_errors(response.errors)
@@ -155,7 +164,6 @@ class DeviceManager(AbstractDeviceManager):
             # TODO: [saga] only throw depending on the log level, tbd
             raise Exception(f'Error from the ICL: {icl_error.message()}')
 
-    @override
     async def stop_icl(self) -> None:
         """
         Stops the communication and cleans up resources.
@@ -164,12 +172,15 @@ class DeviceManager(AbstractDeviceManager):
 
         if not self._icl_communicator.opened():
             await self._icl_communicator.open()
-
-        shutdown_command: Command = Command('icl_shutdown', {})
-        response: Response = await self._icl_communicator.response_from(shutdown_command)
-
-        if response.errors:
-            self._handle_errors(response.errors)
+        try:
+            shutdown_command: Command = Command('icl_shutdown', {})
+            _response: Response = await self._icl_communicator.request_with_response(shutdown_command)
+        except CommunicationException as e:
+            logger.debug(f'CommunicationException: {e.message}')
+        finally:
+            icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
+            if icl_running:
+                raise Exception('Failed to shutdown ICL software.')
 
         if self._icl_communicator.opened():
             await self._icl_communicator.close()
@@ -210,7 +221,7 @@ class DeviceManager(AbstractDeviceManager):
 
     @property
     @override
-    def communicator(self) -> WebsocketCommunicator:
+    def communicator(self) -> AbstractCommunicator:
         """
         Getter method for the communicator attribute.
 

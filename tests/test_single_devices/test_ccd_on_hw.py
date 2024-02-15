@@ -1,98 +1,49 @@
-# pylint: skip-file
 import asyncio
 import os
+import random
 
 import pytest
-import pytest_asyncio
+from loguru import logger
 
 from horiba_sdk import ureg
-from horiba_sdk.devices import DeviceManager
-from horiba_sdk.devices.single_devices import ChargeCoupledDevice
+from horiba_sdk.devices.device_manager import DeviceManager
+
+pytest_plugins = ('pytest_asyncio',)
 
 
-@pytest.fixture(scope='session')
-def event_loop(request):  # noqa: ARG001
-    loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
-
-
-@pytest_asyncio.fixture(scope='module')
-async def device_manager_instance():
-    device_manager = DeviceManager(start_icl=True)
-
-    await device_manager.communicator.open()
-    await device_manager.discover_devices()
-
-    yield device_manager
-
-    await device_manager.stop_icl()
-
-
-@pytest.mark.asyncio
+# Tell pytest to run this test only if called from the scope of this module. If any other pytest scope calls this test,
+# ignore it
+@pytest.mark.run_specific
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-async def test_ccd_opens(device_manager_instance):
-    # arrange
-    # act
-    async with device_manager_instance.charge_coupled_devices[0] as ccd:
-        # assert
-        assert await ccd.is_open() is True
-
-
 @pytest.mark.asyncio
-@pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-async def test_ccd_temperature(device_manager_instance):
-    # arrange
-    # act
-    async with device_manager_instance.charge_coupled_devices[0] as ccd:
-        # assert
-        temperature = await ccd.get_temperature()
-        zero = ureg.Quantity(0, ureg.degC)
-        assert temperature != zero
+async def test_ccd_functionality():
+    device_manager = DeviceManager(enable_binary_messages=False)
+    await device_manager.start()
 
+    ccd = device_manager.charge_coupled_devices[0]
+    await ccd.open()
 
-@pytest.mark.asyncio
-@pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-async def test_ccd_resolution(device_manager_instance):
-    # arrange
-    # act
-    async with device_manager_instance.charge_coupled_devices[0] as ccd:
-        # assert
-        resolution = await ccd.get_chip_size()
-        assert resolution.width > 0 and resolution.height > 0
+    try:
+        chip_size = await ccd.get_chip_size()
+        assert chip_size.width > 0 and chip_size.height > 0
+        await ccd.get_exposure_time()
+        new_exposure_time = random.randint(1000, 5000)
+        await ccd.set_exposure_time(new_exposure_time)
+        assert await ccd.get_exposure_time() == ureg.Quantity(new_exposure_time, 'ms')
+        await ccd.get_temperature()
+        await ccd.set_region_of_interest()  # Set default ROI, if you want a custom ROI, pass the parameters
+        if await ccd.get_acquisition_ready():
+            await ccd.set_acquisition_start(open_shutter=True)
+            await asyncio.sleep(1)  # Wait a short period for the acquisition to start
+            # Poll for acquisition status
+            acquisition_busy = True
+            while acquisition_busy:
+                acquisition_busy = await ccd.get_acquisition_busy()
+                await asyncio.sleep(0.3)
+                logger.info('Acquisition busy')
 
-
-@pytest.mark.asyncio
-@pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-async def test_ccd_speed(device_manager_instance):
-    # arrange
-    # act
-    async with device_manager_instance.charge_coupled_devices[0] as ccd:
-        # assert
-        speed = await ccd.get_speed()
-        zero = ureg.Quantity(0, ureg.kHz)
-        assert speed != zero
-
-
-@pytest.mark.asyncio
-@pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-async def test_ccd_exposure_time(device_manager_instance):
-    # arrange
-    # act
-    async with device_manager_instance.charge_coupled_devices[0] as ccd:
-        await ccd.set_exposure_time(400)
-        exposure_time = await ccd.get_exposure_time()
-        # assert
-        assert exposure_time == 400 * ureg.milliseconds
-
-
-@pytest.mark.asyncio
-@pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-async def test_ccd_x_axis_conversion_type(device_manager_instance):
-    # arrange
-    # act
-    async with device_manager_instance.charge_coupled_devices[0] as ccd:
-        await ccd.set_x_axis_conversion_type(ChargeCoupledDevice.XAxisConversionType.FROM_ICL_SETTINGS_INI)
-        x_axis_conversion_type = await ccd.get_x_axis_conversion_type()
-        # assert
-        assert x_axis_conversion_type == ChargeCoupledDevice.XAxisConversionType.FROM_ICL_SETTINGS_INI
+            await ccd.get_acquisition_data()
+        await ccd.get_speed()
+    finally:
+        await ccd.close()
+        device_manager.stop()

@@ -15,7 +15,7 @@ fake_icl_uri: str = 'ws://' + fake_icl_host + ':' + str(fake_icl_port)
 def _run_fake_icl_server():
     fake_device_manager = FakeDeviceManager(fake_icl_host, fake_icl_port)
 
-    thread = threading.Thread(target=fake_device_manager.start_icl)
+    thread = threading.Thread(target=fake_device_manager.start_fake)
     thread.start()
     yield
     fake_device_manager.loop.call_soon_threadsafe(fake_device_manager.server.cancel)

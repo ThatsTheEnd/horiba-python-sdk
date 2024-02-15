@@ -1,6 +1,5 @@
 import asyncio
 import random
-import time
 
 from loguru import logger
 
@@ -9,10 +8,9 @@ from horiba_sdk.devices.device_manager import DeviceManager
 
 async def main():
     device_manager = DeviceManager()
-    await device_manager.communicator.open()
-    await device_manager.discover_devices()
+    await device_manager.start()
 
-    ccd = device_manager.charged_coupled_devices[0]
+    ccd = device_manager.charge_coupled_devices[0]
     await ccd.open()
 
     try:
@@ -24,7 +22,7 @@ async def main():
         await ccd.set_region_of_interest()  # Set default ROI, if you want a custom ROI, pass the parameters
         if await ccd.get_acquisition_ready():
             await ccd.set_acquisition_start(open_shutter=True)
-            time.sleep(1)  # Wait a short period for the acquisition to start
+            await asyncio.sleep(1)  # Wait a short period for the acquisition to start
             # Poll for acquisition status
             acquisition_busy = True
             while acquisition_busy:

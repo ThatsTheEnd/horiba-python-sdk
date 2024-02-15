@@ -1387,13 +1387,13 @@ docs = ["furo", "sphinx", "sphinx-design"]
 
 [[package]]
 name = "sphinx-book-theme"
-version = "1.1.1"
+version = "1.1.2"
 description = "A clean book theme for scientific explanations and documentation with Sphinx"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "sphinx_book_theme-1.1.1-py3-none-any.whl", hash = "sha256:ce4df1aaab385a3a9633fa797281937ea120a5170968b6eb817b11f3e08abc07"},
-    {file = "sphinx_book_theme-1.1.1.tar.gz", hash = "sha256:e4d1058dbcc2b693c8dfa76110fa122c8219a81b3fb35c6929f23d5da9befd3e"},
+    {file = "sphinx_book_theme-1.1.2-py3-none-any.whl", hash = "sha256:cee744466fde48f50302b851291b208aa67e726ca31b7a3bfb9b6e6a145663e0"},
+    {file = "sphinx_book_theme-1.1.2.tar.gz", hash = "sha256:7f3abcd146ca82e6f39d6db53711102b1c1d328d12f65e3e47ad9bf842614a49"},
 ]
 
 [package.dependencies]

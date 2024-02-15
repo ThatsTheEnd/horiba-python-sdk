@@ -31,10 +31,10 @@ class DeviceDiscovery(AbstractDeviceDiscovery):
         commands_and_types = [('ccd_discover', 'ccd_list', 'CCD'), ('mono_discover', 'mono_list', 'Monochromator')]
 
         for discover_command, list_command, device_type in commands_and_types:
-            response: Response = await self._communicator.response_from(Command(discover_command, {}))
+            response: Response = await self._communicator.request_with_response(Command(discover_command, {}))
             if response.results.get('count', 0) == 0 and error_on_no_device:
                 raise Exception(f'No {device_type} connected')
-            response = await self._communicator.response_from(Command(list_command, {}))
+            response = await self._communicator.request_with_response(Command(list_command, {}))
 
             # as the responses of ccd_list and mono_list differ, we need to parse them separately
             if device_type == 'CCD':

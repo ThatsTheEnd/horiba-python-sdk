@@ -80,12 +80,11 @@ class FakeDeviceManager(AbstractDeviceManager):
         async with websockets.serve(self._echo_handler, self.host, self.port):
             await asyncio.Future()
 
-    @override
-    def start_icl(self) -> None:
+    def start_fake(self) -> None:
         """
-        Starts a local websocket server as an asyncio task in a new async loop.
-        Handles the closing of the loop
-        """
+                        Starts a local websocket server as an asyncio task in a new async loop.
+                        Handles the closing of the loop
+                        """
         self.loop = asyncio.new_event_loop()
         self.server = self.loop.create_task(self._websocket_server())
 
@@ -94,8 +93,20 @@ class FakeDeviceManager(AbstractDeviceManager):
 
         self.loop.close()
 
-    @override
-    def stop_icl(self) -> None:
+    async def start(self) -> None:
+        """
+                Starts a local websocket server as an asyncio task in a new async loop.
+                Handles the closing of the loop
+                """
+        self.loop = asyncio.new_event_loop()
+        self.server = self.loop.create_task(self._websocket_server())
+
+        with contextlib.suppress(asyncio.CancelledError):
+            self.loop.run_until_complete(self.server)
+
+        self.loop.close()
+
+    async def stop(self) -> None:
         """
         Does nothing.
         """

@@ -41,8 +41,7 @@ class AbstractDevice(ABC):
         Returns:
             Result: Result object indicating success or failure.
         """
-        if self._communicator.opened():
-            await self._communicator.close()
+        pass
 
     async def _execute_command(self, command_name: str, parameters: dict[Any, Any]) -> Response:
         """
@@ -59,7 +58,7 @@ class AbstractDevice(ABC):
         Raises:
             Exception: When an error occurred on the device side.
         """
-        response: Response = await self._communicator.response_from(Command(command_name, parameters))
+        response: Response = await self._communicator.request_with_response(Command(command_name, parameters))
         if response.errors:
             self._handle_errors(response.errors)
         return response

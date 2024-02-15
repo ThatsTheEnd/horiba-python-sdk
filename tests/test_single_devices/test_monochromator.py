@@ -21,7 +21,7 @@ def fake_device_manager():
 
 @pytest.fixture(scope='module')
 def _run_fake_icl_server(fake_device_manager):
-    thread = threading.Thread(target=fake_device_manager.start_icl)
+    thread = threading.Thread(target=fake_device_manager.start_fake)
     thread.start()
     yield
     fake_device_manager.loop.call_soon_threadsafe(fake_device_manager.server.cancel)
