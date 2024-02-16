@@ -37,5 +37,6 @@ async def main():
 
     await device_manager.stop()
 
+
 if __name__ == '__main__':
     asyncio.run(main())

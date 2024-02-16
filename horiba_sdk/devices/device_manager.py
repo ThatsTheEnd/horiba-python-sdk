@@ -32,10 +32,9 @@ https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING
 import asyncio
 import importlib.resources
 import platform
-import subprocess
 from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, final, Optional
+from typing import Any, Callable, Optional, final
 
 import psutil
 from loguru import logger
@@ -143,7 +142,7 @@ class DeviceManager(AbstractDeviceManager):
         icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
         if not icl_running:
             logger.info('icl not running, starting it...')
-            #subprocess.Popen([r'C:\Program Files\HORIBA Scientific\SDK\icl.exe'])
+            # subprocess.Popen([r'C:\Program Files\HORIBA Scientific\SDK\icl.exe'])
             self._icl_process = await asyncio.create_subprocess_exec(r'C:\Program Files\HORIBA Scientific\SDK\icl.exe')
         # except subprocess.CalledProcessError:
         #    logger.error('Failed to start ICL software.')
@@ -152,7 +151,6 @@ class DeviceManager(AbstractDeviceManager):
         #     logger.error('Unexpected error: %s', e)
 
     async def _enable_binary_messages(self) -> None:
-
         bin_mode_command: Command = Command('icl_binMode', {'mode': 'all'})
         response: Response = await self._icl_communicator.request_with_response(bin_mode_command)
 
@@ -184,7 +182,8 @@ class DeviceManager(AbstractDeviceManager):
         except CommunicationException as e:
             logger.debug(f'CommunicationException: {e.message}')
         finally:
-            await self._icl_process.wait()
+            if self._icl_process is not None:
+                await self._icl_process.wait()
             icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
             if icl_running:
                 raise Exception('Failed to shutdown ICL software.')

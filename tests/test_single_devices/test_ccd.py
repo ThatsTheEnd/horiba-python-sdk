@@ -1,36 +1,12 @@
 # pylint: skip-file
-# Important note: the FakeDeviceManager will return the contents of the
+# Important note: the fake_icl_exe will return the contents of the
 # horiba_sdk/devices/fake_responses/ccd.json
-import threading
-
-import pytest
-import pytest_asyncio
+# Look at /test/conftest.py for the definition of fake_icl_exe
 
 from horiba_sdk import ureg
-from horiba_sdk.devices import FakeDeviceManager
-
-fake_icl_host: str = 'localhost'
-fake_icl_port: int = 8766
-fake_icl_uri: str = 'ws://' + fake_icl_host + ':' + str(fake_icl_port)
 
 
-@pytest_asyncio.fixture(scope='function')
-def fake_device_manager(event_loop):
-    fake_device_manager = FakeDeviceManager(fake_icl_host, fake_icl_port)
-    return fake_device_manager
-
-
-@pytest_asyncio.fixture(scope='function')
-def _run_fake_icl_server(event_loop, fake_device_manager):
-    thread = threading.Thread(target=fake_device_manager.start_fake)
-    thread.start()
-    yield
-    fake_device_manager.loop.call_soon_threadsafe(fake_device_manager.server.cancel)
-    thread.join()
-
-
-@pytest.mark.asyncio
-async def test_ccd_opens(fake_device_manager, _run_fake_icl_server):
+async def test_ccd_opens(fake_device_manager, fake_icl_exe):  # noqa: ARG001
     # arrange
     # act
     async with fake_device_manager.charge_coupled_devices[0] as ccd:
@@ -38,8 +14,7 @@ async def test_ccd_opens(fake_device_manager, _run_fake_icl_server):
         assert await ccd.is_open() is True
 
 
-@pytest.mark.asyncio
-async def test_ccd_temperature(fake_device_manager, _run_fake_icl_server):
+async def test_ccd_temperature(fake_device_manager, fake_icl_exe):  # noqa: ARG001
     # arrange
     # act
     async with fake_device_manager.charge_coupled_devices[0] as ccd:
@@ -49,8 +24,7 @@ async def test_ccd_temperature(fake_device_manager, _run_fake_icl_server):
         assert temperature != zero
 
 
-@pytest.mark.asyncio
-async def test_ccd_resolution(fake_device_manager, _run_fake_icl_server):
+async def test_ccd_resolution(fake_device_manager, fake_icl_exe):  # noqa: ARG001
     # arrange
     # act
     async with fake_device_manager.charge_coupled_devices[0] as ccd:
@@ -59,8 +33,7 @@ async def test_ccd_resolution(fake_device_manager, _run_fake_icl_server):
         assert resolution.width > 0 and resolution.height > 0
 
 
-@pytest.mark.asyncio
-async def test_ccd_speed(fake_device_manager, _run_fake_icl_server):
+async def test_ccd_speed(fake_device_manager, fake_icl_exe):  # noqa: ARG001
     # arrange
     # act
     async with fake_device_manager.charge_coupled_devices[0] as ccd:

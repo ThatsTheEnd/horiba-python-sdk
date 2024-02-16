@@ -1,14 +1,6 @@
-import asyncio
-import contextlib
-import json
-import os
-from asyncio import AbstractEventLoop, Task
-from typing import Any, Optional, final
+from typing import final
 
-import websockets
-from loguru import logger
 from overrides import override
-from websockets.legacy.server import WebSocketServerProtocol
 
 from horiba_sdk.communication.websocket_communicator import WebsocketCommunicator
 from horiba_sdk.devices.single_devices import ChargeCoupledDevice, Monochromator
@@ -56,61 +48,36 @@ class FakeDeviceManager(AbstractDeviceManager):
     def __init__(self, host: str = '127.0.0.1', port: int = 25011):
         self.host = host
         self.port = port
-        self.websocket: Optional[WebSocketServerProtocol] = None
-        self.loop: Optional[AbstractEventLoop] = None
-        self.server: Optional[Task[Any]] = None
+        # self.websocket: Optional[WebSocketServerProtocol] = None
         self.error_db: FakeErrorDB = FakeErrorDB()
+        self.websocket_communicator = WebsocketCommunicator('ws://' + self.host + ':' + str(self.port))
 
-        current_directory = os.path.dirname(__file__)
-        fake_responses_path = os.path.join(current_directory, 'fake_responses')
+    #         current_directory = os.path.dirname(__file__)
+    #         fake_responses_path = os.path.join(current_directory, 'fake_responses')
 
-        icl_fake_responses_path = os.path.join(fake_responses_path, 'icl.json')
-        with open(icl_fake_responses_path) as json_file:
-            self.icl_responses = json.load(json_file)
+    #         icl_fake_responses_path = os.path.join(fake_responses_path, 'icl.json')
+    #         with open(icl_fake_responses_path) as json_file:
+    #             self.icl_responses = json.load(json_file)
 
-        monochromator_fake_responses_path = os.path.join(fake_responses_path, 'monochromator.json')
-        with open(monochromator_fake_responses_path) as json_file:
-            self.monochromator_responses = json.load(json_file)
+    #         monochromator_fake_responses_path = os.path.join(fake_responses_path, 'monochromator.json')
+    #         with open(monochromator_fake_responses_path) as json_file:
+    #             self.monochromator_responses = json.load(json_file)
 
-        ccd_fake_responses_path = os.path.join(fake_responses_path, 'ccd.json')
-        with open(ccd_fake_responses_path) as json_file:
-            self.ccd_responses = json.load(json_file)
-
-    async def _websocket_server(self) -> None:
-        async with websockets.serve(self._echo_handler, self.host, self.port):
-            await asyncio.Future()
-
-    def start_fake(self) -> None:
-        """
-                        Starts a local websocket server as an asyncio task in a new async loop.
-                        Handles the closing of the loop
-                        """
-        self.loop = asyncio.new_event_loop()
-        self.server = self.loop.create_task(self._websocket_server())
-
-        with contextlib.suppress(asyncio.CancelledError):
-            self.loop.run_until_complete(self.server)
-
-        self.loop.close()
+    #         ccd_fake_responses_path = os.path.join(fake_responses_path, 'ccd.json')
+    #         with open(ccd_fake_responses_path) as json_file:
+    #             self.ccd_responses = json.load(json_file)
 
     async def start(self) -> None:
         """
-                Starts a local websocket server as an asyncio task in a new async loop.
-                Handles the closing of the loop
-                """
-        self.loop = asyncio.new_event_loop()
-        self.server = self.loop.create_task(self._websocket_server())
-
-        with contextlib.suppress(asyncio.CancelledError):
-            self.loop.run_until_complete(self.server)
-
-        self.loop.close()
+        Does nothing.
+        """
+        await self.websocket_communicator.open()
 
     async def stop(self) -> None:
         """
         Does nothing.
         """
-        pass
+        await self.websocket_communicator.close()
 
     @override
     async def discover_devices(self, error_on_no_device: bool = False) -> None:
@@ -123,7 +90,8 @@ class FakeDeviceManager(AbstractDeviceManager):
     @override
     def communicator(self) -> WebsocketCommunicator:
         """Communicator"""
-        return WebsocketCommunicator('ws://' + self.host + ':' + str(self.port))
+        # return WebsocketCommunicator('ws://' + self.host + ':' + str(self.port))
+        return self.websocket_communicator
 
     @property
     @override
@@ -147,19 +115,19 @@ class FakeDeviceManager(AbstractDeviceManager):
         """
         return [ChargeCoupledDevice(0, self.communicator, self.error_db)]
 
-    async def _echo_handler(self, websocket: WebSocketServerProtocol) -> None:
-        async for message in websocket:
-            logger.info('received: {message}', message=message)
-            command = json.loads(message)
-            if command['command'].startswith('icl_'):
-                response = json.dumps(self.icl_responses[command['command']])
-                await websocket.send(response)
-            elif command['command'].startswith('mono_'):
-                response = json.dumps(self.monochromator_responses[command['command']])
-                await websocket.send(response)
-            elif command['command'].startswith('ccd_'):
-                response = json.dumps(self.ccd_responses[command['command']])
-                await websocket.send(response)
-            else:
-                logger.info('unknown command, responding with message')
-                await websocket.send(message)
+    # async def _echo_handler(self, websocket: WebSocketServerProtocol) -> None:
+    #     async for message in websocket:
+    #         logger.info('received: {message}', message=message)
+    #         command = json.loads(message)
+    #         if command['command'].startswith('icl_'):
+    #             response = json.dumps(self.icl_responses[command['command']])
+    #             await websocket.send(response)
+    #         elif command['command'].startswith('mono_'):
+    #             response = json.dumps(self.monochromator_responses[command['command']])
+    #             await websocket.send(response)
+    #         elif command['command'].startswith('ccd_'):
+    #             response = json.dumps(self.ccd_responses[command['command']])
+    #             await websocket.send(response)
+    #         else:
+    #             logger.info('unknown command, responding with message')
+    #             await websocket.send(message)

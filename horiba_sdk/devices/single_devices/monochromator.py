@@ -54,7 +54,6 @@ class Monochromator(AbstractDevice):
             Exception: When an error occured on the device side
         """
         await super()._execute_command('mono_close', {'index': self._id})
-        await super().close()
 
     async def is_open(self) -> bool:
         """Checks if the connection to the monochromator is open.

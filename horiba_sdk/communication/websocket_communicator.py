@@ -153,6 +153,7 @@ class WebsocketCommunicator(AbstractCommunicator):
             await self.websocket.close()
             self.websocket = None
 
+        if self.listen_task:
             logger.debug('Canceling listening task...')
             self.listen_task.cancel()
             with contextlib.suppress(asyncio.CancelledError):

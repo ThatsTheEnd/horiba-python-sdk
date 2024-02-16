@@ -25,7 +25,6 @@ class AbstractCommunicator(ABC):
         """
         pass
 
-
     @abstractmethod
     async def request_with_response(self, command: Command) -> Response:
         """

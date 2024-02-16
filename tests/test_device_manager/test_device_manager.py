@@ -1,6 +1,5 @@
 # pylint: skip-file
 
-import asyncio
 import os
 
 import psutil
@@ -27,7 +26,7 @@ def test_singleton_device_manager():
 
 @pytest.mark.asyncio
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-async def test_device_manager_start_icl(event_loop):
+async def test_device_manager_start_icl(event_loop):  # noqa: ARG001
     device_manager = DeviceManager(start_icl=True)
     await device_manager.start()
     assert is_icl_running(), 'ICL software is not running on the system'
