@@ -1,18 +1,12 @@
-# # pylint: skip-file
-#
-# import os
-# import subprocess
-#
-# import pytest
-#
-#
-# @pytest.fixture(scope='session', autouse=True)
-# def start_icl():
-#     if os.environ.get('HAS_HARDWARE') == 'true':
-#         try:
-#             result = subprocess.run(['C:\\Program Files\\Horiba Scientific\\SDK\\icl.exe'], check=True,
-#                                     capture_output=True, text=True, timeout=10)
-#             print(result.stdout)
-#             print(result.stderr)
-#         except subprocess.CalledProcessError as e:
-#             print('The subprocess encountered an error:', e)
+# pylint: skip-file
+import asyncio
+
+import pytest_asyncio
+
+
+@pytest_asyncio.fixture(scope="session", autouse=True)
+def event_loop(request):
+    """Create an instance of the default event loop for each test case."""
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()

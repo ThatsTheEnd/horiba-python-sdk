@@ -4,6 +4,7 @@
 import threading
 
 import pytest
+import pytest_asyncio
 
 from horiba_sdk import ureg
 from horiba_sdk.devices import FakeDeviceManager
@@ -13,14 +14,14 @@ fake_icl_port: int = 8766
 fake_icl_uri: str = 'ws://' + fake_icl_host + ':' + str(fake_icl_port)
 
 
-@pytest.fixture(scope='module')
-def fake_device_manager():
+@pytest_asyncio.fixture(scope='function')
+def fake_device_manager(event_loop):
     fake_device_manager = FakeDeviceManager(fake_icl_host, fake_icl_port)
     return fake_device_manager
 
 
-@pytest.fixture(scope='module')
-def _run_fake_icl_server(fake_device_manager):
+@pytest_asyncio.fixture(scope='function')
+def _run_fake_icl_server(event_loop, fake_device_manager):
     thread = threading.Thread(target=fake_device_manager.start_fake)
     thread.start()
     yield

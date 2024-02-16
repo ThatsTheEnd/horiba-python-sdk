@@ -70,7 +70,7 @@ class WebsocketCommunicator(AbstractCommunicator):
             raise CommunicationException(None, 'websocket connection issue') from e
 
         logger.debug(f'Websocket connection established to {self.uri}')
-        self.listen_task = asyncio.create_task(self._receive_binary_data())
+        self.listen_task = asyncio.create_task(self._receive_data())
 
     async def send(self, command: Command) -> None:
         """
@@ -168,15 +168,11 @@ class WebsocketCommunicator(AbstractCommunicator):
 
     async def _receive_data(self) -> None:
         try:
-            while True:
-                message = await self.websocket.recv()  # type: ignore
+            async for message in self.websocket:  # type: ignore
                 logger.info(f'Received message: {message!r}')
                 if isinstance(message, str):
                     await self.json_message_queue.put(message)
                 elif isinstance(message, bytes):
-                    # TODO: [saga] is this still needed?
-                    # await self.binary_message_queue.put(message)
-                    # logger.debug(f'Callback before if statement: {self.binary_message_callback}')
                     if self.binary_message_callback:
                         await asyncio.create_task(self.binary_message_callback(message))  # Call the callback
                 else:
@@ -187,9 +183,6 @@ class WebsocketCommunicator(AbstractCommunicator):
             raise CommunicationException(None, 'connection terminated with error') from e
         except Exception as e:
             raise CommunicationException(None, 'failure to process binary data') from e
-
-    async def _receive_binary_data(self) -> None:
-        await self._receive_data()
 
     @override
     async def request_with_response(self, command: Command, timeout: int = 5) -> Response:
@@ -211,7 +204,7 @@ class WebsocketCommunicator(AbstractCommunicator):
         try:
             async with asyncio.timeout(timeout):
                 response: Response = await self.response()
-        except TimeoutError:
-            raise TimeoutError(f'Timeout of {timeout}s while waiting for response.') from None
+        except TimeoutError as te:
+            raise CommunicationException(None, f'Timeout of {timeout}s while waiting for response.') from te
 
         return response

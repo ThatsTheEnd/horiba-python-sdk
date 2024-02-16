@@ -29,12 +29,13 @@ circular dependencies.
 For more details on the TYPE_CHECKING constant and its usage, refer to:
 https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING
 """
+import asyncio
 import importlib.resources
 import platform
 import subprocess
 from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, final
+from typing import Any, Callable, final, Optional
 
 import psutil
 from loguru import logger
@@ -102,6 +103,7 @@ class DeviceManager(AbstractDeviceManager):
         self._icl_communicator.register_binary_message_callback(self._binary_message_callback)
         self._icl_websocket_ip: str = websocket_ip
         self._icl_websocket_port: str = websocket_port
+        self._icl_process: Optional[asyncio.subprocess.Process] = None
         self._binary_messages: bool = enable_binary_messages
         self._charge_coupled_devices: list[ChargeCoupledDevice] = []
         self._monochromators: list[Monochromator] = []
@@ -112,7 +114,7 @@ class DeviceManager(AbstractDeviceManager):
     @override
     async def start(self) -> None:
         if self._start_icl:
-            self.start_icl()
+            await self.start_icl()
 
         await self._icl_communicator.open()
 
@@ -128,26 +130,26 @@ class DeviceManager(AbstractDeviceManager):
     async def stop(self) -> None:
         await self.stop_icl()
 
-    @staticmethod
-    def start_icl() -> None:
+    async def start_icl(self) -> None:
         """
         Starts the ICL software and establishes communication.
         """
         logger.info('Starting ICL software...')
-        try:
-            if platform.system() != 'Windows':
-                logger.info('Only Windows is supported for ICL software. Skip starting of ICL...')
-                return
+        # try:
+        if platform.system() != 'Windows':
+            logger.info('Only Windows is supported for ICL software. Skip starting of ICL...')
+            return
 
-            icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
-            if not icl_running:
-                logger.info('icl not running, starting it...')
-                subprocess.Popen([r'C:\Program Files\HORIBA Scientific\SDK\icl.exe'])
-        except subprocess.CalledProcessError:
-            logger.error('Failed to start ICL software.')
+        icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
+        if not icl_running:
+            logger.info('icl not running, starting it...')
+            #subprocess.Popen([r'C:\Program Files\HORIBA Scientific\SDK\icl.exe'])
+            self._icl_process = await asyncio.create_subprocess_exec(r'C:\Program Files\HORIBA Scientific\SDK\icl.exe')
+        # except subprocess.CalledProcessError:
+        #    logger.error('Failed to start ICL software.')
         # TODO: [saga] is this the best way handle exceptions?
-        except Exception as e:  # pylint: disable=broad-exception-caught
-            logger.error('Unexpected error: %s', e)
+        # except Exception as e:  # pylint: disable=broad-exception-caught
+        #     logger.error('Unexpected error: %s', e)
 
     async def _enable_binary_messages(self) -> None:
 
@@ -173,11 +175,16 @@ class DeviceManager(AbstractDeviceManager):
         if not self._icl_communicator.opened():
             await self._icl_communicator.open()
         try:
+            info_command: Command = Command('icl_info', {})
+            response: Response = await self._icl_communicator.request_with_response(info_command)
+
+            logger.info(f'ICL info: {response.results}')
             shutdown_command: Command = Command('icl_shutdown', {})
             _response: Response = await self._icl_communicator.request_with_response(shutdown_command)
         except CommunicationException as e:
             logger.debug(f'CommunicationException: {e.message}')
         finally:
+            await self._icl_process.wait()
             icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
             if icl_running:
                 raise Exception('Failed to shutdown ICL software.')
