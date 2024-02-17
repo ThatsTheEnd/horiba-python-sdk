@@ -8,14 +8,10 @@ from loguru import logger
 from horiba_sdk import ureg
 from horiba_sdk.devices.device_manager import DeviceManager
 
-pytest_plugins = ('pytest_asyncio',)
-
 
 # Tell pytest to run this test only if called from the scope of this module. If any other pytest scope calls this test,
 # ignore it
-# @pytest.mark.run_specific
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-@pytest.mark.asyncio
 async def test_ccd_functionality(event_loop):  # noqa: ARG001
     device_manager = DeviceManager()
     await device_manager.start()

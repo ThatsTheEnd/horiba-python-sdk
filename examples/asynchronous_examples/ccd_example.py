@@ -10,6 +10,11 @@ async def main():
     device_manager = DeviceManager()
     await device_manager.start()
 
+    if not device_manager.charge_coupled_devices:
+        logger.error('No CCDs found, exiting...')
+        await device_manager.stop()
+        return
+
     ccd = device_manager.charge_coupled_devices[0]
     await ccd.open()
 
