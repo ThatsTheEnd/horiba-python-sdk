@@ -36,8 +36,9 @@ async def test_device_manager_start_icl(event_loop):  # noqa: ARG001
 
 
 async def test_device_manager_with_fake_icl_exe(event_loop, fake_icl_exe, fake_icl_host_fixture, fake_icl_port_fixture):  # noqa: ARG001
-    device_manager = DeviceManager(start_icl=False, websocket_ip=fake_icl_host_fixture,
-                                   websocket_port=fake_icl_port_fixture)
+    device_manager = DeviceManager(
+        start_icl=False, websocket_ip=fake_icl_host_fixture, websocket_port=fake_icl_port_fixture
+    )
     await device_manager.start()
     communicator = device_manager.communicator
 
