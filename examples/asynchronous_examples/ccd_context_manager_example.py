@@ -1,6 +1,5 @@
 import asyncio
 import random
-import time
 
 from loguru import logger
 
@@ -25,7 +24,7 @@ async def main():
         await ccd.set_region_of_interest()  # Set default ROI, if you want a custom ROI, pass the parameters
         if await ccd.get_acquisition_ready():
             await ccd.set_acquisition_start(open_shutter=True)
-            time.sleep(1)  # Wait a short period for the acquisition to start
+            await asyncio.sleep(1)  # Wait a short period for the acquisition to start
             # Poll for acquisition status
             acquisition_busy = True
             while acquisition_busy:
@@ -36,6 +35,7 @@ async def main():
             await ccd.get_acquisition_data()
         await ccd.get_speed()
 
+    await asyncio.sleep(1)
     await device_manager.stop()
 
 

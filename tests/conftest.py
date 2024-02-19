@@ -10,6 +10,15 @@ fake_icl_host: str = 'localhost'
 fake_icl_port: int = 8766
 fake_icl_uri: str = 'ws://' + fake_icl_host + ':' + str(fake_icl_port)
 
+@pytest.fixture(scope='module')
+def fake_icl_host_fixture():
+    return fake_icl_host
+
+
+@pytest.fixture(scope='module')
+def fake_icl_port_fixture():
+    return fake_icl_port
+
 
 @pytest.fixture(scope='module')
 def fake_icl_uri_fixture():

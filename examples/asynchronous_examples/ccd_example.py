@@ -40,6 +40,7 @@ async def main():
     finally:
         await ccd.close()
 
+    await device_manager.stop()
 
 if __name__ == '__main__':
     asyncio.run(main())

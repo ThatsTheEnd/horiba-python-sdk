@@ -172,24 +172,25 @@ class DeviceManager(AbstractDeviceManager):
 
         if not self._icl_communicator.opened():
             await self._icl_communicator.open()
+
         try:
             info_command: Command = Command('icl_info', {})
             response: Response = await self._icl_communicator.request_with_response(info_command)
 
             logger.info(f'ICL info: {response.results}')
             shutdown_command: Command = Command('icl_shutdown', {})
-            _response: Response = await self._icl_communicator.request_with_response(shutdown_command)
+            _response: Response = await self._icl_communicator.request_with_response(shutdown_command, timeout=10)
         except CommunicationException as e:
             logger.debug(f'CommunicationException: {e.message}')
-        finally:
-            if self._icl_process is not None:
-                await self._icl_process.wait()
-            icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
-            if icl_running:
-                raise Exception('Failed to shutdown ICL software.')
 
         if self._icl_communicator.opened():
             await self._icl_communicator.close()
+
+        if self._icl_process is not None:
+            await self._icl_process.wait()
+        icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
+        if icl_running:
+            raise Exception('Failed to shutdown ICL software.')
 
         logger.info('icl_shutdown command sent')
 

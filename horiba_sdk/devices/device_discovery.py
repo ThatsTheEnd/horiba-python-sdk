@@ -49,6 +49,7 @@ class DeviceDiscovery(AbstractDeviceDiscovery):
     def _parse_ccds(self, raw_device_list: dict[str, Any]) -> list[ChargeCoupledDevice]:
         detected_ccds: list[ChargeCoupledDevice] = []
         for key, value in raw_device_list.items():
+            logger.debug(f'Parsing CCD: {key} - {value}')
             ccd_index: int = int(key.split(':')[0].replace('index', '').strip())
             ccd_type_match = re.search(r'deviceType: (.*?),', value)
             if not ccd_type_match:
