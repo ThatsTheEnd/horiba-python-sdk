@@ -9,20 +9,8 @@ from horiba_sdk.communication import Command
 from horiba_sdk.devices import DeviceManager
 
 
-# This fixture ensures DeviceManager is clean for each test
-@pytest.fixture(autouse=True)
-def clean_singleton():
-    DeviceManager.clear_instances()
-
-
 def is_icl_running() -> bool:
     return any(process.info['name'] == 'icl.exe' for process in psutil.process_iter(['pid', 'name']))
-
-
-def test_singleton_device_manager():
-    device_manager_1 = DeviceManager(start_icl=False)
-    device_manager_2 = DeviceManager(start_icl=False)
-    assert device_manager_1 is device_manager_2
 
 
 @pytest.mark.asyncio

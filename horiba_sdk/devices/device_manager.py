@@ -32,13 +32,11 @@ https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING
 import asyncio
 import importlib.resources
 import platform
-from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, Optional, final
+from typing import Optional, final
 
 import psutil
 from loguru import logger
-from mypy_extensions import KwArg, VarArg
 from overrides import override
 
 from horiba_sdk.communication import (
@@ -53,26 +51,7 @@ from horiba_sdk.devices.single_devices import ChargeCoupledDevice, Monochromator
 from horiba_sdk.icl_error import AbstractError, AbstractErrorDB, ICLErrorDB
 
 
-def singleton(cls: type[Any]) -> Callable[[VarArg(Any), KwArg(Any)], Any]:
-    """
-    Decorator to implement the Singleton pattern.
-    """
-
-    _instances: dict[type[Any], Any] = {}
-
-    @wraps(cls)
-    def wrapper(*args, **kwargs):
-        if cls not in _instances:
-            _instances[cls] = cls(*args, **kwargs)
-        return _instances[cls]
-
-    wrapper.clear_instances = lambda: _instances.clear()  # type: ignore
-
-    return wrapper
-
-
 @final
-@singleton
 class DeviceManager(AbstractDeviceManager):
     """
     DeviceManager class manages the lifecycle and interactions with devices.
@@ -198,20 +177,21 @@ class DeviceManager(AbstractDeviceManager):
         return ' '.join(format(byte, '02x') for byte in message[::-1])
 
     async def _binary_message_callback(self, message: bytes) -> None:
-        hex_data = ' '.join(format(byte, '02x') for byte in message)
-        if len(message) < 18:
-            logger.warning(f'binary message not valid: {len(message)} < 16')
-        logger.info(f'Received binary message: {hex_data}')
-        logger.info(f'magic number: {self._format_icl_binary_to_string(message[:2])}')
-        logger.info(f'message type: {self._format_icl_binary_to_string(message[2:4])}')
-        logger.info(f'element type: {self._format_icl_binary_to_string(message[4:6])}')
-        logger.info(f'element count: {self._format_icl_binary_to_string(message[6:10])}')
-        logger.info(f'tag 1: {self._format_icl_binary_to_string(message[10:12])}')
-        logger.info(f'tag 2: {self._format_icl_binary_to_string(message[12:14])}')
-        logger.info(f'tag 3: {self._format_icl_binary_to_string(message[14:16])}')
-        logger.info(f'tag 4: {self._format_icl_binary_to_string(message[16:18])}')
-        logger.info(f'payload: {self._format_icl_binary_to_string(message[18:])}')
-        logger.info(f'payload as string: {str(message[18:])}')
+        # hex_data = ' '.join(format(byte, '02x') for byte in message)
+        # if len(message) < 18:
+        #     logger.warning(f'binary message not valid: {len(message)} < 16')
+        # logger.info(f'Received binary message: {hex_data}')
+        # logger.info(f'magic number: {self._format_icl_binary_to_string(message[:2])}')
+        # logger.info(f'message type: {self._format_icl_binary_to_string(message[2:4])}')
+        # logger.info(f'element type: {self._format_icl_binary_to_string(message[4:6])}')
+        # logger.info(f'element count: {self._format_icl_binary_to_string(message[6:10])}')
+        # logger.info(f'tag 1: {self._format_icl_binary_to_string(message[10:12])}')
+        # logger.info(f'tag 2: {self._format_icl_binary_to_string(message[12:14])}')
+        # logger.info(f'tag 3: {self._format_icl_binary_to_string(message[14:16])}')
+        # logger.info(f'tag 4: {self._format_icl_binary_to_string(message[16:18])}')
+        # logger.info(f'payload: {self._format_icl_binary_to_string(message[18:])}')
+        # logger.info(f'payload as string: {str(message[18:])}')
+        pass
 
     @override
     async def discover_devices(self, error_on_no_device: bool = False) -> None:

@@ -94,7 +94,7 @@ class Monochromator(AbstractDevice):
         response = await super()._execute_command('mono_getPosition', {'index': self._id})
         return float(response.results['wavelength']) * nm
 
-    async def set_current_wavelength(self, wavelength: nm) -> None:
+    async def set_current_wavelength(self, wavelength: int) -> None:
         """This command sets the wavelength value of the current grating position of the monochromator.
 
         .. warning:: This could potentially uncalibrate the monochromator and report an incorrect wavelength compared to
@@ -106,7 +106,7 @@ class Monochromator(AbstractDevice):
         Raises:
             Exception: When an error occured on the device side
         """
-        await super()._execute_command('mono_setPosition', {'index': self._id, 'wavelength': wavelength / nm})
+        await super()._execute_command('mono_setPosition', {'index': self._id, 'wavelength': wavelength})
 
     async def move_to_wavelength(self, wavelength: nm) -> None:
         """Orders the monochromator to move to the requested wavelength.

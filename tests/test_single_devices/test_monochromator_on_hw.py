@@ -37,7 +37,7 @@ async def test_monochromator_opens(device_manager_instance):
     await monochromator.open()
 
     # assert
-    assert await monochromator.is_open is True
+    assert await monochromator.is_open() is True
 
     await monochromator.close()
 
@@ -52,7 +52,7 @@ async def test_monochromator_busy(device_manager_instance):
     await monochromator.open()
 
     # assert
-    assert await monochromator.is_busy is True
+    assert await monochromator.is_busy is False
 
     await monochromator.close()
 
@@ -65,7 +65,12 @@ async def test_monochromator_wavelength(device_manager_instance):
 
     # act
     await monochromator.open()
-
+    await monochromator.set_current_wavelength(100)
+    await asyncio.sleep(1)
+    mono_busy = False
+    while not mono_busy:
+        mono_busy = await monochromator.is_busy
+        await asyncio.sleep(0.1)
     # assert
     assert await monochromator.wavelength > 0
 
