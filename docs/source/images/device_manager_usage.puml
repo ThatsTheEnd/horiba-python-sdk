@@ -1,0 +1,50 @@
+@startuml
+
+participant User
+participant DeviceManager
+participant DeviceDiscovery
+participant WebsocketCommunicator
+participant ICL.exe as ICL #Moccasin
+
+User -> DeviceManager: creation
+activate DeviceManager
+
+DeviceManager -> DeviceManager: start_icl()
+activate DeviceManager #FFBBBB
+DeviceManager -> ICL: start_subprocess
+activate ICL
+deactivate DeviceManager
+
+DeviceManager -> WebsocketCommunicator: open(address)
+activate WebsocketCommunicator
+WebsocketCommunicator -> ICL: connect
+
+DeviceManager -> DeviceDiscovery: discover_devices()
+activate DeviceDiscovery
+
+DeviceDiscovery -> WebsocketCommunicator: execute('ccd_discover')
+WebsocketCommunicator -> ICL: send(command)
+ICL -> WebsocketCommunicator: response
+WebsocketCommunicator -> DeviceDiscovery: response
+DeviceDiscovery -> WebsocketCommunicator: execute('ccd_list')
+WebsocketCommunicator -> ICL: send(command)
+ICL -> WebsocketCommunicator: response
+WebsocketCommunicator -> DeviceDiscovery: response
+DeviceDiscovery -> DeviceDiscovery: parse_ccds(ccd_strings[])
+DeviceDiscovery -> WebsocketCommunicator: execute('mono_discover')
+WebsocketCommunicator -> ICL: send(command)
+ICL -> WebsocketCommunicator: response
+WebsocketCommunicator -> DeviceDiscovery: response
+DeviceDiscovery -> WebsocketCommunicator: execute('mono_list')
+WebsocketCommunicator -> ICL: send(command)
+ICL -> WebsocketCommunicator: response
+WebsocketCommunicator -> DeviceDiscovery: response
+DeviceDiscovery -> DeviceDiscovery: parse_monos('mono_strings[]')
+
+DeviceManager -> DeviceDiscovery: charge_coupled_devices()
+DeviceDiscovery -> DeviceManager: charge_coupled_devices[]
+DeviceManager -> DeviceDiscovery: monochromators()
+DeviceDiscovery -> DeviceManager: monochromators[]
+
+
+@enduml

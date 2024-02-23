@@ -26,22 +26,15 @@ class AbstractCommunicator(ABC):
         pass
 
     @abstractmethod
-    async def send(self, command: Command) -> None:
+    async def request_with_response(self, command: Command) -> Response:
         """
-        Abstract method to send a command.
+        Abstract method to fetch a response from a command.
 
         Args:
-            command (Command): Command to be sent.
-        """
-        pass
-
-    @abstractmethod
-    async def response(self) -> Response:
-        """
-        Abstract method that fetches the next response.
+            command (Command): Command for which a response is desired
 
         Returns:
-            Response: The response from the server
+            Response: The response corresponding to the sent command.
         """
         pass
 
@@ -52,6 +45,8 @@ class AbstractCommunicator(ABC):
 
         Returns:
             BinaryResponse: The binary response from the server
+
+        .. todo:: `[saga]` is this still needed?
         """
         pass
 

@@ -3,8 +3,9 @@ from typing import Any, Callable, final
 
 from mypy_extensions import KwArg, VarArg
 
-from horiba_sdk.communication import WebsocketCommunicator
+from horiba_sdk.communication import AbstractCommunicator
 from horiba_sdk.devices import DeviceManager
+from horiba_sdk.devices.single_devices import ChargeCoupledDevice, Monochromator
 
 
 def singleton(cls: type[Any]) -> Callable[[VarArg(Any), KwArg(Any)], Any]:
@@ -54,17 +55,17 @@ class EasyDeviceManager:
         """
         self._device_manager = DeviceManager(start_icl, websocket_ip, websocket_port)
 
-    def start_icl(self) -> None:
+    def start(self) -> None:
         """
-        Starts the ICL software and establishes communication.
+        Starts the device manager.
         """
-        self._device_manager.start_icl()
+        return asyncio.run(self._device_manager.start())
 
-    def stop_icl(self) -> None:
+    def stop(self) -> None:
         """
-        Stops the communication and cleans up resources.
+        Stops the device manager.
         """
-        return asyncio.run(self._device_manager.stop_icl())
+        return asyncio.run(self._device_manager.stop())
 
     def discover_devices(self, error_on_no_device: bool = False) -> None:
         """
@@ -74,17 +75,8 @@ class EasyDeviceManager:
         """
         return asyncio.run(self._device_manager.discover_devices(error_on_no_device))
 
-    def handle_errors(self, errors: list[str]) -> None:
-        """
-        Handles errors, logs them, and may take corrective actions.
-
-        Args:
-            errors (Exception): The exception or error to handle.
-        """
-        return self._device_manager.handle_errors(errors)
-
     @property
-    def communicator(self) -> WebsocketCommunicator:
+    def communicator(self) -> AbstractCommunicator:
         """
         Getter method for the communicator attribute.
 
@@ -92,3 +84,23 @@ class EasyDeviceManager:
             horiba_sdk.communication.AbstractCommunicator: Returns a new communicator instance.
         """
         return self._device_manager.communicator
+
+    @property
+    def monochromators(self) -> list[Monochromator]:
+        """
+        The detected monochromators, should be called after :meth:`discover_devices`
+
+        Returns:
+            List[Monochromator]: The detected monochromators
+        """
+        return self._device_manager.monochromators
+
+    @property
+    def charge_coupled_devices(self) -> list[ChargeCoupledDevice]:
+        """
+        The detected CCDs, should be called after :meth:`discover_devices`
+
+        Returns:
+            List[ChargeCoupledDevice]: The detected CCDS.
+        """
+        return self._device_manager.charge_coupled_devices

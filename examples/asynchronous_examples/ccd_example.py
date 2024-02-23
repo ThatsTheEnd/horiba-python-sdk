@@ -1,20 +1,22 @@
 import asyncio
 import random
-import time
 
 from loguru import logger
 
 from horiba_sdk.devices.device_manager import DeviceManager
-from horiba_sdk.devices.single_devices.ccd import ChargeCoupledDevice
 
 
 async def main():
-    device_manager = DeviceManager(start_icl=True)
-    await device_manager.communicator.open()
-    await device_manager.discover_devices()
+    device_manager = DeviceManager()
+    await device_manager.start()
 
-    ccd = ChargeCoupledDevice(device_manager)
-    await ccd.open(0, enable_binary_messages=True)
+    if not device_manager.charge_coupled_devices:
+        logger.error('No CCDs found, exiting...')
+        await device_manager.stop()
+        return
+
+    ccd = device_manager.charge_coupled_devices[0]
+    await ccd.open()
 
     try:
         await ccd.get_chip_size()
@@ -25,7 +27,7 @@ async def main():
         await ccd.set_region_of_interest()  # Set default ROI, if you want a custom ROI, pass the parameters
         if await ccd.get_acquisition_ready():
             await ccd.set_acquisition_start(open_shutter=True)
-            time.sleep(1)  # Wait a short period for the acquisition to start
+            await asyncio.sleep(1)  # Wait a short period for the acquisition to start
             # Poll for acquisition status
             acquisition_busy = True
             while acquisition_busy:
@@ -37,6 +39,8 @@ async def main():
         await ccd.get_speed()
     finally:
         await ccd.close()
+
+    await device_manager.stop()
 
 
 if __name__ == '__main__':

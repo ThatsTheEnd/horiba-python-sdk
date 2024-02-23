@@ -29,102 +29,120 @@ circular dependencies.
 For more details on the TYPE_CHECKING constant and its usage, refer to:
 https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING
 """
-
+import asyncio
 import importlib.resources
 import platform
-import re
-import subprocess
 from pathlib import Path
-from typing import Any, Callable, final
+from typing import Optional, final
 
 import psutil
 from loguru import logger
-from mypy_extensions import KwArg, VarArg
 from overrides import override
 
-from horiba_sdk.communication import Command, Response, WebsocketCommunicator
-from horiba_sdk.devices.abstract_device_manager import AbstractDeviceManager
+from horiba_sdk.communication import (
+    AbstractCommunicator,
+    Command,
+    CommunicationException,
+    Response,
+    WebsocketCommunicator,
+)
+from horiba_sdk.devices import AbstractDeviceManager, DeviceDiscovery
+from horiba_sdk.devices.single_devices import ChargeCoupledDevice, Monochromator
 from horiba_sdk.icl_error import AbstractError, AbstractErrorDB, ICLErrorDB
 
 
-def singleton(cls: type[Any]) -> Callable[[VarArg(Any), KwArg(Any)], Any]:
-    """
-    Decorator to implement the Singleton pattern.
-    """
-
-    _instances: dict[type[Any], Any] = {}
-
-    def get_instance(*args, **kwargs):
-        if cls not in _instances:
-            _instances[cls] = cls(*args, **kwargs)
-        return _instances[cls]
-
-    def clear_instances():
-        _instances.clear()
-
-    get_instance.clear_instances = clear_instances
-
-    return get_instance
-
-
 @final
-@singleton
 class DeviceManager(AbstractDeviceManager):
     """
     DeviceManager class manages the lifecycle and interactions with devices.
-
-    Attributes:
-        _icl_communicator: The communicator class used to talk to the ICL.
-        ccds (Dict[int, str]): CCD devices discovered.
-        monos (Dict[int, str]): Monochromator devices discovered.
     """
 
-    def __init__(self, start_icl: bool = True, websocket_ip: str = '127.0.0.1', websocket_port: str = '25010'):
+    def __init__(
+        self,
+        start_icl: bool = True,
+        websocket_ip: str = '127.0.0.1',
+        websocket_port: str = '25010',
+        enable_binary_messages: bool = True,
+    ):
         """
         Initializes the DeviceManager with the specified communicator class.
 
         Args:
-            websocket_ip: str = '127.0.0.1': websocket IP
-            websocket_port: str = '25010': websocket port
+            start_icl (bool) = True: If True, the ICL software is started and communication is established.
+            websocket_ip (str) = '127.0.0.1': websocket IP
+            websocket_port (str) = '25010': websocket port
+            enable_binary_messages (bool) = True: If True, binary messages are enabled.
         """
         super().__init__()
-        self.ccds: dict[int, 'str'] = {}
-        self.monos: dict[int, 'str'] = {}
+        self._start_icl = start_icl
         self._icl_communicator: WebsocketCommunicator = WebsocketCommunicator(
             'ws://' + websocket_ip + ':' + str(websocket_port)
         )
         self._icl_communicator.register_binary_message_callback(self._binary_message_callback)
         self._icl_websocket_ip: str = websocket_ip
         self._icl_websocket_port: str = websocket_port
+        self._icl_process: Optional[asyncio.subprocess.Process] = None
+        self._binary_messages: bool = enable_binary_messages
+        self._charge_coupled_devices: list[ChargeCoupledDevice] = []
+        self._monochromators: list[Monochromator] = []
 
         error_list_path: Path = Path(str(importlib.resources.files('horiba_sdk.icl_error') / 'error_list.json'))
         self._icl_error_db: AbstractErrorDB = ICLErrorDB(error_list_path)
 
-        logger.info(f'Start ICL: {start_icl}')
-        if start_icl:
-            self.start_icl()
+    @override
+    async def start(self) -> None:
+        if self._start_icl:
+            await self.start_icl()
+
+        await self._icl_communicator.open()
+
+        icl_info: Response = await self._icl_communicator.request_with_response(Command('icl_info', {}))
+        logger.info(f'ICL info: {icl_info.results}')
+
+        if self._binary_messages:
+            await self._enable_binary_messages()
+
+        await self.discover_devices()
 
     @override
-    def start_icl(self) -> None:
+    async def stop(self) -> None:
+        await self.stop_icl()
+
+    async def start_icl(self) -> None:
         """
         Starts the ICL software and establishes communication.
         """
         logger.info('Starting ICL software...')
-        try:
-            if platform.system() != 'Windows':
-                logger.log('Only Windows is supported for ICL software. Skip starting of ICL...')
-                return
+        # try:
+        if platform.system() != 'Windows':
+            logger.info('Only Windows is supported for ICL software. Skip starting of ICL...')
+            return
 
-            icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
-            if not icl_running:
-                logger.info('icl not running, starting it...')
-                subprocess.Popen([r'C:\Program Files\HORIBA Scientific\SDK\icl.exe'])
-        except subprocess.CalledProcessError:
-            logger.error('Failed to start ICL software.')
-        except Exception as e:  # pylint: disable=broad-exception-caught
-            logger.error('Unexpected error: %s', e)
+        icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
+        if not icl_running:
+            logger.info('icl not running, starting it...')
+            # subprocess.Popen([r'C:\Program Files\HORIBA Scientific\SDK\icl.exe'])
+            self._icl_process = await asyncio.create_subprocess_exec(r'C:\Program Files\HORIBA Scientific\SDK\icl.exe')
+        # except subprocess.CalledProcessError:
+        #    logger.error('Failed to start ICL software.')
+        # TODO: [saga] is this the best way handle exceptions?
+        # except Exception as e:  # pylint: disable=broad-exception-caught
+        #     logger.error('Unexpected error: %s', e)
 
-    @override
+    async def _enable_binary_messages(self) -> None:
+        bin_mode_command: Command = Command('icl_binMode', {'mode': 'all'})
+        response: Response = await self._icl_communicator.request_with_response(bin_mode_command)
+
+        if response.errors:
+            self._handle_errors(response.errors)
+
+    def _handle_errors(self, errors: list[str]) -> None:
+        for error in errors:
+            icl_error: AbstractError = self._icl_error_db.error_from(error)
+            icl_error.log()
+            # TODO: [saga] only throw depending on the log level, tbd
+            raise Exception(f'Error from the ICL: {icl_error.message()}')
+
     async def stop_icl(self) -> None:
         """
         Stops the communication and cleans up resources.
@@ -134,15 +152,24 @@ class DeviceManager(AbstractDeviceManager):
         if not self._icl_communicator.opened():
             await self._icl_communicator.open()
 
-        command: Command = Command('icl_shutdown', {})
-        await self._icl_communicator.send(command)
-        response: Response = await self._icl_communicator.response()
+        try:
+            info_command: Command = Command('icl_info', {})
+            response: Response = await self._icl_communicator.request_with_response(info_command)
 
-        if response.errors:
-            self.handle_errors(response.errors)
+            logger.info(f'ICL info: {response.results}')
+            shutdown_command: Command = Command('icl_shutdown', {})
+            _response: Response = await self._icl_communicator.request_with_response(shutdown_command, timeout=10)
+        except CommunicationException as e:
+            logger.debug(f'CommunicationException: {e.message}')
 
         if self._icl_communicator.opened():
             await self._icl_communicator.close()
+
+        if self._icl_process is not None:
+            await self._icl_process.wait()
+        icl_running = 'icl.exe' in (p.name() for p in psutil.process_iter())
+        if icl_running:
+            raise Exception('Failed to shutdown ICL software.')
 
         logger.info('icl_shutdown command sent')
 
@@ -150,82 +177,38 @@ class DeviceManager(AbstractDeviceManager):
         return ' '.join(format(byte, '02x') for byte in message[::-1])
 
     async def _binary_message_callback(self, message: bytes) -> None:
-        hex_data = ' '.join(format(byte, '02x') for byte in message)
-        if len(message) < 18:
-            logger.warning(f'binary message not valid: {len(message)} < 16')
-        logger.info(f'Received binary message: {hex_data}')
-        logger.info(f'magic number: {self._format_icl_binary_to_string(message[:2])}')
-        logger.info(f'message type: {self._format_icl_binary_to_string(message[2:4])}')
-        logger.info(f'element type: {self._format_icl_binary_to_string(message[4:6])}')
-        logger.info(f'element count: {self._format_icl_binary_to_string(message[6:10])}')
-        logger.info(f'tag 1: {self._format_icl_binary_to_string(message[10:12])}')
-        logger.info(f'tag 2: {self._format_icl_binary_to_string(message[12:14])}')
-        logger.info(f'tag 3: {self._format_icl_binary_to_string(message[14:16])}')
-        logger.info(f'tag 4: {self._format_icl_binary_to_string(message[16:18])}')
-        logger.info(f'payload: {self._format_icl_binary_to_string(message[18:])}')
-        logger.info(f'payload as string: {str(message[18:])}')
+        # hex_data = ' '.join(format(byte, '02x') for byte in message)
+        # if len(message) < 18:
+        #     logger.warning(f'binary message not valid: {len(message)} < 16')
+        # logger.info(f'Received binary message: {hex_data}')
+        # logger.info(f'magic number: {self._format_icl_binary_to_string(message[:2])}')
+        # logger.info(f'message type: {self._format_icl_binary_to_string(message[2:4])}')
+        # logger.info(f'element type: {self._format_icl_binary_to_string(message[4:6])}')
+        # logger.info(f'element count: {self._format_icl_binary_to_string(message[6:10])}')
+        # logger.info(f'tag 1: {self._format_icl_binary_to_string(message[10:12])}')
+        # logger.info(f'tag 2: {self._format_icl_binary_to_string(message[12:14])}')
+        # logger.info(f'tag 3: {self._format_icl_binary_to_string(message[14:16])}')
+        # logger.info(f'tag 4: {self._format_icl_binary_to_string(message[16:18])}')
+        # logger.info(f'payload: {self._format_icl_binary_to_string(message[18:])}')
+        # logger.info(f'payload as string: {str(message[18:])}')
+        pass
 
     @override
     async def discover_devices(self, error_on_no_device: bool = False) -> None:
         """
         Discovers the connected devices and saves them internally.
+
         Args:
             error_on_no_device (bool): If True, an exception is raised if no device is connected.
         """
-        # Define the commands and device types in a list of tuples for iteration
-        commands_and_types = [('ccd_discover', 'ccd_list', 'CCD'), ('mono_discover', 'mono_list', 'Monochromator')]
-
-        for discover_command, list_command, device_type in commands_and_types:
-            response: Response = await self._icl_communicator.execute_command(discover_command, {})
-            if response.results.get('count', 0) == 0 and error_on_no_device:
-                raise Exception(f'No {device_type} connected')
-            response = await self._icl_communicator.execute_command(list_command, {})
-
-            # as the responses of ccd_list and mono_list differ, we need to parse them separately
-            if device_type == 'CCD':
-                raw_device_list = response.results
-                self.ccds = self._parse_ccds(raw_device_list)
-                logger.info(f'Found {len(self.ccds)} CCD devices: {self.ccds}')
-            elif device_type == 'Monochromator':
-                raw_device_list = response.results['list']
-                self.monos = self._parse_monos(raw_device_list)
-                logger.info(f'Found {len(self.monos)} Monochromator devices: {self.monos}')
-
-    def _parse_ccds(self, raw_device_list: dict[str, Any]) -> dict[int, str]:
-        parsed_ccds = {}
-        for key, value in raw_device_list.items():
-            ccd_index: int = int(key.split(':')[0].replace('index', '').strip())
-            ccd_type_match = re.search(r'deviceType: (.*?),', value)
-            if not ccd_type_match:
-                raise Exception(f'Failed to find ccd type "deviceType" in string "{value}"')
-            ccd_type: str = str(ccd_type_match.group(1).strip())
-            parsed_ccds[ccd_index] = ccd_type
-
-        return parsed_ccds
-
-    def _parse_monos(self, raw_device_list: dict[str, Any]) -> dict[int, str]:
-        parsed_monos = {}
-        for device_string in raw_device_list:
-            mono_index: int = int(device_string.split(';')[0])
-            mono_type: str = device_string.split(';')[1]
-            parsed_monos[mono_index] = mono_type
-
-        return parsed_monos
-
-    @override
-    def handle_errors(self, errors: list[str]) -> None:
-        """
-        Handles errors, logs them, and may take corrective actions.
-
-        Args:
-            errors (Exception): The exception or error to handle.
-        """
-        for error in errors:
-            icl_error: AbstractError = self._icl_error_db.error_from(error)
-            icl_error.log()
+        device_discovery: DeviceDiscovery = DeviceDiscovery(self._icl_communicator, self._icl_error_db)
+        await device_discovery.execute(error_on_no_device)
+        self._charge_coupled_devices = device_discovery.charge_coupled_devices()
+        self._monochromators = device_discovery.monochromators()
 
     @property
-    def communicator(self) -> WebsocketCommunicator:
+    @override
+    def communicator(self) -> AbstractCommunicator:
         """
         Getter method for the communicator attribute.
 
@@ -233,3 +216,25 @@ class DeviceManager(AbstractDeviceManager):
             horiba_sdk.communication.AbstractCommunicator: Returns a new communicator instance.
         """
         return self._icl_communicator
+
+    @property
+    @override
+    def monochromators(self) -> list[Monochromator]:
+        """
+        The detected monochromators, should be called after :meth:`discover_devices`
+
+        Returns:
+            List[Monochromator]: The detected monochromators
+        """
+        return self._monochromators
+
+    @property
+    @override
+    def charge_coupled_devices(self) -> list[ChargeCoupledDevice]:
+        """
+        The detected CCDs, should be called after :meth:`discover_devices`
+
+        Returns:
+            List[ChargeCoupledDevice]: The detected CCDS.
+        """
+        return self._charge_coupled_devices

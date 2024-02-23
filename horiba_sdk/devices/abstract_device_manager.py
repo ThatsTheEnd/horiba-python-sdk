@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Any
 
-from horiba_sdk.communication import WebsocketCommunicator
+from horiba_sdk.communication import AbstractCommunicator
+from horiba_sdk.devices.single_devices import ChargeCoupledDevice, Monochromator
 
 
 class AbstractDeviceManager(ABC):
@@ -10,20 +10,17 @@ class AbstractDeviceManager(ABC):
 
     """
 
-    def __init__(self):
-        self.binary_messages_enabled: bool = False
-
     @abstractmethod
-    def start_icl(self) -> None:
+    async def start(self) -> None:
         """
-        Abstract method that starts the ICL software and establishes communication.
+        Abstract method to start the device manager.
         """
         pass
 
     @abstractmethod
-    def stop_icl(self) -> Any:
+    async def stop(self) -> None:
         """
-        Abstract method that stops the communication and cleans up resources.
+        Abstract method to stop the device manager.
         """
         pass
 
@@ -37,23 +34,35 @@ class AbstractDeviceManager(ABC):
         """
         pass
 
-    @abstractmethod
-    def handle_errors(self, errors: list[str]) -> None:
-        """
-        Abstract method that handles errors, logs them, and may take corrective actions.
-
-        Args:
-            errors (List[str]): The errors to handle.
-        """
-        pass
-
     @property
     @abstractmethod
-    def communicator(self) -> WebsocketCommunicator:
+    def communicator(self) -> AbstractCommunicator:
         """
         Abstract method to get the communicator attribute.
 
         Returns:
             AbstractCommunicator: Returns the internal communicator instance.
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def monochromators(self) -> list[Monochromator]:
+        """
+        Abstract method to get the detected monochromators.
+
+        Returns:
+            List[Monochromator]: The detected monochromators
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def charge_coupled_devices(self) -> list[ChargeCoupledDevice]:
+        """
+        Abstract method to get the detected CCDs.
+
+        Returns:
+            List[ChargeCoupledDevice]: The detected CCDS.
         """
         pass

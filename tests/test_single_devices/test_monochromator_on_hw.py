@@ -7,7 +7,6 @@ import pytest_asyncio
 from numericalunits import nm
 
 from horiba_sdk.devices import DeviceManager
-from horiba_sdk.devices.single_devices import Monochromator
 
 
 @pytest.fixture(scope='session')
@@ -21,25 +20,24 @@ def event_loop(request):  # noqa: ARG001
 async def device_manager_instance():
     device_manager = DeviceManager(start_icl=True)
 
-    await device_manager.communicator.open()
-    await device_manager.discover_devices()
+    await device_manager.start()
 
     yield device_manager
 
-    await device_manager.stop_icl()
+    await device_manager.stop()
 
 
 @pytest.mark.asyncio
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
 async def test_monochromator_opens(device_manager_instance):
     # arrange
-    monochromator = Monochromator(device_manager_instance)
+    monochromator = device_manager_instance.monochromators[0]
 
     # act
-    await monochromator.open(0)
+    await monochromator.open()
 
     # assert
-    assert await monochromator.is_open is True
+    assert await monochromator.is_open() is True
 
     await monochromator.close()
 
@@ -48,13 +46,13 @@ async def test_monochromator_opens(device_manager_instance):
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
 async def test_monochromator_busy(device_manager_instance):
     # arrange
-    monochromator = Monochromator(device_manager_instance)
+    monochromator = device_manager_instance.monochromators[0]
 
     # act
-    await monochromator.open(0)
+    await monochromator.open()
 
     # assert
-    assert await monochromator.is_busy is True
+    assert await monochromator.is_busy is False
 
     await monochromator.close()
 
@@ -63,11 +61,16 @@ async def test_monochromator_busy(device_manager_instance):
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
 async def test_monochromator_wavelength(device_manager_instance):
     # arrange
-    monochromator = Monochromator(device_manager_instance)
+    monochromator = device_manager_instance.monochromators[0]
 
     # act
-    await monochromator.open(0)
-
+    await monochromator.open()
+    await monochromator.set_current_wavelength(100)
+    await asyncio.sleep(1)
+    mono_busy = False
+    while not mono_busy:
+        mono_busy = await monochromator.is_busy
+        await asyncio.sleep(0.1)
     # assert
     assert await monochromator.wavelength > 0
 
@@ -78,10 +81,10 @@ async def test_monochromator_wavelength(device_manager_instance):
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
 async def test_monochromator_can_move_to_wavelength(device_manager_instance):
     # arrange
-    monochromator = Monochromator(device_manager_instance)
+    monochromator = device_manager_instance.monochromators[0]
 
     # act
-    await monochromator.open(0)
+    await monochromator.open()
     await monochromator.move_to_wavelength(350 * nm)
 
     # assert
@@ -94,10 +97,10 @@ async def test_monochromator_can_move_to_wavelength(device_manager_instance):
 @pytest.mark.asyncio
 async def test_monochromator_turret_grating_position(device_manager_instance):
     # arrange
-    monochromator = Monochromator(device_manager_instance)
+    monochromator = device_manager_instance.monochromators[0]
 
     # act
-    await monochromator.open(0)
+    await monochromator.open()
 
     # assert
     assert await monochromator.turret_grating_position > 0
@@ -109,10 +112,10 @@ async def test_monochromator_turret_grating_position(device_manager_instance):
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
 async def test_monochromator_can_move_turret_grating_position(device_manager_instance):
     # arrange
-    monochromator = Monochromator(device_manager_instance)
+    monochromator = device_manager_instance.monochromators[0]
 
     # act
-    await monochromator.open(0)
+    await monochromator.open()
     await monochromator.move_turret_to_grating(50)
 
     # assert

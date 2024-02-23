@@ -17,7 +17,7 @@ from .messages import BinaryResponse, Command, JSONResponse, Response
 class WebsocketCommunicator(AbstractCommunicator):
     """
     The WebsocketCommunicator implements the `horiba_sdk.communication.AbstractCommunicator` via websockets.
-    A background task listens continuoulsy for incoming binary data.
+    A background task listens continuously for incoming binary data.
 
     It supports Asynchronous Context Managers and can be used like the following::
 
@@ -39,6 +39,7 @@ class WebsocketCommunicator(AbstractCommunicator):
         self.json_message_queue: asyncio.Queue[str] = asyncio.Queue()
         self.binary_message_queue: asyncio.Queue[bytes] = asyncio.Queue()
         self.binary_message_callback: Optional[Callable[[bytes], Any]] = None
+        self.icl_info: dict[str, Any] = {}
 
     async def __aenter__(self) -> 'WebsocketCommunicator':
         await self.open()
@@ -63,13 +64,14 @@ class WebsocketCommunicator(AbstractCommunicator):
 
         try:
             self.websocket = await websockets.connect(self.uri)
+            # self.flush_incoming_messages(self)  # Flush any incoming messages (if any
+
         except websockets.WebSocketException as e:
             raise CommunicationException(None, 'websocket connection issue') from e
 
         logger.debug(f'Websocket connection established to {self.uri}')
-        self.listen_task = asyncio.create_task(self._receive_binary_data())
+        self.listen_task = asyncio.create_task(self._receive_data())
 
-    @override
     async def send(self, command: Command) -> None:
         """
         Sends a command to the WebSocket server.
@@ -101,7 +103,6 @@ class WebsocketCommunicator(AbstractCommunicator):
         """
         return self.websocket is not None and self.websocket.open
 
-    @override
     async def response(self) -> Response:
         """Fetches the next response
 
@@ -127,6 +128,8 @@ class WebsocketCommunicator(AbstractCommunicator):
         Raises:
             CommunicationException: When the connection terminated with an error
             or the binary data failed to be processed.
+
+        .. todo:: `[saga]` is this still needed?
         """
         try:
             response: bytes = await self.binary_message_queue.get()
@@ -149,6 +152,7 @@ class WebsocketCommunicator(AbstractCommunicator):
             logger.debug('Waiting websocket close...')
             await self.websocket.close()
             self.websocket = None
+
         if self.listen_task:
             logger.debug('Canceling listening task...')
             self.listen_task.cancel()
@@ -165,15 +169,11 @@ class WebsocketCommunicator(AbstractCommunicator):
 
     async def _receive_data(self) -> None:
         try:
-            while True:
-                message = await self.websocket.recv()  # type: ignore
+            async for message in self.websocket:  # type: ignore
                 logger.info(f'Received message: {message!r}')
                 if isinstance(message, str):
                     await self.json_message_queue.put(message)
                 elif isinstance(message, bytes):
-                    # TODO: [saga] is this still needed?
-                    # await self.binary_message_queue.put(message)
-                    # logger.debug(f'Callback before if statement: {self.binary_message_callback}')
                     if self.binary_message_callback:
                         await asyncio.create_task(self.binary_message_callback(message))  # Call the callback
                 else:
@@ -185,25 +185,27 @@ class WebsocketCommunicator(AbstractCommunicator):
         except Exception as e:
             raise CommunicationException(None, 'failure to process binary data') from e
 
-    async def _receive_binary_data(self) -> None:
-        await self._receive_data()
-
-    async def execute_command(self, command_name: str, parameters: dict[Any, Any]) -> Response:
+    @override
+    async def request_with_response(self, command: Command, timeout: int = 5) -> Response:
         """
-        Creates a command from the command name, and it's parameters
-        Executes a command and handles the response.
+        Concrete method to fetch a response from a command.
 
         Args:
-            command_name (str): The name of the command to execute.
-            parameters (dict): The parameters for the command.
+            command (Command): Command for which a response is desired
+            timeout (int): Maximum time to wait for a response
 
         Returns:
-            Response: The response from the device.
+            Response: The response corresponding to the sent command.
 
         Raises:
-            Exception: When an error occurred on the device side.
+            Exception: When an error occurred with the communication channel
         """
-        command: Command = Command(command_name, parameters)  # create command
-        await self.send(command)  # send command
-        response: Response = await self.response()  # get response
+        # send the command with the send function and wait a maximum of 5 seconds for the response
+        await self.send(command)
+        try:
+            async with asyncio.timeout(timeout):
+                response: Response = await self.response()
+        except TimeoutError as te:
+            raise CommunicationException(None, f'Timeout of {timeout}s while waiting for response.') from te
+
         return response

@@ -7,9 +7,9 @@ from loguru import logger
 from overrides import override
 
 from horiba_sdk import ureg
-from horiba_sdk.communication import Response
+from horiba_sdk.communication import AbstractCommunicator, Response
 from horiba_sdk.core.resolution import Resolution
-from horiba_sdk.devices.device_manager import DeviceManager
+from horiba_sdk.icl_error import AbstractErrorDB
 
 from .abstract_device import AbstractDevice
 
@@ -18,20 +18,8 @@ from .abstract_device import AbstractDevice
 class ChargeCoupledDevice(AbstractDevice):
     """Charge Coupled Device
 
-    Example usage::
-
-        from horiba_sdk.devices.ccd import ChargeCoupledDevice
-
-        # using the context manager:
-        with ChargeCoupledDevice(1, device_manager) as ccd:
-            print(await ccd.is_open)
-
-        # alternative usage
-        ccd: ChargeCoupledDevice = ChargeCoupledDevice(1, device_manager)
-        await charge coupled device.open()
-        print(await charge coupled device.is_open)
-        await charge coupled device.close()
-
+    This class should not be instanced by the end user. Instead, the :class:`horiba_sdk.devices.DeviceManager`
+    should be used to access the detected CCDs on the system.
     """
 
     @final
@@ -40,11 +28,11 @@ class ChargeCoupledDevice(AbstractDevice):
         FROM_CCD_FIRMWARE = 1
         FROM_ICL_SETTINGS_INI = 2
 
-    def __init__(self, device_manager: DeviceManager) -> None:
-        super().__init__(device_manager)
-        self.device_list: list[str] = []
+    def __init__(self, device_id: int, communicator: AbstractCommunicator, error_db: AbstractErrorDB) -> None:
+        super().__init__(device_id, communicator, error_db)
 
     async def __aenter__(self) -> 'ChargeCoupledDevice':
+        await self.open()
         return self
 
     async def __aexit__(
@@ -58,24 +46,14 @@ class ChargeCoupledDevice(AbstractDevice):
         await self.close()
 
     @override
-    async def open(self, device_id: int, enable_binary_messages: bool = True) -> None:
+    async def open(self) -> None:
         """Opens the connection to the Charge Coupled Device
-        and also sends the command to enable binary messages.
-        This is necessary because atm the measurement results
-        are sent back as binary messages.
 
         Raises:
             Exception: When an error occurred on the device side
         """
-        self._id = device_id
-        await super().open(device_id)
+        await super().open()
         await super()._execute_command('ccd_open', {'index': self._id})
-        if enable_binary_messages:
-            await self.do_enable_binary_message()
-
-    async def do_enable_binary_message(self) -> None:
-        """Requests the ICL to include binary messages into the communication"""
-        await super()._execute_command('icl_binMode', {'mode': 'all'})
 
     @override
     async def close(self) -> None:
@@ -85,7 +63,6 @@ class ChargeCoupledDevice(AbstractDevice):
             Exception: When an error occurred on the device side
         """
         await super()._execute_command('ccd_close', {'index': self._id})
-        await super().close()
 
     async def is_open(self) -> bool:
         """Checks if the connection to the charge coupled device is open.
