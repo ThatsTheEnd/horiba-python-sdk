@@ -86,7 +86,7 @@
 | ccd_setAcquisitionStart    |      ✅      |      ✅ |      ✅ |                                                                     |
 | ccd_getAcquisitionBusy     |      ✅      |      ✅ |      ✅ |                                                                     |
 | ccd_setAcquisitionAbort    |      ✅      |     ✖️ |     ✖️ |                                                                     |
-| ccd_getAcquisitionData     |      ✅      |      ✅ |     ⚠️ |              Data is being retrieved but still formatted for telnet |
+| ccd_getAcquisitionData     |      ✅      |      ✅ |      ✅ |                                                                     |
 
 # Single Chanel Detector Commands
 
