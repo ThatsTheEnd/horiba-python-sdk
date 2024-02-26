@@ -7,7 +7,7 @@ from horiba_sdk.devices.device_manager import DeviceManager
 
 
 async def main():
-    device_manager = DeviceManager()
+    device_manager = DeviceManager(start_icl=True)
     await device_manager.start()
 
     if not device_manager.charge_coupled_devices:
@@ -19,6 +19,12 @@ async def main():
     await ccd.open()
 
     try:
+        await ccd.set_acquisition_count(1)
+        await ccd.set_x_axis_conversion_type(ccd.XAxisConversionType(0))
+        logger.warning(await ccd.get_acquisition_count())
+        logger.warning(await ccd.get_clean_count())
+        logger.warning(await ccd.get_timer_resolution())
+        logger.warning(await ccd.get_gain())
         await ccd.get_chip_size()
         await ccd.get_exposure_time()
         await ccd.set_exposure_time(random.randint(1000, 5000))

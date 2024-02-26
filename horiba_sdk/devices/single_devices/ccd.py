@@ -47,6 +47,10 @@ class ChargeCoupledDevice(AbstractDevice):
 
     @final
     class XAxisConversionType(Enum):
+        """
+        Enumeration of possible XAxisConversionTypes
+        None = 0, CCD-Firmware = 1, ICL ini settings file = 2
+        """
         NONE = 0
         FROM_CCD_FIRMWARE = 1
         FROM_ICL_SETTINGS_INI = 2
@@ -277,19 +281,20 @@ class ChargeCoupledDevice(AbstractDevice):
         Args:
             count (int): The number of acquisitions to be performed.
         """
-        await super()._execute_command('ccd_setAcquisitionCount', {'index': self._id, 'count': count})
+        await super()._execute_command('ccd_setAcqCount', {'index': self._id, 'count': count})
 
     async def get_acquisition_count(self) -> int:
         """Gets the number of acquisitions to be performed. The acquisition count is used to perform multiple
         acquisitions in a row.
         """
-        response: Response = await super()._execute_command('ccd_getAcquisitionCount', {'index': self._id})
+        response: Response = await super()._execute_command('ccd_getAcqCount', {'index': self._id})
         return int(response.results['count'])
 
     async def get_clean_count(self) -> str:
         """Gets the clean count mode of the CCD and the according mode"""
         response: Response = await super()._execute_command('ccd_getCleanCount', {'index': self._id})
-        return 'count: ' + response.results['count'] + ' ' + 'mode: ' + response.results['mode']
+        answer: str = 'count: ' + str(response.results['count']) + ' ' + 'mode: ' + str(response.results['mode'])
+        return answer
 
     async def set_clean_count(self, count: int, mode: CleanCountMode) -> None:
         """Sets the clean count mode of the CCD and the according mode
