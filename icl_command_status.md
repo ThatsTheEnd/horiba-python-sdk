@@ -8,39 +8,39 @@
 
 # Monochromator Commands
 
-| Command                     | Implemented | Tested | Status |                                                                 Comment |
-|-----------------------------|:-----------:|-------:|-------:|------------------------------------------------------------------------:|
-| mono_discover               |      ✅      |      ✅ |      ✅ |                                                                         |
-| mono_list                   |      ✅      |      ✅ |      ✅ |                                                                         |
-| mono_listCount              |      ✅      |      ✅ |      ✅ |                                                                         |
-| mono_open                   |      ✅      |      ✅ |      ⛔ |     Opening the mono does not work atm if a CCD is attached to the mono |
-| mono_close                  |      ✅      |      ✅ |      ✅ |                                                                         |
-| mono_isOpen                 |      ✅      |      ✅ |      ✅ |                                                                         |
-| mono_isBusy                 |      ✅      |      ✅ |      ✅ |                                                                         |
-| mono_init                   |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_getConfig              |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_getPosition            |      ✅      |      ✅ |      ✅ |                                                                         |
-| mono_setPosition            |      ✅      |     ✖️ |     ⚠️ |                                      Should this be available to users? |
-| mono_moveToPosition         |      ✅      |      ✅ |      ⛔ | Mono not working as expected yet, does not move to position as expected |
-| mono_getGratingPosition     |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_moveGrating            |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_getFilterWheelPosition |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_moveFilterWheel        |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_getMirrorPosition      |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_moveMirror             |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_getSlitPositionInMM    |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_moveSlitMM             |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_shutterOpen            |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_shutterClose           |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_getShutterStatus       |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_getSlitStepPosition    |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_moveSlit               |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_enableLaser            |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_getLaserStatus         |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_setLaserPower          |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_getLaserPower          |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_getLidStatus           |     ✖️      |     ✖️ |     ✖️ |                                                                         |
-| mono_getSwitchStatus        |     ✖️      |     ✖️ |     ✖️ |                                                                         |
+| Command                     | Implemented | Tested | Status |                                                                                                             Comment |
+|-----------------------------|:-----------:|-------:|-------:|--------------------------------------------------------------------------------------------------------------------:|
+| mono_discover               |      ✅      |      ✅ |      ✅ |                                                                                                                     |
+| mono_list                   |      ✅      |      ✅ |      ✅ |                                                                                                                     |
+| mono_listCount              |      ✅      |      ✅ |      ✅ |                                                                                                                     |
+| mono_open                   |      ✅      |      ✅ |      ⛔ |                                                 Opening the mono does not work atm if a CCD is attached to the mono |
+| mono_close                  |      ✅      |      ✅ |      ✅ |                                                                                                                     |
+| mono_isOpen                 |      ✅      |      ✅ |      ✅ |                                                                                                                     |
+| mono_isBusy                 |      ✅      |      ✅ |      ✅ |                                                                                                                     |
+| mono_init                   |      ✅      |      ✅ |      ✅ |                                                                                                                     |
+| mono_getConfig              |      ⛔      |     ✖️ |     ✖️ |                                                                                             returns an empty result |
+| mono_getPosition            |      ✅      |      ✅ |      ✅ |                                                                                                                     |
+| mono_setPosition            |      ✅      |     ✖️ |     ⚠️ |                                                                                  Should this be available to users? |
+| mono_moveToPosition         |      ✅      |      ✅ |      ⛔ |                                             Mono not working as expected yet, does not move to position as expected |
+| mono_getGratingPosition     |      ✅      |     ✖️ |     ✖️ |                                                                                                                     |
+| mono_moveGrating            |      ✅      |     ✖️ |     ⚠️ |                                                                    Crashes ICL. Are there functions to call before? |
+| mono_getFilterWheelPosition |      ⛔      |     ✖️ |     ✖️ |                                                                       `"[E];-510;Error Mono Command Not Supported"` |
+| mono_moveFilterWheel        |      ⛔      |     ✖️ |     ✖️ |                                                                       `"[E];-510;Error Mono Command Not Supported"` |
+| mono_getMirrorPosition      |      ✅      |      ✅ |     ⚠️ |             what are the right parameters? with `"index": mono_id, "type": any_value_possible` you always get `255` |
+| mono_moveMirror             |      ⛔      |     ✖️ |     ✖️ |                                                                                                         crashes ICL |
+| mono_getSlitPositionInMM    |      ⛔      |     ✖️ |     ✖️ |               what are the right parameters? with `"index": mono_id, "type": any_value_possible` you always get `0` |
+| mono_moveSlitMM             |      ⛔      |     ✖️ |     ✖️ | crashes ICL when command `{"command":"mono_moveSlitMM","parameters":{"index": 0, "type":0, "position": 1}}` is sent |
+| mono_shutterOpen            |      ⛔      |     ✖️ |     ✖️ |                          crashes ICL when command `{"command":"mono_shutterOpen","parameters":{"index":0}}` is sent |
+| mono_shutterClose           |      ⛔      |     ✖️ |     ✖️ |                         crashes ICL when command `{"command":"mono_shutterClose","parameters":{"index":0}}` is sent |
+| mono_getShutterStatus       |      ✅      |      ✅ |     ⚠️ |                                                                     What are the possible `position` return values? |
+| mono_getSlitStepPosition    |      ⛔      |     ✖️ |     ✖️ |               what are the right parameters? with `"index": mono_id, "type": any_value_possible` you always get `0` |
+| mono_moveSlit               |      ⛔      |     ✖️ |     ✖️ |   crashes ICL when command `{"command":"mono_moveSlit","parameters":{"index":0, "type": 0, "position": 0}}` is sent |
+| mono_enableLaser            |      ⛔      |     ✖️ |     ✖️ |                                                              `[E];-2;mono_getLaserStatus;Command handler not found` |
+| mono_getLaserStatus         |      ⛔      |     ✖️ |     ✖️ |                                                              `[E];-2;mono_getLaserStatus;Command handler not found` |
+| mono_setLaserPower          |      ⛔      |     ✖️ |     ✖️ |                                                              `[E];-2;mono_getLaserStatus;Command handler not found` |
+| mono_getLaserPower          |      ⛔      |     ✖️ |     ✖️ |                                                              `[E];-2;mono_getLaserStatus;Command handler not found` |
+| mono_getLidStatus           |      ⛔      |     ✖️ |     ✖️ |                                                              `[E];-2;mono_getLaserStatus;Command handler not found` |
+| mono_getSwitchStatus        |      ⛔      |     ✖️ |     ✖️ |                                                              `[E];-2;mono_getLaserStatus;Command handler not found` |
 
 # CCD Commands
 

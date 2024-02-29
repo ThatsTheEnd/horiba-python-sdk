@@ -155,7 +155,7 @@ class ChargeCoupledDevice(AbstractDevice):
             Exception: When an error occurred on the device side
         """
         response: Response = await super()._execute_command('ccd_getGain', {'index': self._id})
-        return response.results['info']
+        return str(response.results['info'])
 
     async def set_gain(self, gain: Gain) -> None:
         """Sets the gain of the CCD
@@ -178,7 +178,7 @@ class ChargeCoupledDevice(AbstractDevice):
             Exception: When an error occurred on the device side
         """
         response: Response = await super()._execute_command('ccd_getSpeed', {'index': self._id})
-        return response.results['info']
+        return str(response.results['info'])
 
     async def set_speed(self, speed: Speed) -> None:
         """Sets the speed of the CCD
@@ -201,7 +201,7 @@ class ChargeCoupledDevice(AbstractDevice):
             Exception: When an error occurred on the device side
         """
         response: Response = await super()._execute_command('ccd_getFitParams', {'index': self._id})
-        return response.results['params']
+        return str(response.results['params'])
 
     async def set_fit_params(self, fit_params: str) -> None:
         """Sets the fit parameters of the CCD

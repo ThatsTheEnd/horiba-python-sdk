@@ -257,9 +257,9 @@
       },
       {
         "number": -729,
-        "text": "CCD error: Missing parameter argument: openShutter",
+        "text": "Missing parameter argument: ",
         "level": "fatal"
       }
-      
+
     ]
   }

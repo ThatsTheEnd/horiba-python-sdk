@@ -1,8 +1,8 @@
+from enum import Enum
 from types import TracebackType
 from typing import Optional, final
 
 from loguru import logger
-from numericalunits import nm
 from overrides import override
 
 from horiba_sdk.communication import AbstractCommunicator, Response
@@ -18,6 +18,11 @@ class Monochromator(AbstractDevice):
     This class should not be instanced by the end user. Instead, the :class:`horiba_sdk.devices.DeviceManager`
     should be used to access the detected Monochromators on the system.
     """
+
+    @final
+    class ShutterStatus(Enum):
+        CLOSED = 0
+        OPEN = 1
 
     def __init__(self, device_id: int, communicator: AbstractCommunicator, error_db: AbstractErrorDB) -> None:
         super().__init__(device_id, communicator, error_db)
@@ -64,7 +69,6 @@ class Monochromator(AbstractDevice):
         response: Response = await super()._execute_command('mono_isOpen', {'index': self._id})
         return bool(response.results['open'])
 
-    @property
     async def is_busy(self) -> bool:
         """Checks if the monochromator is busy.
 
@@ -84,31 +88,33 @@ class Monochromator(AbstractDevice):
         """
         await super()._execute_command('mono_init', {'index': self._id})
 
-    @property
-    async def wavelength(self) -> nm:
+    async def get_current_wavelength(self) -> float:
         """Current wavelength of the monochromator's position in nm.
 
+        Returns:
+            float: The current wavelength in nm
+
         Raises:
-            Exception: When an error occured on the device side
+            Exception: When an error occurred on the device side
         """
         response = await super()._execute_command('mono_getPosition', {'index': self._id})
-        return float(response.results['wavelength']) * nm
+        return float(response.results['wavelength'])
 
-    async def set_current_wavelength(self, wavelength: int) -> None:
+    async def calibrate_wavelength(self, wavelength: float) -> None:
         """This command sets the wavelength value of the current grating position of the monochromator.
 
-        .. warning:: This could potentially uncalibrate the monochromator and report an incorrect wavelength compared to
-                     the actual output wavelength.
+        .. warning:: This could potentially un-calibrate the monochromator and report an incorrect wavelength
+                     compared to the actual output wavelength.
 
         Args:
-            wavelength (nm): wavelength
+            wavelength (float): wavelength in nm
 
         Raises:
-            Exception: When an error occured on the device side
+            Exception: When an error occurred on the device side
         """
         await super()._execute_command('mono_setPosition', {'index': self._id, 'wavelength': wavelength})
 
-    async def move_to_wavelength(self, wavelength: nm) -> None:
+    async def move_to_target_wavelength(self, wavelength: float) -> None:
         """Orders the monochromator to move to the requested wavelength.
 
         Use :func:`Monochromator.is_busy()` to know if the operation is still taking place.
@@ -117,12 +123,11 @@ class Monochromator(AbstractDevice):
             wavelength (nm): wavelength
 
         Raises:
-            Exception: When an error occured on the device side
+            Exception: When an error occurred on the device side
         """
-        await super()._execute_command('mono_moveToPosition', {'index': self._id, 'wavelength': wavelength / nm})
+        await super()._execute_command('mono_moveToPosition', {'index': self._id, 'wavelength': wavelength}, 60)
 
-    @property
-    async def turret_grating_position(self) -> int:
+    async def get_turret_grating_position(self) -> int:
         """Grating turret position.
 
         Returns:
@@ -134,7 +139,7 @@ class Monochromator(AbstractDevice):
         response: Response = await super()._execute_command('mono_getGratingPosition', {'index': self._id})
         return int(response.results['position'])
 
-    async def move_turret_to_grating(self, position: int) -> None:
+    async def set_turret_grating_position(self, position: int) -> None:
         """Move turret to grating position
 
         .. todo:: Get more information about how it works and clarify veracity of returned data
@@ -145,4 +150,25 @@ class Monochromator(AbstractDevice):
         Raises:
             Exception: When an error occured on the device side
         """
-        await super()._execute_command('mono_getPosition', {'index': self._id, 'position': position})
+        await super()._execute_command('mono_moveGrating', {'index': self._id, 'position': position})
+
+    async def get_mirror_position(self) -> int:
+        """ Mirror position in ???
+
+        .. todo:: Get more information about possible values and explain elements contained in monochromator at top
+           of this class.
+
+        Returns:
+            int: current mirror position
+        """
+        response: Response = await super()._execute_command('mono_getMirrorPosition', {'index': self._id, 'type': 1})
+        return int(response.results['position'])
+
+    async def get_shutter_status(self) -> ShutterStatus:
+        """ Shutter status
+
+        Returns:
+            ShutterStatus: OPEN or CLOSED
+        """
+        response: Response = await super()._execute_command('mono_getShutterStatus', {'index': self._id})
+        return self.ShutterStatus(response.results['position'])
