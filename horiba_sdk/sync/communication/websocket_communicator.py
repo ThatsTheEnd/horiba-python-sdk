@@ -194,7 +194,7 @@ class WebsocketCommunicator(AbstractCommunicator):
         """
         self.send(command)
         logger.debug('sent command, waiting for response')
-        time.sleep(0.1)
+        time.sleep(0.2)
         response: Response = self.response()
 
         return response

@@ -1,3 +1,5 @@
+import time
+
 from loguru import logger
 
 from horiba_sdk.sync.devices import DeviceManager
@@ -9,7 +11,7 @@ def main():
     device_manager.start()
 
     print(f'CCDs: {len(device_manager.charge_coupled_devices)}')
-    if device_manager.charge_coupled_devices.empty():
+    if len(device_manager.charge_coupled_devices) == 0:
         logger.error('No CCDs discovered')
         device_manager.stop()
         return
@@ -17,15 +19,16 @@ def main():
     ccd = device_manager.charge_coupled_devices[0]
     ccd.open()
 
-    resolution = ccd.get_resolution()
+    resolution = ccd.get_chip_size()
     print(f'Resolution {resolution.width} x {resolution.height} pixels')
     print(f'Exposure time: {ccd.get_exposure_time()}')
     ccd.set_exposure_time(5000)
     print(f'Exposure time: {ccd.get_exposure_time()}')
-    ccd.set_acquisition_start(shutter_open=False)
+    ccd.set_acquisition_start(open_shutter=False)
+    time.sleep(6)
     data = ccd.get_acquisition_data()
     print(f'Acquisition data: {data}')
-
+    time.sleep(1)
     # Close the CCD
     ccd.close()
 
