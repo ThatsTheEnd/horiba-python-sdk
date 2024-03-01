@@ -22,7 +22,7 @@ class EasyCCD:
         device_manager (DeviceManager): The device manager instance.
     """
 
-    def __init__(self, device_id, device_manager):
+    def __init__(self, ccd: ChargeCoupledDevice):
         """
         Initializes a new instance of the EasyCCD class.
         The main difference between this class and the ChargeCoupledDevice class is that
@@ -31,20 +31,18 @@ class EasyCCD:
         to use the ChargeCoupledDevice class in a synchronous manner.
 
         Args:
-            device_id (int): The ID of the device.
-            device_manager (DeviceManager): The device manager instance.
+            ccd (ChargeCoupledDevice): The ccd
         """
-        self.ccd = ChargeCoupledDevice(device_manager)
-        self._open(device_id)
+        self.ccd = ccd
 
-    def _open(self, device_id):
+    def open(self):
         """
         Opens the connection to the ChargeCoupledDevice.
 
         Returns:
             None
         """
-        return asyncio.run(self.ccd.open(device_id))
+        return asyncio.run(self.ccd.open())
 
     def get_resolution(self):
         """

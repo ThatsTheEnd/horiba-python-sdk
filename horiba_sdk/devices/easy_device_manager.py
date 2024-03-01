@@ -1,30 +1,12 @@
 import asyncio
-from typing import Any, Callable, final
-
-from mypy_extensions import KwArg, VarArg
+from typing import final
 
 from horiba_sdk.communication import AbstractCommunicator
 from horiba_sdk.devices import DeviceManager
-from horiba_sdk.devices.single_devices import ChargeCoupledDevice, Monochromator
-
-
-def singleton(cls: type[Any]) -> Callable[[VarArg(Any), KwArg(Any)], Any]:
-    """
-    Decorator to implement the Singleton pattern.
-    """
-
-    _instances: dict[type[Any], Any] = {}
-
-    def get_instance(*args, **kwargs):
-        if cls not in _instances:
-            _instances[cls] = cls(*args, **kwargs)
-        return _instances[cls]
-
-    return get_instance
+from horiba_sdk.devices.single_devices import EasyCCD, Monochromator
 
 
 @final
-@singleton
 class EasyDeviceManager:
     """
     This class provides a synchronous interface to the DeviceManager class.
@@ -54,12 +36,15 @@ class EasyDeviceManager:
             websocket_port: str = '25010': websocket port
         """
         self._device_manager = DeviceManager(start_icl, websocket_ip, websocket_port)
+        self._easy_ccds = []
+        self._easy_monos = []
 
     def start(self) -> None:
         """
         Starts the device manager.
         """
-        return asyncio.run(self._device_manager.start())
+        asyncio.run(self._device_manager.start())
+        self.discover_devices()
 
     def stop(self) -> None:
         """
@@ -73,7 +58,11 @@ class EasyDeviceManager:
         Args:
             error_on_no_device (bool): If True, an exception is raised if no device is connected.
         """
-        return asyncio.run(self._device_manager.discover_devices(error_on_no_device))
+        asyncio.run(self._device_manager.discover_devices(error_on_no_device))
+
+        for ccd in self._device_manager.charge_coupled_devices:
+            self._easy_ccds.append(EasyCCD(ccd))
+
 
     @property
     def communicator(self) -> AbstractCommunicator:
@@ -90,17 +79,18 @@ class EasyDeviceManager:
         """
         The detected monochromators, should be called after :meth:`discover_devices`
 
+        .. todo:: create EasyMonochromator class
         Returns:
             List[Monochromator]: The detected monochromators
         """
-        return self._device_manager.monochromators
+        return self._easy_monos
 
     @property
-    def charge_coupled_devices(self) -> list[ChargeCoupledDevice]:
+    def charge_coupled_devices(self) -> list[EasyCCD]:
         """
         The detected CCDs, should be called after :meth:`discover_devices`
 
         Returns:
-            List[ChargeCoupledDevice]: The detected CCDS.
+            List[EasyCCD]: The detected CCDS.
         """
-        return self._device_manager.charge_coupled_devices
+        return self._easy_ccds
