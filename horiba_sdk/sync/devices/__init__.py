@@ -5,9 +5,9 @@ from .device_manager import DeviceManager
 from .fake_device_manager import FakeDeviceManager
 
 __all__ = [
+    'AbstractDeviceDiscovery',
     'AbstractDeviceManager',
+    'DeviceDiscovery',
     'DeviceManager',
     'FakeDeviceManager',
-    'AbstractDeviceDiscovery',
-    'DeviceDiscovery',
 ]
