@@ -2,10 +2,10 @@
 # 1. First run icl.exe
 # 2. Then execute this script:
 #    poetry run python ./horiba_sdk/sync/communication/test_client.py
-import websockets
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
+from websockets.sync.client import connect
 
-websocket = websockets.sync.client.connect(uri='ws://localhost:25010')
+websocket = connect(uri='ws://localhost:25010')
 try:
     websocket.send('{"command":"icl_shutdown"}')
     for message in websocket:
