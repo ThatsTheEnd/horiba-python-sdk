@@ -48,7 +48,6 @@ class DeviceManager(AbstractDeviceManager):
         self._icl_communicator: WebsocketCommunicator = WebsocketCommunicator(
             'ws://' + websocket_ip + ':' + str(websocket_port)
         )
-        self._icl_communicator.register_binary_message_callback(self._binary_message_callback)
         self._icl_websocket_ip: str = websocket_ip
         self._icl_websocket_port: str = websocket_port
         self._icl_process: Optional[Popen[bytes]] = None
@@ -64,6 +63,7 @@ class DeviceManager(AbstractDeviceManager):
         if self._start_icl:
             self.start_icl()
 
+        self._icl_communicator.register_binary_message_callback(self._binary_message_callback)
         self._icl_communicator.open()
 
         icl_info: Response = self._icl_communicator.request_with_response(Command('icl_info', {}))

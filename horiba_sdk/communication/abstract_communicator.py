@@ -32,7 +32,7 @@ class AbstractCommunicator(ABC):
 
         Args:
             command (Command): Command for which a response is desired
-            timeout (int): Time in [s] to wait for the response before giving up. Defaults to 5s
+            timeout (int, optional): Timeout [s] for waiting for the response. Defaults to 5
 
         Returns:
             Response: The response corresponding to the sent command.

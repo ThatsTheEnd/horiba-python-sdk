@@ -130,10 +130,17 @@ class WebsocketCommunicator(AbstractCommunicator):
             logger.debug('Waiting websocket close...')
             self.websocket.close()
 
+        if self.binary_message_handling_thread:
+            logger.debug('Canceling binary listening thread...')
+            self.running_binary_message_handling_thread = False
+            self.binary_message_handling_thread.join()
+            self.binary_message_handling_thread = None
+
         if self.listen_thread:
             logger.debug('Canceling listening thread...')
             self.running_listen_thread = False
             self.listen_thread.join()
+            self.listen_thread = None
 
         self.websocket = None
         logger.debug('Websocket connection closed')
@@ -143,11 +150,12 @@ class WebsocketCommunicator(AbstractCommunicator):
         if self.binary_message_callback:
             raise CommunicationException(None, 'Binary message callback already registered')
 
-        logger.info('Binary message callback registered.')
         self.binary_message_callback = callback
+        logger.info('Binary message callback registered.')
         self.running_binary_message_handling_thread = True
         self.binary_message_handling_thread = Thread(target=self._run_binary_message_callback)
         self.binary_message_handling_thread.start()
+        logger.info('Started binary message thread')
 
     def _receive_data(self) -> None:
         if not self.websocket:
@@ -177,24 +185,28 @@ class WebsocketCommunicator(AbstractCommunicator):
         while self.running_binary_message_handling_thread:
             while self.binary_message_queue.empty():
                 time.sleep(0.5)
+                if not self.running_binary_message_handling_thread:
+                    return
 
             binary_message = self.binary_message_queue.get()
             self.binary_message_callback(binary_message)
 
     @override
-    def request_with_response(self, command: Command) -> Response:
+    def request_with_response(self, command: Command, time_to_wait_for_response_in_s: float = 0.1) -> Response:
         """
         Concrete method to fetch a response from a command.
 
         Args:
             command (Command): Command for which a response is desired
+            time_to_wait_for_response_in_s (float, optional): Time, in seconds, to wait between request and response.
+            Defaults to 0.1s
 
         Returns:
             Response: The response corresponding to the sent command.
         """
         self.send(command)
         logger.debug('sent command, waiting for response')
-        time.sleep(0.2)
+        time.sleep(time_to_wait_for_response_in_s)
         response: Response = self.response()
 
         return response

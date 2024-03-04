@@ -32,8 +32,7 @@ class Monochromator(AbstractDevice):
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
     ) -> None:
-        is_open = self.is_open()
-        if not is_open:
+        if not self.is_open():
             logger.debug('Monochromator is already closed')
             return
 
@@ -47,7 +46,7 @@ class Monochromator(AbstractDevice):
             Exception: When an error occured on the device side
         """
         super().open()
-        super()._execute_command('mono_open', {'index': self._id})
+        super()._execute_command('mono_open', {'index': self._id}, 0.5)
 
     @override
     def close(self) -> None:
