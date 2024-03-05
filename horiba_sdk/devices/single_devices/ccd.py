@@ -51,6 +51,7 @@ class ChargeCoupledDevice(AbstractDevice):
         Enumeration of possible XAxisConversionTypes
         None = 0, CCD-Firmware = 1, ICL ini settings file = 2
         """
+
         NONE = 0
         FROM_CCD_FIRMWARE = 1
         FROM_ICL_SETTINGS_INI = 2
