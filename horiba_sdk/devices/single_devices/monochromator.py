@@ -154,7 +154,7 @@ class Monochromator(AbstractDevice):
         Returns:
             str: configuration of the monochromator
         """
-        response: Response = await super()._execute_command('mono_getConfig', {'index': self._id})
+        response: Response = await super()._execute_command('mono_getConfig', {'index': self._id, "compact": False})
         return str(response.results)
 
     async def get_current_wavelength(self) -> float:
