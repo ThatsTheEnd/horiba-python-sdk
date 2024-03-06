@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from .messages import BinaryResponse, Command, Response
+from horiba_sdk.communication.messages import Command, Response
 
 
 class AbstractCommunicator(ABC):
@@ -9,7 +9,7 @@ class AbstractCommunicator(ABC):
     """
 
     @abstractmethod
-    async def open(self) -> None:
+    def open(self) -> None:
         """
         Abstract method to establish a connection.
         """
@@ -26,13 +26,14 @@ class AbstractCommunicator(ABC):
         pass
 
     @abstractmethod
-    async def request_with_response(self, command: Command, timeout: int = 5) -> Response:
+    def request_with_response(self, command: Command, time_to_wait_for_response_in_s: float = 0.1) -> Response:
         """
         Abstract method to fetch a response from a command.
 
         Args:
             command (Command): Command for which a response is desired
-            timeout (int, optional): Timeout [s] for waiting for the response. Defaults to 5
+            time_to_wait_for_response_in_s (float, optional): Time, in seconds, to wait between request and response.
+            Defaults to 0.1s
 
         Returns:
             Response: The response corresponding to the sent command.
@@ -40,19 +41,7 @@ class AbstractCommunicator(ABC):
         pass
 
     @abstractmethod
-    async def binary_response(self) -> BinaryResponse:
-        """
-        Abstract method that fetches the next binary response.
-
-        Returns:
-            BinaryResponse: The binary response from the server
-
-        .. todo:: `[saga]` is this still needed?
-        """
-        pass
-
-    @abstractmethod
-    async def close(self) -> None:
+    def close(self) -> None:
         """
         Abstract method to close the connection.
         """
