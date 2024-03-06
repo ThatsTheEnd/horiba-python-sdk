@@ -170,7 +170,7 @@ async def test_monochromator_mirror_position(device_manager_instance):
 
         # assert
         # assert mirror_position == Monochromator.MirrorPosition.A
-        assert monochromator.is_busy() is False
+        assert await monochromator.is_busy() is False
 
 
 @pytest.mark.asyncio
@@ -183,7 +183,7 @@ async def test_monochromator_change_mirror_position(device_manager_instance):
         # await monochromator.set_mirror_position(Monochromator.Mirror.FIRST, Monochromator.MirrorPosition.A)
         # assert
         # assert await monochromator.get_mirror_position(Monochromator.Mirror.FIRST) == Monochromator.MirrorPosition.A
-        assert monochromator.is_busy() is False
+        assert await monochromator.is_busy() is False
 
 
 @pytest.mark.asyncio
