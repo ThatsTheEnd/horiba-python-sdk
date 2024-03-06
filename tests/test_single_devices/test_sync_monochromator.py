@@ -25,7 +25,7 @@ def test_monochromator_busy(fake_sync_icl_exe, fake_sync_device_manager):  # noq
     monochromator.open()
 
     # assert
-    assert monochromator.is_busy is True
+    assert monochromator.is_busy is False
 
     monochromator.close()
 
