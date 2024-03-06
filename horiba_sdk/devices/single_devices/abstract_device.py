@@ -43,7 +43,7 @@ class AbstractDevice(ABC):
         """
         pass
 
-    async def _execute_command(self, command_name: str, parameters: dict[Any, Any]) -> Response:
+    async def _execute_command(self, command_name: str, parameters: dict[Any, Any], timeout: int = 5) -> Response:
         """
         Creates a command from the command name, and it's parameters
         Executes a command and handles the response.
@@ -58,7 +58,9 @@ class AbstractDevice(ABC):
         Raises:
             Exception: When an error occurred on the device side.
         """
-        response: Response = await self._communicator.request_with_response(Command(command_name, parameters))
+        response: Response = await self._communicator.request_with_response(
+            Command(command_name, parameters), timeout=timeout
+        )
         if response.errors:
             self._handle_errors(response.errors)
         return response

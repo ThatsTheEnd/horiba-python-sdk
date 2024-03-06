@@ -5,7 +5,6 @@ import random
 import pytest
 from loguru import logger
 
-from horiba_sdk import ureg
 from horiba_sdk.devices.device_manager import DeviceManager
 
 
@@ -25,7 +24,7 @@ async def test_ccd_functionality(event_loop):  # noqa: ARG001
         await ccd.get_exposure_time()
         new_exposure_time = random.randint(1000, 5000)
         await ccd.set_exposure_time(new_exposure_time)
-        assert await ccd.get_exposure_time() == ureg.Quantity(new_exposure_time, 'ms')
+        assert await ccd.get_exposure_time() == new_exposure_time
         await ccd.get_temperature()
         await ccd.set_region_of_interest()  # Set default ROI, if you want a custom ROI, pass the parameters
         if await ccd.get_acquisition_ready():

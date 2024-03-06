@@ -1,6 +1,6 @@
 from enum import Enum
 from types import TracebackType
-from typing import Any, Optional, Union, final
+from typing import Any, Optional, final
 
 import pint
 from loguru import logger
@@ -23,7 +23,35 @@ class ChargeCoupledDevice(AbstractDevice):
     """
 
     @final
+    class Gain(Enum):
+        HIGH_LIGHT = 0
+        BEST_DYNAMIC_RANGE = 1
+        HIGH_SENSITIVITY = 2
+
+    @final
+    class Speed(Enum):
+        SLOW_45_kHz = 0
+        MEDIUM_1_MHz = 1
+        FAST_1_MHz_Ultra = 2
+
+    @final
+    class AcquisitionFormat(Enum):
+        SPECTRA = 0
+        IMAGE = 1
+        CROP = 2
+        FAST_KINETICS = 3
+
+    @final
+    class CleanCountMode(Enum):
+        Mode1 = 238
+
+    @final
     class XAxisConversionType(Enum):
+        """
+        Enumeration of possible XAxisConversionTypes
+        None = 0, CCD-Firmware = 1, ICL ini settings file = 2
+        """
+
         NONE = 0
         FROM_CCD_FIRMWARE = 1
         FROM_ICL_SETTINGS_INI = 2
@@ -73,6 +101,222 @@ class ChargeCoupledDevice(AbstractDevice):
         response: Response = await super()._execute_command('ccd_isOpen', {'index': self._id})
         return bool(response.results['open'])
 
+    async def restart(self) -> None:
+        """Restarts the charge coupled device
+        This command only works if the camera has been opened before.
+        The connection to the camera stays open after the restart.
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        await super()._execute_command('ccd_restart', {'index': self._id})
+
+    async def get_configuration(self) -> dict[str, Any]:
+        """Returns the configuration of the CCD
+
+        Returns:
+            dict[str, Any]: Configuration of the CCD
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        response: Response = await super()._execute_command('ccd_getConfig', {'index': self._id})
+        return response.results
+
+    async def get_number_of_averages(self) -> int:
+        """Returns the number of averages of the CCD
+
+        Returns:
+            int: Number of averages
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        response: Response = await super()._execute_command('ccd_getNumberOfAvgs', {'index': self._id})
+        return int(response.results['count'])
+
+    async def set_number_of_averages(self, number_of_averages: int) -> None:
+        """Sets the number of averages of the CCD
+
+        Args:
+            number_of_averages (int): Number of averages
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        await super()._execute_command('ccd_setNumberOfAvgs', {'index': self._id, 'count': number_of_averages})
+
+    async def get_gain(self) -> str:
+        """Returns the gain of the CCD
+
+        Returns:
+            str: Gain
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        response: Response = await super()._execute_command('ccd_getGain', {'index': self._id})
+        return str(response.results['info'])
+
+    async def set_gain(self, gain: Gain) -> None:
+        """Sets the gain of the CCD
+
+        Args:
+            gain (Gain): Gain
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        await super()._execute_command('ccd_setGain', {'index': self._id, 'token': gain.value})
+
+    async def get_speed(self) -> str:
+        """Returns the speed of the CCD
+
+        Returns:
+            str: Speed
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        response: Response = await super()._execute_command('ccd_getSpeed', {'index': self._id})
+        return str(response.results['info'])
+
+    async def set_speed(self, speed: Speed) -> None:
+        """Sets the speed of the CCD
+
+        Args:
+            speed (Speed): Speed
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        await super()._execute_command('ccd_setSpeed', {'index': self._id, 'token': speed.value})
+
+    async def get_fit_params(self) -> str:
+        """Returns the fit parameters of the CCD
+
+        Returns:
+            str: Fit parameters
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        response: Response = await super()._execute_command('ccd_getFitParams', {'index': self._id})
+        return str(response.results['params'])
+
+    async def set_fit_params(self, fit_params: str) -> None:
+        """Sets the fit parameters of the CCD
+
+        Args:
+            fit_params (str): Fit parameters
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        await super()._execute_command('ccd_setFitParams', {'index': self._id, 'params': fit_params})
+
+    async def get_timer_resolution(self) -> int:
+        """Returns the timer resolution of the CCD
+
+        Returns:
+            int: Timer resolution
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        response: Response = await super()._execute_command('ccd_getTimerResolution', {'index': self._id})
+        return int(response.results['resolution'])
+
+    async def set_timer_resolution(self, timer_resolution: int) -> None:
+        """Sets the timer resolution of the CCD
+
+        Args:
+            timer_resolution (int): Timer resolution
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        await super()._execute_command('ccd_setTimerResolution', {'index': self._id, 'resolution': timer_resolution})
+
+    async def set_acquisition_format(self, number_of_rois: int, acquisition_format: AcquisitionFormat) -> None:
+        """Sets the acquisition format and the number of ROIs (Regions of Interest) or areas. After using this command
+         to set the number of ROIs and format, the ccd_setRoi command should be used to define each ROI.
+         Note: The Crop (2) and Fast Kinetics (3) acquisition formats are not supported by every CCD.
+
+        Args:
+            acquisition_format (AcquisitionFormat): Acquisition format
+            number_of_rois (int): Number of regions of interest
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        await super()._execute_command(
+            'ccd_setAcqFormat', {'index': self._id, 'format': acquisition_format.value, 'numberOfRois': number_of_rois}
+        )
+
+    async def set_x_axis_conversion_type(self, conversion_type: XAxisConversionType) -> None:
+        """Sets the X-axis pixel conversion type to be used when retrieving the acquisition data with the
+        ccd_getAcquisitionData command.
+        0 = None (default)
+        1 = CCD FIT parameters contained in the CCD firmware
+        2 = Mono Wavelength parameters contained in the icl_settings.ini file
+
+        Args:
+            conversion_type (XAxisConversionType): Conversion type Integer. The X-axis pixel conversion type to be used.
+
+        """
+        await super()._execute_command('ccd_setXAxisConversionType', {'index': self._id, 'type': conversion_type.value})
+
+    async def get_x_axis_conversion_type(self) -> XAxisConversionType:
+        """Gets the conversion type of the x axis.
+        0 = None (default)
+        1 = CCD FIT parameters contained in the CCD firmware
+        2 = Mono Wavelength parameters contained in the icl_settings.ini file
+        """
+        response: Response = await super()._execute_command('ccd_getXAxisConversionType', {'index': self._id})
+        return self.XAxisConversionType(self.XAxisConversionType(response.results['type']))
+
+    async def set_acquisition_count(self, count: int) -> None:
+        """Sets the number of acquisitions to be performed. The acquisition count is used to perform multiple
+            acquisitions in a row.
+        Args:
+            count (int): The number of acquisitions to be performed.
+        """
+        await super()._execute_command('ccd_setAcqCount', {'index': self._id, 'count': count})
+
+    async def get_acquisition_count(self) -> int:
+        """Gets the number of acquisitions to be performed. The acquisition count is used to perform multiple
+        acquisitions in a row.
+        """
+        response: Response = await super()._execute_command('ccd_getAcqCount', {'index': self._id})
+        return int(response.results['count'])
+
+    async def get_clean_count(self) -> str:
+        """Gets the clean count mode of the CCD and the according mode"""
+        response: Response = await super()._execute_command('ccd_getCleanCount', {'index': self._id})
+        answer: str = 'count: ' + str(response.results['count']) + ' ' + 'mode: ' + str(response.results['mode'])
+        return answer
+
+    async def set_clean_count(self, count: int, mode: CleanCountMode) -> None:
+        """Sets the clean count mode of the CCD and the according mode
+        Args:
+            count (int): The number of acquisitions to be performed.
+            mode (CleanCountMode): The mode of the clean count
+        """
+        await super()._execute_command('ccd_setCleanCount', {'index': self._id, 'count': count, 'mode': mode.value})
+
+    async def get_data_size(self) -> int:
+        """Returns the size of the data of the CCD
+
+        Returns:
+            int: Size of the data
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        response: Response = await super()._execute_command('ccd_getDataSize', {'index': self._id})
+        return int(response.results['size'])
+
     async def get_temperature(self) -> pint.Quantity:
         """Chip temperature of the CCD.
 
@@ -100,19 +344,7 @@ class ChargeCoupledDevice(AbstractDevice):
         resolution: Resolution = Resolution(width, height)
         return resolution
 
-    async def get_speed(self) -> Union[pint.Quantity, None]:
-        """Chip transfer speed in kHz
-
-        Returns:
-            pint.Quantity: Transfer speed in kilo Hertz
-
-        Raises:
-            Exception: When an error occurred on the device side
-        """
-        response: Response = await super()._execute_command('ccd_getSpeed', {'index': self._id})
-        return ureg(response.results['info'])
-
-    async def get_exposure_time(self) -> Union[pint.Quantity, None]:
+    async def get_exposure_time(self) -> int:
         """Returns the exposure time in ms
 
         Returns:
@@ -121,7 +353,7 @@ class ChargeCoupledDevice(AbstractDevice):
             Exception: When an error occurred on the device side
         """
         response: Response = await super()._execute_command('ccd_getExposureTime', {'index': self._id})
-        exposure = ureg.Quantity(response.results['time'], 'ms')
+        exposure = int(response.results['time'])
         return exposure
 
     async def set_exposure_time(self, exposure_time_ms: int) -> None:
@@ -206,11 +438,6 @@ class ChargeCoupledDevice(AbstractDevice):
         response: Response = await super()._execute_command('ccd_getAcquisitionBusy', {'index': self._id})
         return bool(response.results['isBusy'])
 
-    async def set_x_axis_conversion_type(self, conversion_type: XAxisConversionType) -> None:
-        """Sets the conversion type of the x axis"""
-        await super()._execute_command('ccd_setXAxisConversionType', {'index': self._id, 'type': conversion_type.value})
-
-    async def get_x_axis_conversion_type(self) -> XAxisConversionType:
-        """Gets the conversion type of the x axis"""
-        response: Response = await super()._execute_command('ccd_getXAxisConversionType', {'index': self._id})
-        return self.XAxisConversionType(response.results['type'])
+    async def set_acquisition_abort(self) -> None:
+        """Stops the acquisition of the CCD"""
+        await super()._execute_command('ccd_setAcquisitionAbort', {'index': self._id})

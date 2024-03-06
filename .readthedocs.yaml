@@ -13,13 +13,15 @@ build:
   jobs:
     post_install:
       - pip install poetry
-      - poetry config virtualenvs.create false
-      - poetry install --with docs
+      - pip install poetry-plugin-export
+      - poetry export --format=requirements.txt --output=requirements.txt --with docs
+      - pip install -r requirements.txt
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
    configuration: docs/source/conf.py
    fail_on_warning: false
+   builder: "dirhtml"
 
 # Optionally build your docs in additional formats such as PDF and ePub
 # formats:
