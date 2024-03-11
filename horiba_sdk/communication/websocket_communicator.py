@@ -148,6 +148,8 @@ class WebsocketCommunicator(AbstractCommunicator):
         """
         if not self.opened():
             raise CommunicationException(None, 'cannot close already closed websocket')
+        if self.binary_message_callback:
+            self.binary_message_callback = None
         if self.websocket:
             logger.debug('Waiting websocket close...')
             await self.websocket.close()
