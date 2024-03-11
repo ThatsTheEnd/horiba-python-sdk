@@ -37,6 +37,17 @@ files = [
 ]
 
 [[package]]
+name = "appdirs"
+version = "1.4.4"
+description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
+optional = false
+python-versions = "*"
+files = [
+    {file = "appdirs-1.4.4-py2.py3-none-any.whl", hash = "sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128"},
+    {file = "appdirs-1.4.4.tar.gz", hash = "sha256:7d5d0167b2b1ba821647616af46a749d1c653740dd0d2415100fe26e27afdf41"},
+]
+
+[[package]]
 name = "astroid"
 version = "3.0.3"
 description = "An abstract syntax tree for Python with inference support."
@@ -403,6 +414,23 @@ files = [
 docs = ["furo (>=2023.9.10)", "sphinx (>=7.2.6)", "sphinx-autodoc-typehints (>=1.24)"]
 testing = ["covdefaults (>=2.3)", "coverage (>=7.3.2)", "diff-cover (>=8)", "pytest (>=7.4.3)", "pytest-cov (>=4.1)", "pytest-mock (>=3.12)", "pytest-timeout (>=2.2)"]
 typing = ["typing-extensions (>=4.8)"]
+
+[[package]]
+name = "git-changelog"
+version = "2.4.0"
+description = "Automatic Changelog generator using Jinja2 templates."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "git_changelog-2.4.0-py3-none-any.whl", hash = "sha256:f5e7f30a0c6057d7510d132e62038a5d392acfad82def0f8b3eea513fa1b699c"},
+    {file = "git_changelog-2.4.0.tar.gz", hash = "sha256:c772191fa96e584b3ff29b1a67fad6d1b4ee2a24647947a28fb1a8b229682421"},
+]
+
+[package.dependencies]
+appdirs = ">=1.4"
+Jinja2 = ">=2.10"
+semver = ">=2.13"
+tomli = {version = ">=2.0", markers = "python_version < \"3.11\""}
 
 [[package]]
 name = "identify"
@@ -1289,6 +1317,17 @@ github = ["jinja2 (>=3.1.0)", "pygithub (>=1.43.3)"]
 gitlab = ["python-gitlab (>=1.3.0)"]
 
 [[package]]
+name = "semver"
+version = "3.0.2"
+description = "Python helper for Semantic Versioning (https://semver.org)"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "semver-3.0.2-py3-none-any.whl", hash = "sha256:b1ea4686fe70b981f85359eda33199d60c53964284e0cfb4977d243e37cf4bf4"},
+    {file = "semver-3.0.2.tar.gz", hash = "sha256:6253adb39c70f6e51afed2fa7152bcd414c411286088fb4b9effb133885ab4cc"},
+]
+
+[[package]]
 name = "setuptools"
 version = "69.1.0"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
@@ -1696,4 +1735,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<4"
-content-hash = "2844ec51bf1edde0f793e12f3a5c17b4f0f46d0a5c38acf4e3713fd2142e1949"
+content-hash = "2476280f4a9bfb064b8bd47496407f458722d12b27fe0b2e608de74ab0e3a632"
