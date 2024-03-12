@@ -18,14 +18,39 @@
 
 </div>
 
-## Very first steps
+## 🛠️ Usage
+
+1. Install the sdk:
+
+   ```bash
+   pip install horiba-python-sdk
+   ```
+
+   or install with `Poetry`
+
+   ```bash
+   poetry add horiba-python-sdk
+   ```
+
+2. Create a file named `center_scan.py` and copy-paste the content of
+   [`examples/asynchronous_examples/center_scan.py`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/feature/publishing/examples/asynchronous_examples/center_scan.py)
+
+
+3. Run the example with:
+
+   ```bash
+   python center_scan.py
+   ```
+
+## 👩‍💻 First steps as contributor
 
 ### Initialize your code
 
 1. Initialize `git` inside your repo:
 
 ```bash
-cd horiba-python-sdk && git init
+cd horiba-python-sdk
+git init
 ```
 
 2. If you don't have `Poetry` installed run:
@@ -57,10 +82,10 @@ git remote add origin https://github.com/ThatsTheEnd/horiba-python-sdk.git
 git push -u origin main
 ```
 
-### Set up bots
+<!-- ### Set up bots -->
 
-- Set up [Dependabot](https://docs.github.com/en/github/administering-a-repository/enabling-and-disabling-version-updates#enabling-github-dependabot-version-updates) to ensure you have the latest dependencies.
-- Set up [Stale bot](https://github.com/apps/stale) for automatic issue closing.
+<!-- - Set up [Dependabot](https://docs.github.com/en/github/administering-a-repository/enabling-and-disabling-version-updates#enabling-github-dependabot-version-updates) to ensure you have the latest dependencies. -->
+<!-- - Set up [Stale bot](https://github.com/apps/stale) for automatic issue closing. -->
 
 ### Poetry
 
@@ -85,73 +110,14 @@ etc
 Building a new version of the application contains steps:
 
 - Bump the version of your package `poetry version <version>`. You can pass the new version explicitly, or a rule such as `major`, `minor`, or `patch`. For more details, refer to the [Semantic Versions](https://semver.org/) standard.
+- Update the `CHANGELOG.md` with `git-changelog -B auto -Tio CHANGELOG.md`
 - Make a commit to `GitHub`.
-- Create a `GitHub release`.
-- And... publish 🙂 `poetry publish --build`
+- Create a tag and push it. The release is automatically triggered on tag push:
 
-## 🎯 What's next
-
-Well, that's up to you 💪🏻. I can only recommend the packages and articles that helped me.
-
-- [`Typer`](https://github.com/tiangolo/typer) is great for creating CLI applications.
-- [`Rich`](https://github.com/willmcgugan/rich) makes it easy to add beautiful formatting in the terminal.
-- [`Pydantic`](https://github.com/samuelcolvin/pydantic/) – data validation and settings management using Python type hinting.
-- [`Loguru`](https://github.com/Delgan/loguru) makes logging (stupidly) simple.
-- [`tqdm`](https://github.com/tqdm/tqdm) – fast, extensible progress bar for Python and CLI.
-- [`IceCream`](https://github.com/gruns/icecream) is a little library for sweet and creamy debugging.
-- [`orjson`](https://github.com/ijl/orjson) – ultra fast JSON parsing library.
-- [`Returns`](https://github.com/dry-python/returns) makes you function's output meaningful, typed, and safe!
-- [`Hydra`](https://github.com/facebookresearch/hydra) is a framework for elegantly configuring complex applications.
-- [`FastAPI`](https://github.com/tiangolo/fastapi) is a type-driven asynchronous web framework.
-
-Articles:
-
-- [Open Source Guides](https://opensource.guide/).
-- [A handy guide to financial support for open source](https://github.com/nayafia/lemonade-stand)
-- [GitHub Actions Documentation](https://help.github.com/en/actions).
-- Maybe you would like to add [gitmoji](https://gitmoji.carloscuesta.me/) to commit names. This is really funny. 😄
-
-## 🚀 Features
-
-### Development features
-
-- Supports for `Python 3.9` and higher.
-- [`Poetry`](https://python-poetry.org/) as the dependencies manager. See configuration in [`pyproject.toml`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/pyproject.toml) and [`setup.cfg`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/setup.cfg).
-- Automatic codestyle with [`black`](https://github.com/psf/black), [`isort`](https://github.com/timothycrosley/isort) and [`pyupgrade`](https://github.com/asottile/pyupgrade).
-- Ready-to-use [`pre-commit`](https://pre-commit.com/) hooks with code-formatting.
-- Type checks with [`mypy`](https://mypy.readthedocs.io); docstring checks with [`darglint`](https://github.com/terrencepreilly/darglint); security checks with [`safety`](https://github.com/pyupio/safety) and [`bandit`](https://github.com/PyCQA/bandit)
-- Testing with [`pytest`](https://docs.pytest.org/en/latest/).
-- Ready-to-use [`.editorconfig`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/.editorconfig), [`.dockerignore`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/.dockerignore), and [`.gitignore`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/.gitignore). You don't have to worry about those things.
-
-### Deployment features
-
-- `GitHub` integration: issue and pr templates.
-- `Github Actions` with predefined [build workflow](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/.github/workflows/build.yml) as the default CI/CD.
-- Everything is already set up for security checks, codestyle checks, code formatting, testing, linting, docker builds, etc with [`Makefile`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/Makefile#L89). More details in [makefile-usage](#makefile-usage).
-- [Dockerfile](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/docker/Dockerfile) for your package.
-- Always up-to-date dependencies with [`@dependabot`](https://dependabot.com/). You will only [enable it](https://docs.github.com/en/github/administering-a-repository/enabling-and-disabling-version-updates#enabling-github-dependabot-version-updates).
-- Automatic drafts of new releases with [`Release Drafter`](https://github.com/marketplace/actions/release-drafter). You may see the list of labels in [`release-drafter.yml`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/.github/release-drafter.yml). Works perfectly with [Semantic Versions](https://semver.org/) specification.
-
-### Open source community features
-
-- Ready-to-use [Pull Requests templates](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/.github/PULL_REQUEST_TEMPLATE.md) and several [Issue templates](https://github.com/ThatsTheEnd/horiba-python-sdk/tree/master/.github/ISSUE_TEMPLATE).
-- Files such as: `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md` are generated automatically.
-- [`Stale bot`](https://github.com/apps/stale) that closes abandoned issues after a period of inactivity. (You will only [need to setup free plan](https://github.com/marketplace/stale)). Configuration is [here](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/.github/.stale.yml).
-- [Semantic Versions](https://semver.org/) specification with [`Release Drafter`](https://github.com/marketplace/actions/release-drafter).
-
-## Installation
-
-```bash
-pip install -U horiba-python-sdk
-```
-
-or install with `Poetry`
-
-```bash
-poetry add horiba-python-sdk
-```
-
-
+  ```bash
+  git tag vX.Y.Z # where the version MUST match the one you indicated before
+  git push --tags
+  ```
 
 ### Makefile usage
 
@@ -281,7 +247,10 @@ make lint
 the same as:
 
 ```bash
-make test && make check-codestyle && make mypy && make check-safety
+make test
+make check-codestyle
+make mypy
+make check-safety
 ```
 
 </p>
@@ -348,7 +317,7 @@ make cleanup
 </p>
 </details>
 
-## Documentation
+## 📚 Documentation
 
 The latest documentation can be found at
 [horiba-python-sdk.readthedocs.io](https://horiba-python-sdk.readthedocs.io/en/latest/).
@@ -364,13 +333,42 @@ Documentation is built each time a commit is pushed on `main` or for pull
 requests. When release tags are created in the repo, readthedocs will also tag
 the documentation accordingly
 
+## 🚀 Features
+
+### Development features
+
+- Supports for `Python 3.9` and higher.
+- [`Poetry`](https://python-poetry.org/) as the dependencies manager. See configuration in [`pyproject.toml`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/pyproject.toml).
+- Automatic codestyle with [`ruff`](https://github.com/astral-sh/ruff)
+- Ready-to-use [`pre-commit`](https://pre-commit.com/) hooks with code-formatting.
+- Type checks with [`mypy`](https://mypy.readthedocs.io); security checks with [`safety`](https://github.com/pyupio/safety) and [`bandit`](https://github.com/PyCQA/bandit)
+- Testing with [`pytest`](https://docs.pytest.org/en/latest/).
+- Ready-to-use [`.editorconfig`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/.editorconfig), [`.dockerignore`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/.dockerignore), and [`.gitignore`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/.gitignore). You don't have to worry about those things.
+
+### Deployment features
+
+- `GitHub` integration: issue and pr templates.
+- `Github Actions` with predefined [build workflow](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/.github/workflows/build.yml) as the default CI/CD.
+- Everything is already set up for security checks, codestyle checks, code formatting, testing, linting, docker builds, etc with [`Makefile`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/Makefile#L89). More details in [makefile-usage](#makefile-usage).
+- [Dockerfile](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/docker/Dockerfile) for your package.
+- Always up-to-date dependencies with [`@dependabot`](https://dependabot.com/). You will only [enable it](https://docs.github.com/en/github/administering-a-repository/enabling-and-disabling-version-updates#enabling-github-dependabot-version-updates).
+- Automatic drafts of new releases with [`Release Drafter`](https://github.com/marketplace/actions/release-drafter). You may see the list of labels in [`release-drafter.yml`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/.github/release-drafter.yml). Works perfectly with [Semantic Versions](https://semver.org/) specification.
+
+### Open source community features
+
+- Ready-to-use [Pull Requests templates](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/.github/PULL_REQUEST_TEMPLATE.md) and several [Issue templates](https://github.com/ThatsTheEnd/horiba-python-sdk/tree/master/.github/ISSUE_TEMPLATE).
+- Files such as: `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md` are generated automatically.
+- [Semantic Versions](https://semver.org/) specification with [`Release Drafter`](https://github.com/marketplace/actions/release-drafter).
+<!-- - [`Stale bot`](https://github.com/apps/stale) that closes abandoned issues after a period of inactivity. (You will only [need to setup free plan](https://github.com/marketplace/stale)). Configuration is [here](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/.github/.stale.yml). -->
+
+
 ## 📈 Releases
 
 You can see the list of available releases on the [GitHub Releases](https://github.com/ThatsTheEnd/horiba-python-sdk/releases) page.
 
 We follow [Semantic Versions](https://semver.org/) specification.
 
-We use [`Release Drafter`](https://github.com/marketplace/actions/release-drafter). As pull requests are merged, a draft release is kept up-to-date listing the changes, ready to publish when you’re ready. With the categories option, you can categorize pull requests in release notes using labels.
+<!-- We use [`Release Drafter`](https://github.com/marketplace/actions/release-drafter). As pull requests are merged, a draft release is kept up-to-date listing the changes, ready to publish when you’re ready. With the categories option, you can categorize pull requests in release notes using labels. -->
 
 ### List of labels and corresponding titles
 
@@ -383,9 +381,9 @@ We use [`Release Drafter`](https://github.com/marketplace/actions/release-drafte
 |            `documentation`            |    📝 Documentation     |
 |            `dependencies`             | ⬆️ Dependencies updates |
 
-You can update it in [`release-drafter.yml`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/.github/release-drafter.yml).
+<!-- You can update it in [`release-drafter.yml`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/.github/release-drafter.yml). -->
 
-GitHub creates the `bug`, `enhancement`, and `documentation` labels for you. Dependabot creates the `dependencies` label. Create the remaining labels on the Issues tab of your GitHub repository, when you need them.
+<!-- GitHub creates the `bug`, `enhancement`, and `documentation` labels for you. Dependabot creates the `dependencies` label. Create the remaining labels on the Issues tab of your GitHub repository, when you need them. -->
 
 ## 🛡 License
 

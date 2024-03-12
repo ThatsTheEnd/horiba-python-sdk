@@ -1,0 +1,77 @@
+name: Release on Tag
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        if: steps.cache-poetry.outputs.cache-hit != 'true'
+        run: |
+          python -m pip install poetry==1.5.1
+        shell: bash
+
+      - name: Install Git Changelog
+        run: |
+          python -m pip install git-changelog
+        shell: bash
+
+      - name: Verify Poetry Installation Path
+        run: |
+          which poetry || true
+        shell: bash
+
+      - name: Configure Poetry
+        run: |
+          python -m poetry config virtualenvs.in-project true
+        shell: bash
+
+      - name: Set up cache
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('poetry.lock') }}
+
+      - name: Install dependencies
+        run: |
+          poetry config virtualenvs.in-project true
+          poetry install
+
+      - name: Extract Changelog from Commit Trailers
+        id: changelog
+        run: |
+          git-changelog --release-notes > release-notes.md
+          cat ./release-notes.md
+
+      - name: Build and publish
+        run: |
+          poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
+          poetry publish --build
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          body_path: ./release-notes.md
+          files: |
+            ./dist/*

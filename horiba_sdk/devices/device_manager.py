@@ -29,6 +29,7 @@ circular dependencies.
 For more details on the TYPE_CHECKING constant and its usage, refer to:
 https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING
 """
+
 import asyncio
 import importlib.resources
 import platform
@@ -46,7 +47,9 @@ from horiba_sdk.communication import (
     Response,
     WebsocketCommunicator,
 )
-from horiba_sdk.devices import AbstractDeviceManager, DeviceDiscovery
+from horiba_sdk.devices import AbstractDeviceManager
+from horiba_sdk.devices.ccd_discovery import ChargeCoupledDevicesDiscovery
+from horiba_sdk.devices.monochromator_discovery import MonochromatorsDiscovery
 from horiba_sdk.devices.single_devices import ChargeCoupledDevice, Monochromator
 from horiba_sdk.icl_error import AbstractError, AbstractErrorDB, ICLErrorDB
 
@@ -201,10 +204,17 @@ class DeviceManager(AbstractDeviceManager):
         Args:
             error_on_no_device (bool): If True, an exception is raised if no device is connected.
         """
-        device_discovery: DeviceDiscovery = DeviceDiscovery(self._icl_communicator, self._icl_error_db)
-        await device_discovery.execute(error_on_no_device)
-        self._charge_coupled_devices = device_discovery.charge_coupled_devices()
-        self._monochromators = device_discovery.monochromators()
+        ccds_discovery: ChargeCoupledDevicesDiscovery = ChargeCoupledDevicesDiscovery(
+            self._icl_communicator, self._icl_error_db
+        )
+        await ccds_discovery.execute(error_on_no_device)
+        self._charge_coupled_devices = ccds_discovery.charge_coupled_devices()
+
+        monochromators_discovery: MonochromatorsDiscovery = MonochromatorsDiscovery(
+            self._icl_communicator, self._icl_error_db
+        )
+        await monochromators_discovery.execute(error_on_no_device)
+        self._monochromators = monochromators_discovery.monochromators()
 
     @property
     @override

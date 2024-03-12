@@ -17,7 +17,7 @@ async def main():
     async with device_manager.monochromators[0] as mono:
         logger.info(await mono.get_current_wavelength())
         # TODO: this is currently making the mono be stuck endlessly
-        #await mono.move_to_target_wavelength(100)
+        # await mono.move_to_target_wavelength(100)
         mono_is_busy = True
         while mono_is_busy:
             await asyncio.sleep(0.1)
@@ -25,6 +25,7 @@ async def main():
         logger.warning(await mono.get_current_wavelength())
 
     await device_manager.stop()
+
 
 if __name__ == '__main__':
     asyncio.run(main())
