@@ -45,8 +45,8 @@ class FakeICLServer:
             logger.info('received: {message}', message=message)
             command = json.loads(message)
 
-            if "shutdown" in command['command']:
-                logger.info("Shutting down websocket")
+            if 'shutdown' in command['command']:
+                logger.info('Shutting down websocket')
                 websocket.close()
                 continue
 

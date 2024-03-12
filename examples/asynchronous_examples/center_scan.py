@@ -1,8 +1,6 @@
 import asyncio
-import json
 
 import matplotlib.pyplot as plt
-
 from loguru import logger
 
 from horiba_sdk.devices.device_manager import DeviceManager
@@ -39,7 +37,7 @@ async def main():
         await ccd.set_x_axis_conversion_type(ccd.XAxisConversionType(0))
         await ccd.set_exposure_time(1000)
         await ccd.set_region_of_interest()  # Set default ROI, if you want a custom ROI, pass the parameters
-        xy_data_str = "[[0,0]]"
+        xy_data_str = '[[0,0]]'
 
         if await ccd.get_acquisition_ready():
             await ccd.set_acquisition_start(open_shutter=True)
@@ -54,11 +52,11 @@ async def main():
 
             # Extracting xyData the hard way
             start_index = raw_data['data'].find('"xyData": [')
-            end_index = raw_data['data'].find("]]", start_index) + 1
-            xy_data_str = raw_data['data'][start_index + 10: end_index + 1]
+            end_index = raw_data['data'].find(']]', start_index) + 1
+            xy_data_str = raw_data['data'][start_index + 10 : end_index + 1]
     finally:
         await ccd.close()
-        logger.info("Waiting before closing Monochromator")
+        logger.info('Waiting before closing Monochromator')
         await asyncio.sleep(7)
         await mono.close()
 

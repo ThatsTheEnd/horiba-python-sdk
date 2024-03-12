@@ -184,16 +184,19 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side
         """
-        super()._execute_command('ccd_setRoi', {
-            'index': self._id,
-            'roiIndex': roi_index,
-            'xOrigin': x_origin,
-            'yOrigin': y_origin,
-            'xSize': x_size,
-            'ySize': y_size,
-            'xBin': x_bin,
-            'yBin': y_bin,
-        })
+        super()._execute_command(
+            'ccd_setRoi',
+            {
+                'index': self._id,
+                'roiIndex': roi_index,
+                'xOrigin': x_origin,
+                'yOrigin': y_origin,
+                'xSize': x_size,
+                'ySize': y_size,
+                'xBin': x_bin,
+                'yBin': y_bin,
+            },
+        )
 
     def get_acquisition_data(self) -> dict[Any, Any]:
         """Returns the acquisition data of the CCD

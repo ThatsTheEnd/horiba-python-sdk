@@ -32,54 +32,9 @@
    poetry add horiba-python-sdk
    ```
 
-2. Create a file named `center_scan.py` and copy-paste the following content into it:
+2. Create a file named `center_scan.py` and copy-paste the content of
+   [`examples/asynchronous_examples/center_scan.py`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/feature/publishing/examples/asynchronous_examples/center_scan.py)
 
-   <details>
-   <summary>Center Scan TODO: fix example</summary>
-   <p>
-
-   ```python
-   import asyncio
-   from horiba_sdk.devices.device_manager import DeviceManager
-
-   async def main():
-     device_manager = DeviceManager()
-     await device_manager.start()
-
-     if not device_manager.charge_coupled_devices:
-         logger.error('No CCDs found, exiting...')
-         await device_manager.stop()
-         return
-
-     async with device_manager.charge_coupled_devices[0] as ccd:  # ChargeCoupledDevice
-         await ccd.get_chip_size()
-         await ccd.get_exposure_time()
-         await ccd.set_exposure_time(random.randint(1000, 5000))
-         await ccd.get_exposure_time()
-         await ccd.get_temperature()
-         await ccd.set_region_of_interest()  # Set default ROI, if you want a custom ROI, pass the parameters
-         if await ccd.get_acquisition_ready():
-             await ccd.set_acquisition_start(open_shutter=True)
-             await asyncio.sleep(1)  # Wait a short period for the acquisition to start
-             # Poll for acquisition status
-             acquisition_busy = True
-             while acquisition_busy:
-                 acquisition_busy = await ccd.get_acquisition_busy()
-                 await asyncio.sleep(0.3)
-                 logger.info('Acquisition busy')
-
-             await ccd.get_acquisition_data()
-         await ccd.get_speed()
-
-     await asyncio.sleep(1)
-     await device_manager.stop()
-
-
-   if __name__ == '__main__':
-       asyncio.run(main())
-   ```
-   </p>
-   </details>
 
 3. Run the example with:
 
@@ -94,7 +49,8 @@
 1. Initialize `git` inside your repo:
 
 ```bash
-cd horiba-python-sdk && git init
+cd horiba-python-sdk
+git init
 ```
 
 2. If you don't have `Poetry` installed run:
@@ -291,7 +247,10 @@ make lint
 the same as:
 
 ```bash
-make test && make check-codestyle && make mypy && make check-safety
+make test
+make check-codestyle
+make mypy
+make check-safety
 ```
 
 </p>
