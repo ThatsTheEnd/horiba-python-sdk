@@ -58,15 +58,19 @@ async def main():
             xy_data_str = raw_data['data'][start_index + 10: end_index + 1]
     finally:
         await ccd.close()
+        logger.info("Waiting before closing Monochromator")
+        await asyncio.sleep(7)
         await mono.close()
 
     await device_manager.stop()
 
-    center_scan_data = eval(xy_data_str)
+    await plot_values(target_wavelength, xy_data_str)
 
+
+async def plot_values(target_wavelength, xy_data_str):
+    center_scan_data = eval(xy_data_str)
     x_values = [point[0] for point in center_scan_data]
     y_values = [point[1] for point in center_scan_data]
-
     # Plotting the data
     plt.plot(x_values, y_values, linestyle='-')
     plt.title(f'Wavelength ({target_wavelength}[nm]) vs. Intensity')
