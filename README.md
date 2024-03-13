@@ -2,11 +2,12 @@
 
 <div align="center">
 
-[![Build status](https://github.com/ThatsTheEnd/horiba-python-sdk/workflows/build/badge.svg?branch=master&event=push)](https://github.com/ThatsTheEnd/horiba-python-sdk/actions?query=workflow%3Abuild)
-[![Python Version](https://img.shields.io/pypi/pyversions/horiba-python-sdk.svg)](https://pypi.org/project/horiba-python-sdk/)
+[![build](https://github.com/ThatsTheEnd/horiba-python-sdk/actions/workflows/build.yml/badge.svg)](https://github.com/ThatsTheEnd/horiba-python-sdk/actions/workflows/build.yml)
+[![PyPI - Version](https://img.shields.io/pypi/v/horiba-sdk)](https://pypi.org/project/horiba-sdk/)
+[![Python Version](https://img.shields.io/pypi/pyversions/horiba-sdk.svg)](https://pypi.org/project/horiba-sdk/)
 [![Dependencies Status](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg)](https://github.com/ThatsTheEnd/horiba-python-sdk/pulls?utf8=%E2%9C%93&q=is%3Apr%20author%3Aapp%2Fdependabot)
 
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Security: bandit](https://img.shields.io/badge/security-bandit-green.svg)](https://github.com/PyCQA/bandit)
 [![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/master/.pre-commit-config.yaml)
 [![Semantic Versions](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--versions-e10079.svg)](https://github.com/ThatsTheEnd/horiba-python-sdk/releases)
@@ -14,22 +15,28 @@
 ![Coverage Report](assets/images/coverage.svg)
 [![Documentation Status](https://readthedocs.org/projects/horiba-python-sdk/badge/?version=latest)](https://horiba-python-sdk.readthedocs.io/en/latest/?badge=latest)
 
-'horiba-python-sdk' is a package that provides source code for the development with Horiba devices
+'horiba-sdk' is a package that provides source code for the development with Horiba devices
 
 </div>
 
+**📦 Prerequisites**
+
+* Python `>=3.9`
+* ICL
+
 ## 🛠️ Usage
+
 
 1. Install the sdk:
 
    ```bash
-   pip install horiba-python-sdk
+   pip install horiba-sdk
    ```
 
    or install with `Poetry`
 
    ```bash
-   poetry add horiba-python-sdk
+   poetry add horiba-sdk
    ```
 
 2. Create a file named `center_scan.py` and copy-paste the content of
