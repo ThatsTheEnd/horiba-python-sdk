@@ -11,7 +11,9 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.11"]
-
+    permissions:
+      id-token: write  # Mandatory for trusted publishing
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
@@ -57,9 +59,12 @@ jobs:
           git-changelog --release-notes > release-notes.md
           cat ./release-notes.md
 
-      - name: Build and publish
+      - name: Build
         run: |
-          poetry publish --build
+          poetry build
+
+      - name: Publish on PyPi
+        uses: pypa/gh-action-pypi-publish@release/v1
 
       - name: Create GitHub Release
         id: create_release
