@@ -26,6 +26,34 @@
 
 ## 🛠️ Usage
 
+0. (Optional but recommended) Work in a virtual environment:
+
+   Navigate to the (empty) project folder you want to work and run:
+
+   ```bash
+   python -m venv .
+   ```
+
+   Activate the virtual environment:
+
+   <details>
+   <summary>Windows</summary>
+
+   ```powershell
+   .\Scripts\activate
+   ```
+   </details>
+
+   <details>
+   <summary>Unix</summary>
+
+   ```bash
+   source ./bin/activate
+   ```
+   </details>
+
+   *Note: do deactivate it, simply run `deactivate`.*
+
 
 1. Install the sdk:
 
