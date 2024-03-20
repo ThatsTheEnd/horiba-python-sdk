@@ -26,6 +26,11 @@
 
 ## 🛠️ Usage
 
+<details>
+<summary>Video of the steps below</summary>
+![first steps in python](docs/source/images/python_first_steps.gif)
+</details>
+
 0. (Optional but recommended) Work in a virtual environment:
 
    Navigate to the (empty) project folder you want to work and run:
@@ -68,10 +73,21 @@
    ```
 
 2. Create a file named `center_scan.py` and copy-paste the content of
-   [`examples/asynchronous_examples/center_scan.py`](https://github.com/ThatsTheEnd/horiba-python-sdk/blob/feature/publishing/examples/asynchronous_examples/center_scan.py)
+   [`examples/asynchronous_examples/center_scan.py`](examples/asynchronous_examples/center_scan.py)
 
+3. Install the required library for plotting the graph in the example:
 
-3. Run the example with:
+   ```bash
+   pip install matplotlib
+   ```
+
+   or install with `Poetry`
+
+   ```bash
+   poetry add matplotlib
+   ```
+
+4. Run the example with:
 
    ```bash
    python center_scan.py

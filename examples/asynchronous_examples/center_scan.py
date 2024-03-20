@@ -1,3 +1,4 @@
+# Dependencies: matplotlib package
 import asyncio
 
 import matplotlib.pyplot as plt
@@ -27,10 +28,9 @@ async def main():
         await mono.home()
         await wait_for_mono(mono)
 
-        target_wavelength = 350.0
-        # Does not work at the moment
-        # await mono.move_to_target_wavelength(target_wavelength)
-        # await wait_for_mono(mono)
+        target_wavelength = 100.0
+        await mono.move_to_target_wavelength(target_wavelength)
+        await wait_for_mono(mono)
 
         # ccd configuration
         await ccd.set_acquisition_count(1)
@@ -57,7 +57,7 @@ async def main():
     finally:
         await ccd.close()
         logger.info('Waiting before closing Monochromator')
-        await asyncio.sleep(7)
+        await asyncio.sleep(15)
         await mono.close()
 
     await device_manager.stop()
