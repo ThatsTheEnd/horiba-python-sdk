@@ -28,7 +28,9 @@
 
 <details>
 <summary>Video of the steps below</summary>
+
 ![first steps in python](docs/source/images/python_first_steps.gif)
+
 </details>
 
 0. (Optional but recommended) Work in a virtual environment:
