@@ -19,6 +19,19 @@
 
 </div>
 
+> [!WARNING]  
+> This SDK is under development and not yet released.
+
+> [!IMPORTANT]  
+> For this python code to work, the SDK from Horiba has to be purchased, installed and licensed.
+> The code in this repo and the SDK are under development!
+
+| :exclamation:  This SDK is under development and not yet released |
+|-------------------------------------------------------------------|
+
+| :zap:  For this python code to work, the SDK from Horiba has to be purchased, installed and licensed. The code in this repo and the SDK are under development! |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
 **📦 Prerequisites**
 
 * Python `>=3.9`
