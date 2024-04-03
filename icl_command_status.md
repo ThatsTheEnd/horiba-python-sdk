@@ -35,12 +35,6 @@
 | mono_getShutterStatus       |      ✅      |      ✅ |      ✅ |                                                                                                                   |
 | mono_getSlitStepPosition    |      ✅      |      ✅ |     ⚠️ |                              what are the right parameters? `"type": any_value_possible` always returns something |
 | mono_moveSlit               |      ✅      |      ⛔ |      ⛔ | crashes ICL when command `{"command":"mono_moveSlit","parameters":{"index":0, "type": 0, "position": 0}}` is sent |
-| mono_enableLaser            |      ⛔      |     ✖️ |     ✖️ |                                                            `[E];-2;mono_getLaserStatus;Command handler not found` |
-| mono_getLaserStatus         |      ⛔      |     ✖️ |     ✖️ |                                                            `[E];-2;mono_getLaserStatus;Command handler not found` |
-| mono_setLaserPower          |      ⛔      |     ✖️ |     ✖️ |                                                            `[E];-2;mono_getLaserStatus;Command handler not found` |
-| mono_getLaserPower          |      ⛔      |     ✖️ |     ✖️ |                                                            `[E];-2;mono_getLaserStatus;Command handler not found` |
-| mono_getLidStatus           |      ⛔      |     ✖️ |     ✖️ |                                                            `[E];-2;mono_getLaserStatus;Command handler not found` |
-| mono_getSwitchStatus        |      ⛔      |     ✖️ |     ✖️ |                                                            `[E];-2;mono_getLaserStatus;Command handler not found` |
 
 # CCD Commands
 
