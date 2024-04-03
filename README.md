@@ -19,23 +19,25 @@
 
 </div>
 
+___
+
+⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️
+
 > [!WARNING]  
 > This SDK is under development and not yet released.
 
 > [!IMPORTANT]  
 > For this python code to work, the SDK from Horiba has to be purchased, installed and licensed.
-> The code in this repo and the SDK are under development!
+> The code in this repo and the SDK are under development and not yet released for public use!
 
-| :exclamation:  This SDK is under development and not yet released |
-|-------------------------------------------------------------------|
+⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️⬆️
 
-| :zap:  For this python code to work, the SDK from Horiba has to be purchased, installed and licensed. The code in this repo and the SDK are under development! |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+___
 
 **📦 Prerequisites**
 
 * Python `>=3.9`
-* ICL
+* ICL.exe installed as part of the Horiba SDK, licensed and activated
 
 ## 🛠️ Usage
 
