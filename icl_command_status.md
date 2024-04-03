@@ -1,46 +1,46 @@
 # Generic Commands
 
-| Command      | Implemented | Tested | Status |                                      Comment |
-|--------------|:-----------:|-------:|-------:|---------------------------------------------:|
-| icl_info     |      ✅      |      ✅ |      ✅ |                                              |
-| icl_shutdown |      ✅      |      ✅ |     ⚠️ | Shutdown frame not always received by client |
-| icl_binMode  |      ✅      |      ✅ |      ✅ |                                              |
+| Command      | Implemented | Tested | Status | Comment |
+|--------------|:-----------:|-------:|-------:|--------:|
+| icl_info     |      ✅      |      ✅ |      ✅ |         |
+| icl_shutdown |      ✅      |      ✅ |      ✅ |         |
+| icl_binMode  |      ✅      |      ✅ |      ✅ |         |
 
 # Monochromator Commands
 
-| Command                     | Implemented | Tested | Status |                                                                                                             Comment |
-|-----------------------------|:-----------:|-------:|-------:|--------------------------------------------------------------------------------------------------------------------:|
-| mono_discover               |      ✅     |     ✅ |     ✅ |                                                                                                                     |
-| mono_list                   |      ✅     |     ✅ |     ✅ |                                                                                                                     |
-| mono_listCount              |      ✅     |     ✅ |     ✅ |                                                                                                                     |
-| mono_open                   |      ✅     |     ✅ |     ✅ |                                                                                                                     |
-| mono_close                  |      ✅     |     ✅ |     ✅ |                                                                                                                     |
-| mono_isOpen                 |      ✅     |     ✅ |     ✅ |                                                                                                                     |
-| mono_isBusy                 |      ✅     |     ✅ |     ✅ |                                                                                                                     |
-| mono_init                   |      ✅     |     ✅ |     ✅ |                                                                                                                     |
-| mono_getConfig              |      ✅     |     ✅ |     ⚠️  |                                                                                             returns an empty result |
-| mono_getPosition            |      ✅     |     ✅ |     ✅ |                                                                                                                     |
-| mono_setPosition            |      ✅     |     ✅ |     ✅ |                                                                                                                     |
-| mono_moveToPosition         |      ✅     |     ✅ |     ⛔ |                                             Mono not working as expected yet, does not move to position as expected |
-| mono_getGratingPosition     |      ✅     |     ✅ |     ✅ |                                                                                                                     |
-| mono_moveGrating            |      ✅     |     ✅ |     ⛔ |                                                                    Crashes ICL. Are there functions to call before? |
-| mono_getFilterWheelPosition |      ✅     |     ⛔ |     ⛔ |                                 `"[E];-510;Error Mono Command Not Supported"`, what are all the possible positions? |
-| mono_moveFilterWheel        |      ✅     |     ⛔ |     ⛔ |                                 `"[E];-510;Error Mono Command Not Supported"`, what are all the possible positions? |
-| mono_getMirrorPosition      |      ✅     |     ✅ |     ⚠️  |                                what are the right parameters? `"type": any_value_possible` always returns something |
-| mono_moveMirror             |      ✅     |     ⛔ |     ⛔ |                                                                                                         crashes ICL |
-| mono_getSlitPositionInMM    |      ✅     |     ✅ |     ✅ |                                                                                                                     |
-| mono_moveSlitMM             |      ✅     |     ⛔ |     ⛔ | crashes ICL when command `{"command":"mono_moveSlitMM","parameters":{"index": 0, "type":0, "position": 1}}` is sent |
-| mono_shutterOpen            |      ✅     |     ⛔ |     ⛔ |                          crashes ICL when command `{"command":"mono_shutterOpen","parameters":{"index":0}}` is sent |
-| mono_shutterClose           |      ✅     |     ⛔ |     ⛔ |                         crashes ICL when command `{"command":"mono_shutterClose","parameters":{"index":0}}` is sent |
-| mono_getShutterStatus       |      ✅     |     ✅ |     ✅ |                                                                                                                     |
-| mono_getSlitStepPosition    |      ✅     |     ✅ |     ⚠️  |                                what are the right parameters? `"type": any_value_possible` always returns something |
-| mono_moveSlit               |      ✅     |     ⛔ |     ⛔ |   crashes ICL when command `{"command":"mono_moveSlit","parameters":{"index":0, "type": 0, "position": 0}}` is sent |
-| mono_enableLaser            |      ⛔     |      ✖️ |      ✖️ |                                                              `[E];-2;mono_getLaserStatus;Command handler not found` |
-| mono_getLaserStatus         |      ⛔     |      ✖️ |      ✖️ |                                                              `[E];-2;mono_getLaserStatus;Command handler not found` |
-| mono_setLaserPower          |      ⛔     |      ✖️ |      ✖️ |                                                              `[E];-2;mono_getLaserStatus;Command handler not found` |
-| mono_getLaserPower          |      ⛔     |      ✖️ |      ✖️ |                                                              `[E];-2;mono_getLaserStatus;Command handler not found` |
-| mono_getLidStatus           |      ⛔     |      ✖️ |      ✖️ |                                                              `[E];-2;mono_getLaserStatus;Command handler not found` |
-| mono_getSwitchStatus        |      ⛔     |      ✖️ |      ✖️ |                                                              `[E];-2;mono_getLaserStatus;Command handler not found` |
+| Command                     | Implemented | Tested | Status |                                                                                                           Comment |
+|-----------------------------|:-----------:|-------:|-------:|------------------------------------------------------------------------------------------------------------------:|
+| mono_discover               |      ✅      |      ✅ |      ✅ |                                                                                                                   |
+| mono_list                   |      ✅      |      ✅ |      ✅ |                                                                                                                   |
+| mono_listCount              |      ✅      |      ✅ |      ✅ |                                                                                                                   |
+| mono_open                   |      ✅      |      ✅ |      ✅ |                                                                                                                   |
+| mono_close                  |      ✅      |      ✅ |      ✅ |                                                                                                                   |
+| mono_isOpen                 |      ✅      |      ✅ |      ✅ |                                                                                                                   |
+| mono_isBusy                 |      ✅      |      ✅ |      ✅ |                                                                                                                   |
+| mono_init                   |      ✅      |      ✅ |      ✅ |                                                                                                                   |
+| mono_getConfig              |      ✅      |      ✅ |     ✅️ |                                                                                                                   |
+| mono_getPosition            |      ✅      |      ✅ |      ✅ |                                                                                                                   |
+| mono_setPosition            |      ✅      |      ✅ |      ✅ |                                                                                                                   |
+| mono_moveToPosition         |      ✅      |      ✅ |      ✅ |                                                                                                                   |
+| mono_getGratingPosition     |      ✅      |      ✅ |      ✅ |                                                                                                                   |
+| mono_moveGrating            |      ✅      |      ✅ |      ✅ |                                                                                                                   |
+| mono_getFilterWheelPosition |      ✅      |      ⛔ |      ⛔ |                               `"[E];-510;Error Mono Command Not Supported"`, what are all the possible positions? |
+| mono_moveFilterWheel        |      ✅      |      ⛔ |      ⛔ |                               `"[E];-510;Error Mono Command Not Supported"`, what are all the possible positions? |
+| mono_getMirrorPosition      |      ✅      |      ✅ |      ✅ |                                                                                                                   |
+| mono_moveMirror             |      ✅      |      ⛔ |      ⛔ |                                                                                                       crashes ICL |
+| mono_getSlitPositionInMM    |      ✅      |      ✅ |      ✅ |                                                                                                                   |
+| mono_moveSlitMM             |      ✅      |      ⛔ |      ⛔ |                                                                                                                   |
+| mono_shutterOpen            |      ✅      |      ⛔ |      ⛔ |                        crashes ICL when command `{"command":"mono_shutterOpen","parameters":{"index":0}}` is sent |
+| mono_shutterClose           |      ✅      |      ⛔ |      ⛔ |                       crashes ICL when command `{"command":"mono_shutterClose","parameters":{"index":0}}` is sent |
+| mono_getShutterStatus       |      ✅      |      ✅ |      ✅ |                                                                                                                   |
+| mono_getSlitStepPosition    |      ✅      |      ✅ |     ⚠️ |                              what are the right parameters? `"type": any_value_possible` always returns something |
+| mono_moveSlit               |      ✅      |      ⛔ |      ⛔ | crashes ICL when command `{"command":"mono_moveSlit","parameters":{"index":0, "type": 0, "position": 0}}` is sent |
+| mono_enableLaser            |      ⛔      |     ✖️ |     ✖️ |                                                            `[E];-2;mono_getLaserStatus;Command handler not found` |
+| mono_getLaserStatus         |      ⛔      |     ✖️ |     ✖️ |                                                            `[E];-2;mono_getLaserStatus;Command handler not found` |
+| mono_setLaserPower          |      ⛔      |     ✖️ |     ✖️ |                                                            `[E];-2;mono_getLaserStatus;Command handler not found` |
+| mono_getLaserPower          |      ⛔      |     ✖️ |     ✖️ |                                                            `[E];-2;mono_getLaserStatus;Command handler not found` |
+| mono_getLidStatus           |      ⛔      |     ✖️ |     ✖️ |                                                            `[E];-2;mono_getLaserStatus;Command handler not found` |
+| mono_getSwitchStatus        |      ⛔      |     ✖️ |     ✖️ |                                                            `[E];-2;mono_getLaserStatus;Command handler not found` |
 
 # CCD Commands
 
@@ -52,7 +52,7 @@
 | ccd_close                  |      ✅      |      ✅ |      ✅ |                                                                     |
 | ccd_isOpen                 |      ✅      |      ✅ |      ✅ |                                                                     |
 | ccd_restart                |      ✅      |      ✅ |      ✅ |                                                                     |
-| ccd_getConfig              |      ✅      |      ✅ |      ⛔ |                              Does not return anything at the moment |
+| ccd_getConfig              |      ✅      |      ✅ |      ✅ |                              Does not return anything at the moment |
 | ccd_getChipSize            |      ✅      |      ✅ |      ✅ |                                                                     |
 | ccd_getChipTemperature     |      ✅      |      ✅ |      ✅ |                                                                     |
 | ccd_getNumberOfAvgs        |      ✅      |      ⛔ |      ⛔ |                             [E];-315;CCD does not support averaging |
