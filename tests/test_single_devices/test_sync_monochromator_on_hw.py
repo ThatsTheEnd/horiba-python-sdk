@@ -42,7 +42,8 @@ def test_monochromator_wavelength(device_manager_instance):  # noqa: ARG001
     # act
     with device_manager_instance.monochromators[0] as monochromator:
         # assert
-        assert abs(monochromator.wavelength - 0.0) < 1e-9
+        monochromator.move_to_wavelength(0.0)
+        assert abs(monochromator.wavelength - 0.0) < 1e-2
 
 
 # TODO: Test is commented out until more is known about moving to the desired wavelength and max time it can take

@@ -1,5 +1,6 @@
 # pylint: skip-file
 import asyncio
+import json
 import os
 
 import pytest
@@ -54,8 +55,11 @@ async def test_monochromator_config(device_manager_instance):  # noqa: ARG001
     async with device_manager_instance.monochromators[0] as monochromator:
         # act
         config = await monochromator.configuration()
+
         # assert
-        assert config == '{}'
+        assert config
+        assert 'configuration' in config
+        assert config['configuration'] != ''
 
 
 # takes a looooot of time, which makes the websocket run into the timeout
@@ -153,7 +157,6 @@ async def test_monochromator_shutter_position(device_manager_instance):
     async with device_manager_instance.monochromators[0] as monochromator:
         # act
         # TODO: uncomment as soon as ICL is fixed
-        # await monochromator.close_shutter()
         shutter_status = await monochromator.get_shutter_position()
         # assert
         assert (

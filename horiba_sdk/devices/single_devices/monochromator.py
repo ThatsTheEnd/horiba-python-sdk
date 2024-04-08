@@ -1,6 +1,6 @@
 from enum import Enum
 from types import TracebackType
-from typing import Optional, final
+from typing import Optional, final, Dict, Any
 
 from loguru import logger
 from overrides import override
@@ -148,14 +148,14 @@ class Monochromator(AbstractDevice):
         """
         await super()._execute_command('mono_init', {'index': self._id})
 
-    async def configuration(self) -> str:
+    async def configuration(self) -> Dict[str, Any]:
         """Returns the configuration of the monochromator.
 
         Returns:
             str: configuration of the monochromator
         """
         response: Response = await super()._execute_command('mono_getConfig', {'index': self._id, 'compact': False})
-        return str(response.results)
+        return response.results
 
     async def get_current_wavelength(self) -> float:
         """Current wavelength of the monochromator's position in nm.
@@ -306,7 +306,7 @@ class Monochromator(AbstractDevice):
         """
 
         response: Response = await super()._execute_command(
-            'mono_getSlitPositionInMM', {'index': self._id, 'type': slit.value}
+            'mono_getSlitPositionInMM', {'index': self._id, 'id': slit.value}
         )
         return float(response.results['position'])
 
@@ -344,7 +344,7 @@ class Monochromator(AbstractDevice):
         """
 
         response: Response = await super()._execute_command(
-            'mono_getSlitStepPosition', {'index': self._id, 'type': slit.value}
+            'mono_getSlitStepPosition', {'index': self._id, 'id': slit.value}
         )
         return self.SlitStepPosition(response.results['position'])
 
@@ -392,4 +392,5 @@ class Monochromator(AbstractDevice):
             Exception: When an error occurred on the device side
         """
         response: Response = await super()._execute_command('mono_getShutterStatus', {'index': self._id})
+        # TODO: what is the actual response format?
         return self.ShutterPosition(response.results['position'])

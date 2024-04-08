@@ -37,7 +37,9 @@ async def test_monochromator_config(fake_device_manager, fake_icl_exe):  # noqa:
         # act
         config = await monochromator.configuration()
         # assert
-        assert config == '{}'
+        assert config
+        assert 'configuration' in config
+        assert config['configuration'] != ''
 
 
 @pytest.mark.asyncio

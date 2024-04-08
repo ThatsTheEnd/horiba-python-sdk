@@ -2,7 +2,6 @@ from types import TracebackType
 from typing import Optional, final
 
 from loguru import logger
-from numericalunits import nm
 from overrides import override
 
 from horiba_sdk.communication import Response
@@ -87,14 +86,14 @@ class Monochromator(AbstractDevice):
         super()._execute_command('mono_init', {'index': self._id})
 
     @property
-    def wavelength(self) -> nm:
+    def wavelength(self) -> float:
         """Current wavelength of the monochromator's position in nm.
 
         Raises:
             Exception: When an error occured on the device side
         """
         response = super()._execute_command('mono_getPosition', {'index': self._id})
-        return float(response.results['wavelength']) * nm
+        return float(response.results['wavelength'])
 
     def set_current_wavelength(self, wavelength: int) -> None:
         """This command sets the wavelength value of the current grating position of the monochromator.
@@ -110,18 +109,18 @@ class Monochromator(AbstractDevice):
         """
         super()._execute_command('mono_setPosition', {'index': self._id, 'wavelength': wavelength})
 
-    def move_to_wavelength(self, wavelength: nm) -> None:
+    def move_to_wavelength(self, wavelength_nm: float) -> None:
         """Orders the monochromator to move to the requested wavelength.
 
         Use :func:`Monochromator.is_busy()` to know if the operation is still taking place.
 
         Args:
-            wavelength (nm): wavelength
+            wavelength_nm (float): wavelength
 
         Raises:
             Exception: When an error occured on the device side
         """
-        super()._execute_command('mono_moveToPosition', {'index': self._id, 'wavelength': wavelength / nm})
+        super()._execute_command('mono_moveToPosition', {'index': self._id, 'wavelength': wavelength_nm})
 
     @property
     def turret_grating_position(self) -> int:
