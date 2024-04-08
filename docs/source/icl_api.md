@@ -40,11 +40,10 @@ This document describes the remote command and data API provided by the ICL.
     - [mono\_moveMirror](#mono_movemirror)
     - [mono\_getSlitPositionInMM](#mono_getslitpositioninmm)
     - [mono\_moveSlitMM](#mono_moveslitmm)
+    - [mono\_shutterSelect](#mono_shutterselect)
     - [mono\_shutterOpen](#mono_shutteropen)
     - [mono\_shutterClose](#mono_shutterclose)
     - [mono\_getShutterStatus](#mono_getshutterstatus)
-    - [mono\_getSlitStepPosition](#mono_getslitstepposition)
-    - [mono\_moveSlit](#mono_moveslit)
     - [mono\_enableLaser](#mono_enablelaser)
     - [mono\_getLaserStatus](#mono_getlaserstatus)
     - [mono\_setLaserPower](#mono_setlaserpower)
@@ -357,7 +356,7 @@ Attempts to find supported monos connected and powered on the USB bus.
 
 ### <a id="mono_list"></a>mono_list
 
-Returns a formated list of strings.
+Returns a formated list of discovered mono devices.
 
 **Command parameters:**
 >| parameter  | description   |
@@ -367,17 +366,7 @@ Returns a formated list of strings.
 **Response results:**
 >| results | description |
 >|---|---|
->|list|Array of strings each describing a monochromator that was found. See below for format.|
-
-String format per monochromator found:
-
-```c++
-<index>;<mono name>;<mono serialnumber>
-```
-
-*index* - Integer index to use in monochromator commands to indicate which monochomator to target.  
-*mono name* - ??  
-*mono serialnumber* - Monochromator reported serial number.  
+>| devices | Array of discovered mono devices. Each discovered mono consists of the following details: <br> deviceType - Mono device description <br> index - Index of the discovered device <br> serialNumber - Mono device serial number|
 
 **Example command:**
 
@@ -392,15 +381,18 @@ String format per monochromator found:
 
 ```json
 {
-    "id": 1234,
     "command": "mono_list",
+    "errors": [],
+    "id": 1234,
     "results": {
-        "list": [
-            "0;iHR550;sn12345",
-            "1;iHR320;snabscde",
+        "devices": [
+            {
+                "deviceType": "HORIBA Scientific iHR",
+                "index": 0,
+                "serialNumber": "1745A-2017-iHR320"
+            }
         ]
     }
-  "errors": []
 }
 ```
 
@@ -621,6 +613,7 @@ Starts the monochromator initialization process (homing...). This is a "long-run
 >| parameter  | description   |
 >|---|---|
 >| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+>| force | Boolean. Force starts the initialization process.
 
 **Response results:**
 >| results | description |
@@ -635,7 +628,8 @@ Start the initialization process of the first mono.
     "id": 1234,
     "command": "mono_init",
     "parameters":{
-        "index": 0
+        "index": 0,
+        "force": false
     }
 }
 ```
@@ -651,15 +645,71 @@ Start the initialization process of the first mono.
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
 
 ### <a id="mono_getconfig"></a>mono_getConfig
 
 This command returns the monochromator configuration.
 
+**Command parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+
+**Response results:**
+>| results | description |
+>|---|---|
+>|configuration| String. Mono device configuration.|
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "mono_getConfig",
+    "parameters":{
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "mono_getConfig",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "configuration": {
+            "filterWheels": [
+                {
+                    "location": 1
+                },
+                {
+                    "location": 2
+                }
+            ],
+            "gratings": [
+                {
+                    "blaze": 0,
+                    "grooveDensity": 600,
+                    "positionIndex": 0
+                },
+                {
+                    "blaze": 0,
+                    "grooveDensity": 300,
+                    "positionIndex": 1...
+}
+```
+
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
 
 ### mono_getPosition
 
@@ -727,6 +777,7 @@ Sets the position wavelength value to 320nm.
     "id": 1234,
     "command": "mono_setPosition",
     "parameters":{
+        "index": 0
         "wavelength": 320
     }
 }
@@ -767,8 +818,9 @@ Sets the position wavelength value to 320nm.
 ```json
 {
     "id": 1234,
-    "command": "mono_setPosition",
+    "command": "mono_moveToPosition",
     "parameters":{
+        "index": 0,
         "wavelength": 320
     }
 }
@@ -779,18 +831,22 @@ Sets the position wavelength value to 320nm.
 ```json
 {
     "id": 1234,
-    "command": "mono_setPosition",
+    "command": "mono_moveToPosition",
     "errors": [
     ]
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
 
+
 ### <a id="mono_getgratingposition"></a>mono_getGratingPosition
 
-Returns the current grating turret position.  
+Returns the current grating turret position.
+
+Note: Prior to the initialization of the grating turret, this value may not reflect the actual position of the turret. To read the current position of the grating turret, please run [mono_init](#mono_init) prior to running this command.
 
 **Command parameters:**
 >| parameter  | description   |
@@ -800,7 +856,7 @@ Returns the current grating turret position.
 **Response results:**
 >| results | description |
 >|---|---|
->|position|Integer.|
+>|position|Integer. Current position of the grating turret.|
 
 **Example command:**
 
@@ -828,18 +884,22 @@ Returns the current grating turret position.
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
 
+
 ### <a id="mono_movegrating"></a>mono_moveGrating
 
-Move the grating turret.  
+Moves the grating turret to the specified position.
+
+Note: The turret sensor does not re-read the position each time it is moved, therefore the position may not be accurate prior to initialization. See note for [mono_getGratingPosition](#mono_getgratingposition).
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
 >| index | Integer. Used to identify which mono to control. See _mono_list_ command|
->|position| Integer.|
+>|position| Integer. Position to move the grating turret.|
 
 **Response results:**
 >| results | description |
@@ -1000,18 +1060,21 @@ Returns the position of the mirror.
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
 
+
 ### <a id="mono_movemirror"></a>mono_moveMirror
 
-Move the mirror to a position.  
+Moves the mirror to a position.
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->|type| Integer. Identifies which mirror.|
->|position| Integer. Position to move to.|
+>| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+>|id| Integer. Identifies which mirror to move (zero-based). <br> 0 - Mirror 1 <br> 1 - Mirror 2|
+>|position| Integer. Position to move to. <br> 0 - Axial <br> 1 - Lateral|
 
 **Response results:**
 >| results | description |
@@ -1019,14 +1082,15 @@ Move the mirror to a position.
 >|_none_||
 
 **Example command:**
-Move mirror to position 1.
+Move mirror 2 to position 1.
 
 ```json
 {
     "id": 1234,
     "command": "mono_moveMirror",
     "parameters":{
-        "type": 0,
+        "index": 0,
+        "id": 1,
         "position": 1
     }
 }
@@ -1043,22 +1107,277 @@ Move mirror to position 1.
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
 
-### mono_getSlitPositionInMM
 
-### mono_moveSlitMM
+### <a id="mono_getslitpositioninmm"></a>mono_getSlitPositionInMM
 
-### mono_shutterOpen
+Returns the position of the specified slit in millimeters.
 
-### mono_shutterClose
+**Command parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+>| id | Integer. Slit index (zero-based) |
 
-### mono_getShutterStatus
+**Response results:**
+>| results | description |
+>|---|---|
+>| position | Float. Slit position in millimeters|
 
-### mono_getSlitStepPosition
+**Example command:**
 
-### mono_moveSlit
+```json
+{
+    "id": 1234,
+    "command": "mono_getSlitPositionInMM",
+    "parameters":{
+        "index": 0,
+        "id": 3
+    }
+}
+```
+
+**Example response:**
+
+```json
+{  
+    "command": "mono_getSlitPositionInMM",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "position": 0.5
+    }  
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="mono_moveslitmm"></a>mono_moveSlitMM
+
+Moves the specified slit to the position in millimeters.
+
+**Command parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+>| id | Integer. Slit index (zero-based) |
+>| position | Float. Position in millimeters |
+
+**Response results:**
+>| results | description |
+>|---|---|
+>|_none_||
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "mono_moveSlitMM",
+    "parameters":{
+        "index": 0,
+        "id": 1,
+        "position": 1.5
+    }
+}
+```
+
+**Example response:**
+
+```json
+{  
+    "id": 1234,
+    "command": "mono_moveSlitMM",
+    "errors": [
+    ]  
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="mono_shutterselect"></a>mono_shutterSelect
+
+Used to select the active internal shutter (zero-based).
+
+Note: To set the active shutter the device must be configured for internal shutter mode. The shutter solenoids will not be activated in External (Bypass) Mode.
+
+**Command parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+>| shutter | Integer. Shutter selection <br> 0 - Shutter 1 <br> 1 - Shutter 2|
+
+**Response results:**
+>| results | description |
+>|---|---|
+>|_none_||
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "mono_shutterSelect",
+    "parameters":{
+        "index": 0,
+        "shutter": 1
+    }
+}
+```
+
+**Example response:**
+
+```json
+{  
+    "id": 1234,
+    "command": "mono_shutterSelect",
+    "errors": [
+    ]  
+}
+```
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+### <a id="mono_shutteropen"></a>mono_shutterOpen
+
+Activates the currently selected shutter solenoid.
+
+Note: The device must be configured for interal shutter mode. The shutter solenoid will not respond in External (Bypass) mode.
+
+**Command parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+
+**Response results:**
+>| results | description |
+>|---|---|
+>|_none_||
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "mono_shutterOpen",
+    "parameters":{
+        "index": 0,
+    }
+}
+```
+
+**Example response:**
+
+```json
+{  
+    "id": 1234,
+    "command": "mono_shutterOpen",
+    "errors": [
+    ]  
+}
+```
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+### <a id="mono_shutterclose"></a>mono_shutterClose
+
+Deactivates the currently selected shutter solenoid.
+
+Note: The device must be configured for interal shutter mode. The shutter solenoid will not respond in External (Bypass) mode.
+
+**Command parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+
+**Response results:**
+>| results | description |
+>|---|---|
+>|_none_||
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "mono_shutterClose",
+    "parameters":{
+        "index": 0,
+    }
+}
+```
+
+**Example response:**
+
+```json
+{  
+    "id": 1234,
+    "command": "mono_shutterClose",
+    "errors": [
+    ]  
+}
+```
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+### <a id="mono_getshutterstatus"></a>mono_getShutterStatus
+
+Returns the status of the currently selected shutter.
+
+Note: To view the status of the shutter solenoid the device must be configured for internal shutter mode.
+
+**Command parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+
+**Response results:**
+>| results | description |
+>|---|---|
+>| shutter 1 <br> shutter 2 | Integer. Shutter position. <br> 0 - Closed <br> 1 - Open
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "mono_getShutterStatus",
+    "parameters":{
+        "index": 0,
+    }
+}
+```
+
+**Example response:**
+
+```json
+{  
+    "id": 1234,
+    "command": "mono_getShutterStatus",
+    "errors": [],
+    "results": {
+        "shutter 1": 0
+        "shutter 2": 1
+    }  
+}
+```
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
 
 ### mono_enableLaser
 
@@ -1121,17 +1440,6 @@ If this command does not discover a particular CCD, please insure that the devic
 ### <a id="ccd_list"></a>ccd_list
 
 This command returns a list of the CCD devices that were discovered in the computer system.
-A typical return result for a system containing two CCDs might appear similar to the following:  
-
-0;7;HORIBA Scientific Synapse / Symphony II;Camera SN: 439  
-1;8;HORIBA Scientific Compact CCD;Camera SN: 1026
-
-Each discovered CCD item in the list consists of four details separated by a semicolon character (‘;’). These details are:  
-
-- ccd index: Index of the discovered CCD
-- ccd product id: CCD HORIBA USB product id (PID)
-- ccd description: CCD HORIBA device description
-- ccd serial number: CCD HORIBA serial number
 
 **Command parameters:**
 >| parameter  | description   |
@@ -1141,17 +1449,8 @@ Each discovered CCD item in the list consists of four details separated by a sem
 **Response results:**
 >| results | description |
 >|---|---|
->|list|Array of strings each describing a CCD that was found. See below for format.|
+>|devices| Array of discovered CCD devices. Each discovered CCD consists of the following details: <br> deviceType - CCD device description <br> index - Index of the discovered device <br> productId - CCD USB product id (PID) <br> serialNumber - CCD device serial number|
 
-String format per CCD found:
-
-```c++
-<index>;<CCD name>;<CCD serialnumber>
-```
-
-*index* - Integer index to use in CCD commands to indicate which CCD to target.  
-*CCD name* - TBD  
-*CCD serialnumber* - CCD reported serial number.  
 
 **Example command:**
 
@@ -1166,15 +1465,25 @@ String format per CCD found:
 
 ```json
 {
-    "id": 1234,
     "command": "ccd_list",
+    "errors": [],
+    "id": 1234,
     "results": {
-        "list": [
-            "0;7;HORIBA Scientific Synapse / Symphony II;Camera SN: 439",
-            "1;8;HORIBA Scientific Compact CCD;Camera SN: 1026",
+        "devices": [
+            {
+                "deviceType": "HORIBA Scientific Syncerity",
+                "index": 0,
+                "productId": 13,
+                "serialNumber": "Camera SN:  5128"
+            },
+            {
+                "deviceType": "HORIBA Compact CCD",
+                "index": 1,
+                "productId": 8,
+                "serialNumber": "Camera SN:  934"
+            }
         ]
     }
-  "errors": []
 }
 ```
 
@@ -1343,7 +1652,53 @@ Returns _true_ if selected CCD is open.
 
 ### <a id="ccd_restart"></a>ccd_restart
 
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
 ### <a id="ccd_getconfig"></a>ccd_getConfig
+
+Gets the CCD device configuration string.
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| configuration | String. CCD device configuration. |
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_getConfig",
+    "parameters":{
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_getConfig",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "configuration": {
+            "CenterWavelength": 0,
+            "ChipHSpacing": "140",
+            "ChipHeight": "70",
+            "ChipName": "S10420",
+            "ChipSerialNumber": "FAH23 098",
+            "ChipVSpacing": "140"
+        }
+}
+```
 
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
@@ -2018,4 +2373,110 @@ ERR_MONO_MISSING_PARAMETER      -521
 
 ERR_SCD_CMD_NOT_SUPPORTED       -600
 
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+## Production Commands
+
+- [Monochromater Module Commands](#monochromater-module-commands-prod)
+    - [mono\_moveSlit](#mono_moveslit)
+    - [mono\_getSlitStepPosition](#mono_getslitstepposition)
+
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+## <a id="monochromater-module-commands-prod"></a>Monochromater Module Commands
+
+### <a id="mono_moveslit"></a>mono_moveSlit
+
+Moves the specified slit to the position in steps.
+
+**Command parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+>| id | Integer. Slit index (zero-based) |
+>| position | Integer. Position in steps |
+
+**Response results:**
+>| results | description |
+>|---|---|
+>|_none_||
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "mono_moveSlit",
+    "parameters":{
+        "index": 0,
+        "id": 1,
+        "position": 250
+    }
+}
+```
+
+**Example response:**
+
+```json
+{  
+    "id": 1234,
+    "command": "mono_moveSlit",
+    "errors": [
+    ]  
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="mono_getslitstepposition"></a>mono_getSlitStepPosition
+
+Returns the position of the specified slit in steps.
+
+**Command parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+>| id | Integer. Slit index (zero-based) |
+
+**Response results:**
+>| results | description |
+>|---|---|
+>| position | Integer. Slit position in steps.|
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "mono_getSlitStepPosition",
+    "parameters":{
+        "index": 0,
+        "id": 3
+    }
+}
+```
+
+**Example response:**
+
+```json
+{  
+    "command": "mono_getSlitStepPosition",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "position": 250
+    }  
+}
 ```

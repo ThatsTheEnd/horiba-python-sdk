@@ -1,5 +1,4 @@
-import re
-from typing import Any, final
+from typing import final
 
 from loguru import logger
 from overrides import override
@@ -37,41 +36,18 @@ class DeviceDiscovery(AbstractDeviceDiscovery):
                 raise Exception(f'No {device_type} connected')
             response = self._communicator.request_with_response(Command(list_command, {}))
 
-            # as the responses of ccd_list and mono_list differ, we need to parse them separately
-            if device_type == 'CCD':
-                raw_device_list = response.results
-                self._charge_coupled_devices = self._parse_ccds(raw_device_list)
-                logger.info(f'Found {len(self._charge_coupled_devices)} CCD devices: {self._charge_coupled_devices}')
-            elif device_type == 'Monochromator':
-                raw_device_list = response.results['list']
-                self._monochromators = self._parse_monos(raw_device_list)
-                logger.info(f'Found {len(self._monochromators)} Monochromator devices: {self._monochromators}')
+            for device in response.results['devices']:
+                if device_type == 'CCD':
+                    ccd = ChargeCoupledDevice(device['index'], self._communicator, self._error_db)
+                    logger.info(f'Detected CCD: {device["deviceType"]}')
+                    self._charge_coupled_devices.append(ccd)
+                elif device_type == 'Monochromator':
+                    mono = Monochromator(device['index'], self._communicator, self._error_db)
+                    logger.info(f'Detected Monochromator: {device["deviceType"]}')
+                    self._monochromators.append(mono)
 
-    def _parse_ccds(self, raw_device_list: dict[str, Any]) -> list[ChargeCoupledDevice]:
-        detected_ccds: list[ChargeCoupledDevice] = []
-        for key, value in raw_device_list.items():
-            logger.debug(f'Parsing CCD: {key} - {value}')
-            ccd_index: int = int(key.split(':')[0].replace('index', '').strip())
-            ccd_type_match = re.search(r'deviceType: (.*?),', value)
-            if not ccd_type_match:
-                raise Exception(f'Failed to find ccd type "deviceType" in string "{value}"')
-            ccd_type: str = str(ccd_type_match.group(1).strip())
-
-            logger.info(f'Detected CCD: {ccd_type}')
-            detected_ccds.append(ChargeCoupledDevice(ccd_index, self._communicator, self._error_db))
-
-        return detected_ccds
-
-    def _parse_monos(self, raw_device_list: dict[str, Any]) -> list[Monochromator]:
-        detected_monos = []
-        for device_string in raw_device_list:
-            mono_index: int = int(device_string.split(';')[0])
-            mono_type: str = device_string.split(';')[1]
-
-            logger.info(f'Detected Monochromator: {mono_type}')
-            detected_monos.append(Monochromator(mono_index, self._communicator, self._error_db))
-
-        return detected_monos
+        logger.info(f'Found {len(self._monochromators)} Monochromator devices')
+        logger.info(f'Found {len(self._charge_coupled_devices)} CCD devices')
 
     @override
     def charge_coupled_devices(self) -> list[ChargeCoupledDevice]:

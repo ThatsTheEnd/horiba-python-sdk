@@ -9,15 +9,19 @@
     "errors": []
   },
   "mono_list": {
-    "id": 1234,
     "command": "mono_list",
-    "results": {
-      "list": [
-        "0;iHR550;sn12345",
-        "1;iHR320;snabscde"
+    "errors": [],
+    "id": 0,
+    "results":
+    {
+      "devices": [
+        {
+          "deviceType": "HORIBA Scientific iHR",
+          "index": 0,
+          "serialNumber":"1745B-2017-iHR320       "
+        }
       ]
-    },
-    "errors": []
+    }
   },
   "mono_listCount": {
     "id": 1234,
@@ -61,10 +65,33 @@
   "mono_getConfig": {
     "id": 1234,
     "command": "mono_getConfig",
-    "results":{
+    "results": {
+      "configuration": {
+        "filterWheels": [
+          {"location":1},
+          {"location":2}
+        ],
+        "gratings": [
+          {"blaze":0,"grooveDensity":1800,"positionIndex":0},
+          {"blaze":0,"grooveDensity":1200,"positionIndex":1},
+          {"blaze":0,"grooveDensity":300,"positionIndex":2}
+        ],
+        "mirrors": [
+          {"blaze":0,"grooveDensity":1800,"positionIndex":0},
+          {"blaze":0,"grooveDensity":1200,"positionIndex":1},
+          {"blaze":0,"grooveDensity":300,"positionIndex":2}
+        ],
+        "monoModel":"iHR320",
+        "ports": [
+          {"monoPortLocation":1,"slitType":2},
+          {"monoPortLocation":2,"slitType":2},
+          {"monoPortLocation":4,"slitType":2}
+        ],
+        "procuctId":"257",
+        "serialNumber":""
+      }
     },
     "errors": []
-
   },
   "mono_setConfig": {},
   "mono_getPosition": {
@@ -160,7 +187,8 @@
     "id": 1234,
     "command": "mono_getShutterStatus",
     "results": {
-      "position": 0
+      "shutter 1": 0,
+      "shutter 2": 1
     },
     "errors": []
   },

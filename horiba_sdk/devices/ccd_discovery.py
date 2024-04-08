@@ -1,4 +1,3 @@
-import re
 from typing import Any, final
 
 from loguru import logger
@@ -32,24 +31,23 @@ class ChargeCoupledDevicesDiscovery(AbstractDeviceDiscovery):
         response: Response = await self._communicator.request_with_response(Command('ccd_discover', {}))
         if response.results.get('count', 0) == 0 and error_on_no_device:
             raise Exception('No CCDs connected')
+
         response = await self._communicator.request_with_response(Command('ccd_list', {}))
 
         raw_device_list = response.results
         self._charge_coupled_devices = self._parse_ccds(raw_device_list)
-        logger.info(f'Found {len(self._charge_coupled_devices)} CCD devices: {self._charge_coupled_devices}')
+        logger.info(f'Found {len(self._charge_coupled_devices)} CCD devices')
 
     def _parse_ccds(self, raw_device_list: dict[str, Any]) -> list[ChargeCoupledDevice]:
         detected_ccds: list[ChargeCoupledDevice] = []
-        for key, value in raw_device_list.items():
-            logger.debug(f'Parsing CCD: {key} - {value}')
-            ccd_index: int = int(key.split(':')[0].replace('index', '').strip())
-            ccd_type_match = re.search(r'deviceType: (.*?),', value)
-            if not ccd_type_match:
-                raise Exception(f'Failed to find ccd type "deviceType" in string "{value}"')
-            ccd_type: str = str(ccd_type_match.group(1).strip())
-
-            logger.info(f'Detected CCD: {ccd_type}')
-            detected_ccds.append(ChargeCoupledDevice(ccd_index, self._communicator, self._error_db))
+        for device in raw_device_list['devices']:
+            try:
+                logger.debug(f'Parsing CCD: {device}')
+                ccd = ChargeCoupledDevice(device['index'], self._communicator, self._error_db)
+                logger.info(f'Detected CCD: {device["deviceType"]}')
+                detected_ccds.append(ccd)
+            except Exception as e:
+                logger.error(f'Error while parsing ChargeCoupledDevice: {e}')
 
         return detected_ccds
 

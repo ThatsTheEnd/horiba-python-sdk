@@ -1,7 +1,6 @@
 # pylint: skip-file
 # Important note: the FakeDeviceManager will return the contents of the
 # horiba_sdk/devices/fake_responses/monochromator.json
-from numericalunits import nm
 
 
 def test_monochromator_opens(fake_sync_icl_exe, fake_sync_device_manager):  # noqa: ARG001
@@ -49,7 +48,7 @@ def test_monochromator_can_move_to_wavelength(fake_sync_icl_exe, fake_sync_devic
 
     # act
     monochromator.open()
-    monochromator.move_to_wavelength(350 * nm)
+    monochromator.move_to_wavelength(350)
 
     # assert
     assert monochromator.wavelength > 0

@@ -8,12 +8,19 @@
     "errors": []
   },
   "ccd_list": {
-    "id": 1234,
     "command": "ccd_list",
+    "errors": [],
+    "id": 1234,
     "results": {
-      "index0: %2" : "{ productId: 13, deviceType: HORIBA Scientific Syncerity, serialNumber: Camera SN:  2244}"
-    },
-    "errors": []
+      "devices": [
+        {
+          "deviceType": "HORIBA Scientific Syncerity",
+          "index":0,
+          "productId":13,
+          "serialNumber": "Camera SN:  2244"
+        }
+      ]
+    }
   },
   "ccd_listCount": {
     "id": 1234,
@@ -45,7 +52,126 @@
     ]
   },
   "ccd_restart": {},
-  "ccd_getConfig": {},
+  "ccd_getConfig": {
+    "command": "ccd_getConfig",
+    "errors": [],
+    "id": 1234,
+    "results": {
+      "configuration": {
+        "CenterWavelength": 0,
+        "ChipHSpacing": "260",
+        "ChipHeight": "256",
+        "ChipName": "CCD30-11-1-275",
+        "ChipSerialNumber": "20091-22-21",
+        "ChipVSpacing": "260",
+        "ChipWidth": "1024",
+        "DeviceType": "HORIBA Scientific Syncerity",
+        "FitParameters": [0,1,0,0,0],
+        "Gains": [
+          {"Info": "Best Dynamic Range","Token":1},
+          {"Info": "High Sensitivity","Token":2},
+          {"Info": "High Light","Token":0}
+        ],
+        "HardwareAvgAvailable": "False",
+        "LineScan": "False",
+        "ProductId": "13",
+        "SerialNumber": "Camera SN:  2244",
+        "Signals": [
+          {
+            "Events":
+            [
+              {
+                "Name": "Ready For Trigger",
+                "Token": 1,
+                "Types": [
+                  {"Name": "TTL Active Low", "Token": 1},
+                  {"Name": "TTL Active High", "Token": 0}
+                ]
+              },
+              {
+                "Name": "Reserved-DO NOT USE",
+                "Token": 2,
+                "Types": [
+                  {"Name": "TTL Active Low", "Token": 1},
+                  {"Name": "TTL Active High", "Token":0}
+                ]
+              },
+              {
+                "Name": "Shutter Open",
+                "Token": 3,
+                "Types": [
+                  {"Name": "TTL Active Low","Token":1},
+                  {"Name": "TTL Active High","Token":0}
+                ]
+              },
+              {
+                "Name": " Start Experiment",
+                "Token": 0,
+                "Types": [
+                  {"Name": "TTL Active Low","Token":1},
+                  {"Name": "TTL Active High","Token":0}
+                ]
+              }
+            ],
+            "Name": "Signal Output","Token":0
+          }],
+          "Speeds": [
+            {"Info": " 1 MHz       ","Token":1},
+            {"Info": " 1 MHz Ultra ","Token":2},
+            {"Info": "500 kHz Wrap","Token":127},
+            {"Info": "45 kHz       ","Token":0}
+          ],
+          "SupportedFeatures": {
+            "CF_3PositionSlit": "False",
+            "CF_CMOSOffsetCorrection": "False",
+            "CF_Cleaning": "True",
+            "CF_DSP": "False",
+            "CF_DSPBin2X": "False",
+            "CF_DelayAfterTrigger": "False",
+            "CF_Delays": "False",
+            "CF_EMCCD": "False",
+            "CF_EShutter": "False",
+            "CF_HDR": "False",
+            "CF_Image": "True",
+            "CF_MemorySlots": "True",
+            "CF_Metadata": "False",
+            "CF_MultipleExposeTimes": "False",
+            "CF_MultipleSensors": "False",
+            "CF_PulseSummation": "False",
+            "CF_ROIs": "True",
+            "CF_Signals": "True",
+            "CF_Spectra": "True",
+            "CF_TriggerQualifier": "False",
+            "CF_Triggers": "True"
+          },
+          "Triggers": [
+            {
+              "Events": [
+                {
+                  "Name": "Each - For Each Acq",
+                  "Token":1,
+                  "Types": [
+                    {"Name": "TTL Rising  Edge", "Token": 1},
+                    {"Name": "TTL Falling Edge", "Token": 0}
+                  ]
+                },
+                {
+                  "Name": "Once - Start All",
+                  "Token":0,
+                  "Types": [
+                    {"Name": "TTL Rising  Edge", "Token": 1},
+                    {"Name": "TTL Falling Edge", "Token": 0}
+                  ]
+                }
+              ],
+              "Name": "Trigger Input",
+              "Token":0
+            }
+          ],
+          "Version": "Syncerity Ver 1.001.7.1"
+      }
+    }
+  },
   "ccd_getChipSize": {
     "id": 1234,
     "command": "ccd_getChipSize",

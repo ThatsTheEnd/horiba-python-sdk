@@ -1078,17 +1078,6 @@ files = [
 setuptools = "*"
 
 [[package]]
-name = "numericalunits"
-version = "1.25"
-description = "A package that lets you define quantities with units, which can then be used in almost any numerical calculation in any programming language. Checks that calculations pass dimensional analysis, performs unit conversions, and defines physical constants."
-optional = false
-python-versions = "*"
-files = [
-    {file = "numericalunits-1.25-py3-none-any.whl", hash = "sha256:5919ce8ad0009dbd73041698bb53c12cb9c1f7374e56131e1bbb6504791ae6e7"},
-    {file = "numericalunits-1.25.tar.gz", hash = "sha256:c32a482adae818a1a8d6c799bf9fb153326461d490c0de9deab9c694a6537eec"},
-]
-
-[[package]]
 name = "numpy"
 version = "1.26.4"
 description = "Fundamental package for array computing in Python"
@@ -2213,4 +2202,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<4"
-content-hash = "f40524e712def6394f538a2d0ca4a36c567b4cf7e7876d25a827bb2559b9c1c0"
+content-hash = "bd5a750859bdc22045e7fef596e8c75c820cb089c632238e47803511df54ac06"
