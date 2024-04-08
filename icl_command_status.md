@@ -36,12 +36,6 @@
 | mono_getShutterStatus       |      ✅     |     ✅ |      ⚠️ |                                    How to configure mono for internal shutter mode? |
 | mono_getSlitStepPosition    |      ✅     |     ✅ |     ✅ |                                                                                     |
 | mono_moveSlit               |      ✅     |     ✅ |     ✅ |                                                                                     |
-| mono_enableLaser            |      ⛔     |      ✖️ |      ✖️ |                              `[E];-2;mono_getLaserStatus;Command handler not found` |
-| mono_getLaserStatus         |      ⛔     |      ✖️ |      ✖️ |                              `[E];-2;mono_getLaserStatus;Command handler not found` |
-| mono_setLaserPower          |      ⛔     |      ✖️ |      ✖️ |                              `[E];-2;mono_getLaserStatus;Command handler not found` |
-| mono_getLaserPower          |      ⛔     |      ✖️ |      ✖️ |                              `[E];-2;mono_getLaserStatus;Command handler not found` |
-| mono_getLidStatus           |      ⛔     |      ✖️ |      ✖️ |                              `[E];-2;mono_getLaserStatus;Command handler not found` |
-| mono_getSwitchStatus        |      ⛔     |      ✖️ |      ✖️ |                              `[E];-2;mono_getLaserStatus;Command handler not found` |
 
 # CCD Commands
 
