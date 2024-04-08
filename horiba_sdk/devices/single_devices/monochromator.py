@@ -1,6 +1,6 @@
 from enum import Enum
 from types import TracebackType
-from typing import Optional, final, Dict, Any
+from typing import Any, Optional, final
 
 from loguru import logger
 from overrides import override
@@ -148,7 +148,7 @@ class Monochromator(AbstractDevice):
         """
         await super()._execute_command('mono_init', {'index': self._id})
 
-    async def configuration(self) -> Dict[str, Any]:
+    async def configuration(self) -> dict[str, Any]:
         """Returns the configuration of the monochromator.
 
         Returns:
@@ -393,4 +393,4 @@ class Monochromator(AbstractDevice):
         """
         response: Response = await super()._execute_command('mono_getShutterStatus', {'index': self._id})
         # TODO: what is the actual response format?
-        return self.ShutterPosition(response.results['position'])
+        return self.ShutterPosition(response.results['shutter 1'])
