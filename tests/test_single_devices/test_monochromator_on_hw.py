@@ -1,6 +1,5 @@
 # pylint: skip-file
 import asyncio
-import json
 import os
 
 import pytest
