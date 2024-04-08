@@ -20,6 +20,10 @@ class MonochromatorsDiscovery(AbstractDeviceDiscovery):
     async def execute(self, error_on_no_device: bool = False) -> None:
         """
         Discovers the connected Monochromators and saves them internally.
+
+        Raises:
+            Exception: When no Monochromators are discovered and that `error_on_no_device` is set. Or when there is an
+            issue parsing the Monochromators list
         """
         if not self._communicator.opened():
             await self._communicator.open()
@@ -29,18 +33,21 @@ class MonochromatorsDiscovery(AbstractDeviceDiscovery):
             raise Exception('No Monochromators connected')
 
         response = await self._communicator.request_with_response(Command('mono_list', {}))
-        raw_device_list = response.results['list']
+
+        raw_device_list = response.results
         self._monochromators = self._parse_monos(raw_device_list)
-        logger.info(f'Found {len(self._monochromators)} Monochromator devices: {self._monochromators}')
+        logger.info(f'Found {len(self._monochromators)} Monochromator devices')
 
     def _parse_monos(self, raw_device_list: dict[str, Any]) -> list[Monochromator]:
-        detected_monos = []
-        for device_string in raw_device_list:
-            mono_index: int = int(device_string.split(';')[0])
-            mono_type: str = device_string.split(';')[1]
-
-            logger.info(f'Detected Monochromator: {mono_type}')
-            detected_monos.append(Monochromator(mono_index, self._communicator, self._error_db))
+        detected_monos: list[Monochromator] = []
+        for device in raw_device_list['devices']:
+            try:
+                logger.debug(f'Parsing Monochromator: {device}')
+                mono = Monochromator(device['index'], self._communicator, self._error_db)
+                logger.info(f'Detected Monochromator: {device["deviceType"]}')
+                detected_monos.append(mono)
+            except Exception as e:
+                logger.error(f'Error while parsing Monochromator: {e}')
 
         return detected_monos
 

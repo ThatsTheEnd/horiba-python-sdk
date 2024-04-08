@@ -35,6 +35,6 @@ async def test_device_manager_with_fake_icl_exe(event_loop, fake_icl_exe, fake_i
     assert 'nodeVersion' in info_response.results
     assert communicator.opened()
     assert len(device_manager.charge_coupled_devices) == 1  # defined in horiba_sdk/devices/fake_responses/ccd.json
-    assert len(device_manager.monochromators) == 2  # defined in horiba_sdk/devices/fake_responses/monochromator.json
+    assert len(device_manager.monochromators) == 1  # defined in horiba_sdk/devices/fake_responses/monochromator.json
 
     await device_manager.stop()

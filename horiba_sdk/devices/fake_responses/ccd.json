@@ -8,12 +8,19 @@
     "errors": []
   },
   "ccd_list": {
-    "id": 1234,
     "command": "ccd_list",
+    "errors": [],
+    "id": 1234,
     "results": {
-      "index0: %2" : "{ productId: 13, deviceType: HORIBA Scientific Syncerity, serialNumber: Camera SN:  2244}"
-    },
-    "errors": []
+      "devices": [
+        {
+          "deviceType": "HORIBA Scientific Syncerity",
+          "index":0,
+          "productId":13,
+          "serialNumber":"Camera SN:  2244"
+        }
+      ]
+    }
   },
   "ccd_listCount": {
     "id": 1234,
