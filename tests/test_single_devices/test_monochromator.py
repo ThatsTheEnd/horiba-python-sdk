@@ -2,7 +2,6 @@
 # Important note: the FakeDeviceManager will return the contents of the
 # horiba_sdk/devices/fake_responses/monochromator.json
 import pytest
-from numericalunits import nm
 
 from horiba_sdk.devices.single_devices import Monochromator
 
@@ -55,7 +54,7 @@ async def test_monochromator_can_move_to_wavelength(fake_device_manager, fake_ic
     # arrange
     async with fake_device_manager.monochromators[0] as monochromator:
         # assert
-        await monochromator.move_to_target_wavelength(350 * nm)
+        await monochromator.move_to_target_wavelength(350)
         assert await monochromator.get_current_wavelength() > 0
 
 
