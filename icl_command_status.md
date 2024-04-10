@@ -81,7 +81,7 @@
 | ccd_setAcquisitionStart    |      ✅     |     ✅ |     ✅ |                                                                     |
 | ccd_getAcquisitionBusy     |      ✅     |     ✅ |     ✅ |                                                                     |
 | ccd_setAcquisitionAbort    |      ✅     |      ✖️ |      ✖️ |                                                                     |
-| ccd_getAcquisitionData     |      ✅     |     ✅ |     ✅ |                                                                     |
+| ccd_getAcquisitionData     |      ✅     |     ✅ |     ⛔ |                                                                     |
 
 # Single Chanel Detector Commands
 
