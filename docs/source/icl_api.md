@@ -1245,8 +1245,10 @@ Note: To set the active shutter the device must be configured for internal shutt
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
 
 ### <a id="mono_shutteropen"></a>mono_shutterOpen
 
@@ -1287,8 +1289,10 @@ Note: The device must be configured for interal shutter mode. The shutter soleno
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
 
 ### <a id="mono_shutterclose"></a>mono_shutterClose
 
@@ -1329,8 +1333,10 @@ Note: The device must be configured for interal shutter mode. The shutter soleno
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
 
 ### <a id="mono_getshutterstatus"></a>mono_getShutterStatus
 
@@ -1374,9 +1380,9 @@ Note: To view the status of the shutter solenoid the device must be configured f
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
-
 
 
 ### mono_enableLaser
@@ -1391,8 +1397,10 @@ Note: To view the status of the shutter solenoid the device must be configured f
 
 ### mono_getSwitchStatus
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
 
 ## CCD Module Commands
 
@@ -1434,8 +1442,10 @@ If this command does not discover a particular CCD, please insure that the devic
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
 
 ### <a id="ccd_list"></a>ccd_list
 
@@ -1487,8 +1497,10 @@ This command returns a list of the CCD devices that were discovered in the compu
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
 
 ### <a id="ccd_listcount"></a>ccd_listCount
 
@@ -1526,8 +1538,10 @@ This command returns the number of CCD devices discovered on the USB bus.
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
 
 ### <a id="ccd_open"></a>ccd_open
 
@@ -1566,8 +1580,10 @@ Open first (index 0) CCD in the list of monos discoverd.
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
 
 ### <a id="ccd_close"></a>ccd_close
 
@@ -1605,8 +1621,10 @@ Closes communications with the CCD indicated by the index.
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
 
 ### <a id="ccd_isopen"></a>ccd_isOpen
 
@@ -1647,17 +1665,21 @@ Returns _true_ if selected CCD is open.
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
 
 ### <a id="ccd_restart"></a>ccd_restart
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
 
+
 ### <a id="ccd_getconfig"></a>ccd_getConfig
 
-Gets the CCD device configuration string.
+Returns the CCD device configuration.
 
 **Command Parameters:**
 >| parameter  | description   |
@@ -1667,7 +1689,7 @@ Gets the CCD device configuration string.
 **Return Results:**
 >| results | description |
 >|---|---|
->| configuration | String. CCD device configuration. |
+>| configuration | JSON. CCD device configuration. |
 
 **Example command:**
 
@@ -1695,8 +1717,178 @@ Gets the CCD device configuration string.
             "ChipHeight": "70",
             "ChipName": "S10420",
             "ChipSerialNumber": "FAH23 098",
-            "ChipVSpacing": "140"
+            "ChipVSpacing": "140",
+            "ChipWidth": "2048",
+            "DeviceType": "HORIBA Scientific Syncerity",
+            "FitParameters": [
+                0,
+                1,
+                0,
+                0,
+                0
+            ],
+            "Gains": [
+                {
+                    "Info": "Best Dynamic Range",
+                    "Token": 1
+                },
+                {
+                    "Info": "High Sensitivity",
+                    "Token": 2
+                },
+                {
+                    "Info": "High Light",
+                    "Token": 0
+                }
+            ],
+            "HardwareAvgAvailable": "False",
+            "LineScan": "False",
+            "ProductId": "13",
+            "SerialNumber": "Camera SN:  5128",
+            "Signals": [
+                {
+                    "Events": [
+                        {
+                            "Name": "Ready For Trigger",
+                            "Token": 1,
+                            "Types": [
+                                {
+                                    "Name": "TTL Active Low",
+                                    "Token": 1
+                                },
+                                {
+                                    "Name": "TTL Active High",
+                                    "Token": 0
+                                }
+                            ]
+                        },
+                        {
+                            "Name": "Not Readout",
+                            "Token": 2,
+                            "Types": [
+                                {
+                                    "Name": "TTL Active Low",
+                                    "Token": 1
+                                },
+                                {
+                                    "Name": "TTL Active High",
+                                    "Token": 0
+                                }
+                            ]
+                        },
+                        {
+                            "Name": "Shutter Open",
+                            "Token": 3,
+                            "Types": [
+                                {
+                                    "Name": "TTL Active Low",
+                                    "Token": 1
+                                },
+                                {
+                                    "Name": "TTL Active High",
+                                    "Token": 0
+                                }
+                            ]
+                        },
+                        {
+                            "Name": "Start Experiment",
+                            "Token": 0,
+                            "Types": [
+                                {
+                                    "Name": "TTL Active Low",
+                                    "Token": 1
+                                },
+                                {
+                                    "Name": "TTL Active High",
+                                    "Token": 0
+                                }
+                            ]
+                        }
+                    ],
+                    "Name": "Signal Output",
+                    "Token": 0
+                }
+            ],
+            "Speeds": [
+                {
+                    "Info": "500 kHz ",
+                    "Token": 1
+                },
+                {
+                    "Info": "500 kHz Ultra",
+                    "Token": 2
+                },
+                {
+                    "Info": "500 kHz Wrap",
+                    "Token": 127
+                },
+                {
+                    "Info": " 45 kHz ",
+                    "Token": 0
+                }
+            ],
+            "SupportedFeatures": {
+                "CF_3PositionSlit": "False",
+                "CF_CMOSOffsetCorrection": "False",
+                "CF_Cleaning": "True",
+                "CF_DSP": "False",
+                "CF_DSPBin2X": "False",
+                "CF_DelayAfterTrigger": "False",
+                "CF_Delays": "False",
+                "CF_EMCCD": "False",
+                "CF_EShutter": "False",
+                "CF_HDR": "False",
+                "CF_Image": "True",
+                "CF_MemorySlots": "True",
+                "CF_Metadata": "False",
+                "CF_MultipleExposeTimes": "False",
+                "CF_MultipleSensors": "False",
+                "CF_PulseSummation": "False",
+                "CF_ROIs": "True",
+                "CF_Signals": "True",
+                "CF_Spectra": "True",
+                "CF_TriggerQualifier": "False",
+                "CF_Triggers": "True"
+            },
+            "Triggers": [
+                {
+                    "Events": [
+                        {
+                            "Name": "Each - For Each Acq",
+                            "Token": 1,
+                            "Types": [
+                                {
+                                    "Name": "TTL Rising  Edge",
+                                    "Token": 1
+                                },
+                                {
+                                    "Name": "TTL Falling Edge",
+                                    "Token": 0
+                                }
+                            ]
+                        },
+                        {
+                            "Name": "Once - Start All",
+                            "Token": 0,
+                            "Types": [
+                                {
+                                    "Name": "TTL Rising  Edge",
+                                    "Token": 1
+                                },
+                                {
+                                    "Name": "TTL Falling Edge",
+                                    "Token": 0
+                                }
+                            ]
+                        }
+                    ],
+                    "Name": "Trigger Input",
+                    "Token": 0
+                }
+            ],
+            "Version": "Syncerity Ver 1.002.9"
         }
+    }
 }
 ```
 
@@ -1767,14 +1959,153 @@ Returns the chip sensor’s pixel width and height size.
 
 ### ccd_getExposureTime
 
-### ccd_setExposureTime
-
-### ccd_getTimerResolution
-
-### ccd_setTimerResolution
 
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
+
+### <a id="ccd_setexposuretime"></a>ccd_setExposureTime
+
+Sets the exposure time (expressed in Timer Resolution units).
+
+_\*Note: To check the current Timer Resolution value see [ccd_getTimerResolution](#ccd_gettimerresolution). Alternatively the Timer Resolution value can be set using [ccd_setTimerResolution](#ccd_settimerresolution)._
+
+**Example:** <br>
+If _Exposure Time_ is set to 50, and the _Timer Resolution_ value is 1000, the CCD exposure time (integration time) = 50 milliseconds. <br>
+
+If _Exposure Time_ is set to 50, and the _Timer Resolution_ value is 1, the CCD exposure time (integration time) = 50 microseconds.
+
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
+>| time | Integer. Exposure time (expressed in Timer Resolution units).
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>|_none_|
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_setExposureTime",
+    "parameters": {
+        "index": 0,
+        "time": 50
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_setExposureTime",
+    "errors": [],
+    "id": 1234,
+    "results": {}
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="ccd_gettimerresolution"></a>ccd_getTimerResolution
+
+Gets the current timer resolution in microseconds.
+
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| resolution | Integer. Timer resolution in microseconds.
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_getTimerResolution",
+    "parameters": {
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_getTimerResolution",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "resolution": 1000
+    }
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="ccd_settimerresolution"></a>ccd_setTimerResolution
+
+Sets the current timer resolution value.
+
+_\*Note: The timer resolution value of 1 microsecond is not supported by every CCD._
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
+>| resolution | Integer. Timer resolution value. <br> 0 - Sets the timer resolution to 1000 microseconds <br> 1 - Sets the timer resolution to 1 microsecond
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>|_none_|
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_setTimerResolution",
+    "parameters": {
+        "index": 0,
+        "resolution": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_setTimerResolution",
+    "errors": [],
+    "id": 1234,
+    "results": {}
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
 
 ### <a id="ccd_setacqformat"></a>ccd_setAcqFormat
 
@@ -1928,7 +2259,54 @@ Sets the X-axis pixel conversion type to be used when retrieving the acquisition
 
 ### ccd_getAcqCount
 
-### ccd_setAcqCount
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="ccd_setacqcount"></a>ccd_setAcqCount
+
+Sets the number of acquisition measurements to be performed sequentially by the hardware. A count > 1 is commonly referred to as "MultiAcq".
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
+>| count | Integer. The number of acquisition measurements.
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>|_none_|
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_setAcqCount",
+    "parameters": {
+        "index": 0,
+        "count": 1
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_setAcqCount",
+    "errors": [],
+    "id": 1234,
+    "results": {}
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
 
 ### ccd_getCleanCount
 
@@ -1936,18 +2314,371 @@ Sets the X-axis pixel conversion type to be used when retrieving the acquisition
 
 ### ccd_getDataSize
 
-### ccd_getTriggerIn
-
-### ccd_setTriggerIn
-
-### ccd_getSignalOut
-
-### ccd_setSignalOut
-
-### ccd_getAcquisitionReady
 
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
+
+### <a id="ccd_gettriggerin"></a>ccd_getTriggerIn
+
+This command is used to get the current setting of the input trigger. The _address_, _event_, and _signalType_ parameters are used to define the input trigger based on the supported options of that particular CCD. <br>
+The supported trigger options are retrieved using the [ccd_getConfig](#ccd_getconfig) command, and begin with the "Triggers" string contained in the configuration. <br> **For example:** <br>
+```json
+"Triggers": [
+    {
+        "Events": [
+            {
+                "Name": "Each - For Each Acq",
+                "Token": 1,
+                "Types": [
+                    {
+                        "Name": "TTL Rising Edge",
+                        "Token": 1
+                    },
+                    {
+                        "Name": "TTL Falling Edge",
+                        "Token": 0
+                    }
+                ]
+            },
+            {
+                "Name": "Once - Start All",
+                "Token": 0,
+                "Types": [
+                    {
+                        "Name": "TTL Rising Edge",
+                        "Token": 1
+                    },
+                    {
+                        "Name": "TTL Falling Edge",
+                        "Token": 0
+                    }
+                ]
+            }
+        ],
+        "Name": "Trigger Input",
+        "Token": 0
+    }
+]
+```
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| address | Integer. Token used to specify _where_ the trigger is located. <br> (e.g. 0 = Trigger Input) <br> <br> Note: Trigger name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the input trigger is disabled |
+>| event | Integer. Token used to specify _when_ the trigger event should occur. <br> (e.g. 0 = Once - Start All) <br> <br> Note: Event name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the input trigger is disabled |
+>| signalType | Integer. Token used to specify _how_ the signal will cause the input trigger. <br> (e.g. 0 = TTL Falling Edge) <br> <br> Note: Signal type and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the input trigger is disabled |
+
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_getTriggerIn",
+    "parameters": {
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_getTriggerIn",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "address": 0,
+        "event": 0,
+        "signalType": 0
+    }
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="ccd_settriggerin"></a>ccd_setTriggerIn
+
+This command is used to enable or disable the trigger input. When enabling the trigger input, the _address_, _event_, and _signalType_ parameters are used to define the input trigger based on the supported options of that particular CCD. <br>
+The supported trigger options are retrieved using the [ccd_getConfig](#ccd_getconfig) command, and begin with the "Triggers" string contained in the configuration. <br> **For example:** <br>
+```json
+"Triggers": [
+    {
+        "Events": [
+            {
+                "Name": "Each - For Each Acq",
+                "Token": 1,
+                "Types": [
+                    {
+                        "Name": "TTL Rising Edge",
+                        "Token": 1
+                    },
+                    {
+                        "Name": "TTL Falling Edge",
+                        "Token": 0
+                    }
+                ]
+            },
+            {
+                "Name": "Once - Start All",
+                "Token": 0,
+                "Types": [
+                    {
+                        "Name": "TTL Rising Edge",
+                        "Token": 1
+                    },
+                    {
+                        "Name": "TTL Falling Edge",
+                        "Token": 0
+                    }
+                ]
+            }
+        ],
+        "Name": "Trigger Input",
+        "Token": 0
+    }
+]
+```
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+>| enable | Boolean. Enables or disables the input trigger. <br> true = enable <br> false = disable <br> <br> Note: When disabling the input trigger, the _address_, _event_, and _signalType_ parameters are ignored.|
+>| address | Integer. Token used to specify _where_ the trigger is located. <br> (e.g. 0 = Trigger Input) <br> <br> Note: Trigger name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
+>| event | Integer. Token used to specify _when_ the trigger event should occur. <br> (e.g. 0 = Once - Start All) <br> <br> Note: Event name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
+>| signalType | Integer. Token used to specify _how_ the signal will cause the input trigger. <br> (e.g. 0 = TTL Falling Edge) <br> <br> Note: Signal type and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>|_none_|
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_setTriggerIn",
+    "parameters": {
+        "index": 0,
+        "enable": true,
+        "address": 0,
+        "event": 0,
+        "signalType": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_setTriggerIn",
+    "errors": [],
+    "id": 1234,
+    "results": {}
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="ccd_getsignalout"></a>ccd_getSignalOut
+
+This command is used to get the current setting of the signal output. The _address_, _event_, and _signalType_ parameters are used to define the signal based on the supported options of that particular CCD. <br>
+The supported signal options are retrieved using the [ccd_getConfig](#ccd_getconfig) command, and begin with the "Signals" string contained in the configuration. <br> **For example:** <br>
+```json
+"Signals": [
+    {
+        "Events": [
+            {
+                "Name": "Shutter Open",
+                "Token": 3,
+                "Types": [
+                    {
+                        "Name": "TTL Active Low",
+                        "Token": 1
+                    },
+                    {
+                        "Name": "TTL Active High",
+                        "Token": 0
+                    }
+                ]
+            },
+            {
+                "Name": "Start Experiment",
+                "Token": 0,
+                "Types": [
+                    {
+                        "Name": "TTL Active Low",
+                        "Token": 1
+                    },
+                    {
+                        "Name": "TTL Active High",
+                        "Token": 0
+                    }
+                ]
+            }
+        ],
+        "Name": "Signal Output",
+        "Token": 0
+    }
+]
+```
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| address | Integer. Token setting used to specify _where_ the signal is located. <br> (e.g. 0 = Signal Output) <br> <br> Note: Signal name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the signal output is disabled |
+>| event | Integer. Token setting used to specify _when_ the signal event should occur. <br> (e.g. 3 = Shutter Open) <br> <br> Note: Event name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the signal output is disabled |
+>| signalType | Integer. Token setting used to specify _how_ the signal will cause the event. <br> (e.g. 0 = TTL Active High) <br> <br> Note: Signal type and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the signal output is disabled |
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_getSignalOut",
+    "parameters": {
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_getSignalOut",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "address": 0,
+        "event": 2,
+        "signalType": 1
+    }
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="ccd_setsignalout"></a>ccd_setSignalOut
+
+This command is used to enable or disable the signal output. When enabling the signal output, the _address_, _event_, and _signalType_ parameters are used to define the signal based on the supported options of that particular CCD. <br>
+The supported signal options are retrieved using the [ccd_getConfig](#ccd_getconfig) command, and begin with the "Signals" string contained in the configuration. <br> **For example:** <br>
+```json
+"Signals": [
+    {
+        "Events": [
+            {
+                "Name": "Shutter Open",
+                "Token": 3,
+                "Types": [
+                    {
+                        "Name": "TTL Active Low",
+                        "Token": 1
+                    },
+                    {
+                        "Name": "TTL Active High",
+                        "Token": 0
+                    }
+                ]
+            },
+            {
+                "Name": "Start Experiment",
+                "Token": 0,
+                "Types": [
+                    {
+                        "Name": "TTL Active Low",
+                        "Token": 1
+                    },
+                    {
+                        "Name": "TTL Active High",
+                        "Token": 0
+                    }
+                ]
+            }
+        ],
+        "Name": "Signal Output",
+        "Token": 0
+    }
+]
+```
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+>| enable | Boolean. Enables or disables the signal. <br> true = enable <br> false = disable <br> <br> Note: When disabling the signal output, the _address_, _event_, and _signalType_ parameters are ignored.|
+>| address | Integer. Token used to specify _where_ the signal is located. <br> (e.g. 0 = Signal Output) <br> <br> Note: Signal name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
+>| event | Integer. Token used to specify _when_ the signal event should occur. <br> (e.g. 3 = Shutter Open) <br> <br> Note: Event name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
+>| signalType | Integer. Token used to specify _how_ the signal will cause the event. <br> (e.g. 0 = TTL Active High) <br> <br> Note: Signal type and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>|_none_|
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_setSignalOut",
+    "parameters": {
+        "index": 0,
+        "enable": 1,
+        "address": 0,
+        "event": 3,
+        "signalType": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_setSignalOut",
+    "errors": [],
+    "id": 1234,
+    "results": {}
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### ccd_getAcquisitionReady
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
 
 ### <a id="ccd_setacquisitionstart"></a>ccd_setAcquisitionStart
 
@@ -2002,18 +2733,18 @@ Note: To specify the acquisiton parameters please see [ccd_setROI](#ccd_setroi) 
 
 ### <a id="ccd_getacquisitiondata"></a>ccd_getAcquisitionData
 
-Retrieves data from the last acquisition. The acquisition data is returned in ASCII text format as comma-separated XY values. The XY values for each acquisition and Region of Interest (ROI) are preceded by a header description string.  
+Retrieves data from the last acquisition.
 
-The acquisition header description string consists of the following information
-- Acq. #: Acquisition number  
-- ROI #: Region of Interest number  
-- xOrigin-#: ROI’s X Origin  
-- yOrigin-#: ROI’s Y Origin  
-- xSize-#: ROI’s X Size  
-- ySize-#: ROI’s Y Size  
-- xBin-#: ROI’s X Bin  
-- yBin-#: ROI’s Y Bin  
-- @ ###: Timestamp. This is a timestamp that relates to the time when the all the programmed acquisitions have completed. The data from all programmed acquisitions are retrieve from the CCD after all acquisitions have completed, therefore the same header timestamp is used for all acquisitions.
+The acquisition description string consists of the following information:
+- acqIndex: Acquisition number
+- roiIndex: Region of Interest number
+- xOrigin: ROI’s X Origin
+- yOrigin: ROI’s Y Origin
+- xSize: ROI’s X Size
+- ySize: ROI’s Y Size
+- xBinning: ROI’s X Bin
+- yBinning: ROI’s Y Bin
+- Timestamp: This is a timestamp that relates to the time when the all the programmed acquisitions have completed. The data from all programmed acquisitions are retrieve from the CCD after all acquisitions have completed, therefore the same timestamp is used for all acquisitions.
 
 **Command Parameters:**
 >| parameter  | description   |
@@ -2023,7 +2754,7 @@ The acquisition header description string consists of the following information
 **Return Results:**
 >| results | description |
 >|---|---|
->| data | String. Acquisition data. 
+>| acquisition | String. Acquisition data. 
 
 **Example command:**
 
@@ -2031,7 +2762,7 @@ The acquisition header description string consists of the following information
 {
     "id": 1234,
     "command": "ccd_getAcquisitionData",
-    "parameters":{
+    "parameters": {
         "index": 0
     }
 }
@@ -2044,11 +2775,34 @@ The acquisition header description string consists of the following information
     "command": "ccd_getAcquisitionData",
     "errors": [],
     "id": 1234,
-    "results":{
-        "data": "Acq. 1 - ROI 1: xOrigin-1; yOrigin-1; xSize-1; ySize-1; xBin-1; yBin-1; @ 2024.02.01
-        10:35:46.937 
-        823.527,0"
-    }
+    "results": {
+        "acquisition": [
+                {
+                "acqIndex": 1,
+                "roi":
+                    [
+                        {
+                        "roiIndex": 1,
+                        "xBinning": 1,
+                        "xOrigin": 1,
+                        "xSize": 8,
+                        "xyData": [
+                            [
+                                885.6389770507812,
+                                976
+                            ],
+                            [
+                                885.2899780273438,
+                                975
+                            ],
+                            [
+                                884.9409790039062,
+                                979
+                            ],
+                            [
+                                884.593017578125,
+                                976
+                            ],
 }
 ```
 
