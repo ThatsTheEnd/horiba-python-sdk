@@ -117,8 +117,8 @@ async def test_ccd_resolution(event_loop):  # noqa: ARG001
             config = await ccd.get_configuration()
 
             # assert
-            assert resolution.width == config['ChipWidth']
-            assert resolution.height == config['ChipHeight']
+            assert resolution.width == int(config['ChipWidth'])
+            assert resolution.height == int(config['ChipHeight'])
     finally:
         await device_manager.stop()
 
@@ -313,10 +313,10 @@ async def test_ccd_clean_count(event_loop):  # noqa: ARG001
             expected_clean_count_after = 2
 
             # act
-            await ccd.set_clean_count(expected_clean_count_before)
+            await ccd.set_clean_count(expected_clean_count_before, ChargeCoupledDevice.CleanCountMode.Mode1)
             actual_clean_count_before = await ccd.get_clean_count()
 
-            await ccd.set_clean_count(expected_clean_count_after)
+            await ccd.set_clean_count(expected_clean_count_after, ChargeCoupledDevice.CleanCountMode.Mode1)
             actual_clean_count_after = await ccd.get_clean_count()
 
             assert actual_clean_count_before == expected_clean_count_before
@@ -362,6 +362,48 @@ async def test_ccd_trigger_in(event_loop):  # noqa: ARG001
 
             assert actual_trigger_input_before == expected_trigger_input_before
             assert actual_trigger_input_after == expected_trigger_input_after
+
+    finally:
+        await device_manager.stop()
+
+
+@pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
+async def test_ccd_signal_out(event_loop):  # noqa: ARG001
+    # arrange
+    device_manager = DeviceManager()
+    try:
+        await device_manager.start()
+
+        async with device_manager.charge_coupled_devices[0] as ccd:
+            expected_signal_output_before = (False, -1, -1, -1)
+            (
+                expected_enabled_before,
+                expected_address_before,
+                expected_event_before,
+                expected_signal_type_before,
+            ) = expected_signal_output_before
+
+            expected_signal_output_after = (True, 0, 0, 0)
+            (
+                expected_enabled_after,
+                expected_address_after,
+                expected_event_after,
+                expected_signal_type_after,
+            ) = expected_signal_output_after
+
+            # act
+            await ccd.set_signal_output(
+                expected_enabled_before, expected_address_before, expected_event_before, expected_signal_type_before
+            )
+            actual_signal_output_before = await ccd.get_signal_output()
+
+            await ccd.set_signal_output(
+                expected_enabled_after, expected_address_after, expected_event_after, expected_signal_type_after
+            )
+            actual_signal_output_after = await ccd.get_signal_output()
+
+            assert actual_signal_output_before == expected_signal_output_before
+            assert actual_signal_output_after == expected_signal_output_after
 
     finally:
         await device_manager.stop()

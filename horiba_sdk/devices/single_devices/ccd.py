@@ -623,4 +623,4 @@ class ChargeCoupledDevice(AbstractDevice):
                      acquisitions have completed, therefore the same timestamp is used for all acquisitions.
         """
         response: Response = await super()._execute_command('ccd_getAcquisitionData', {'index': self._id})
-        return response.results
+        return response.results['acquisition']
