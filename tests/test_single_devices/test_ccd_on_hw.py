@@ -50,8 +50,8 @@ async def test_ccd_functionality(event_loop):  # noqa: ARG001
                 acquisition_data = await ccd.get_acquisition_data()
 
                 assert acquisition_data_size > 0
-                assert acquisition_data['acquisition'][0]['xOrigin'] == 0
-                assert acquisition_data['acquisition'][0]['yOrigin'] == 0
+                assert acquisition_data[0]['xOrigin'] == 0
+                assert acquisition_data[0]['yOrigin'] == 0
     finally:
         await device_manager.stop()
 
@@ -242,12 +242,12 @@ async def test_ccd_roi(event_loop):  # noqa: ARG001
                 acquisition_data = await ccd.get_acquisition_data()
 
                 assert acquisition_data_size == 1000
-                assert acquisition_data['acquisition'][0]['xOrigin'] == 0
-                assert acquisition_data['acquisition'][0]['yOrigin'] == 0
-                assert acquisition_data['acquisition'][0]['xSize'] == 1000
-                assert acquisition_data['acquisition'][0]['ySize'] == 200
-                assert acquisition_data['acquisition'][0]['xBinning'] == 1
-                assert acquisition_data['acquisition'][0]['yBinning'] == 200
+                assert acquisition_data[0]['xOrigin'] == 0
+                assert acquisition_data[0]['yOrigin'] == 0
+                assert acquisition_data[0]['xSize'] == 1000
+                assert acquisition_data[0]['ySize'] == 200
+                assert acquisition_data[0]['xBinning'] == 1
+                assert acquisition_data[0]['yBinning'] == 200
 
     finally:
         await device_manager.stop()
