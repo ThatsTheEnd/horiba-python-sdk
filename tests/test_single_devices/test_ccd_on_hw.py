@@ -31,7 +31,7 @@ async def test_ccd_functionality(event_loop):  # noqa: ARG001
             temperature = await ccd.get_temperature()
             assert temperature < 0
 
-            _ignored_speed = await ccd.get_speed()
+            _ignored_speed = await ccd.get_speed(Speed.SyncerityOE)
 
             await ccd.set_acquisition_format(1, ChargeCoupledDevice.AcquisitionFormat.IMAGE)
             await ccd.set_region_of_interest()
@@ -132,7 +132,7 @@ async def test_ccd_temperature(event_loop):  # noqa: ARG001
 
         async with device_manager.charge_coupled_devices[0] as ccd:
             # act
-            temperature = await ccd.get_chip_temperature()
+            temperature = await ccd.get_temperature()
 
             # assert
             assert temperature < 0
@@ -173,11 +173,11 @@ async def test_ccd_timer_resolution(event_loop):  # noqa: ARG001
         await device_manager.start()
 
         async with device_manager.charge_coupled_devices[0] as ccd:
-            expected_timer_resolution_before = ChargeCoupledDevice.TimerResolution._1_MICROSECONDS
+            expected_timer_resolution_before = ChargeCoupledDevice.TimerResolution._1_MICROSECOND
             expected_timer_resolution_after = ChargeCoupledDevice.TimerResolution._1000_MICROSECONDS
 
             # act
-            await ccd.set_timer_resolution(ChargeCoupledDevice.TimerResolution._1_MICROSECONDS)
+            await ccd.set_timer_resolution(ChargeCoupledDevice.TimerResolution._1_MICROSECOND)
             actual_timer_resolution_before = await ccd.get_timer_resolution()
 
             await ccd.set_timer_resolution(ChargeCoupledDevice.TimerResolution._1000_MICROSECONDS)
@@ -289,10 +289,10 @@ async def test_ccd_acquisition_count(event_loop):  # noqa: ARG001
             expected_acquisition_count_after = 2
 
             # act
-            ccd.set_acquisition_count(expected_acquisition_count_before)
+            await ccd.set_acquisition_count(expected_acquisition_count_before)
             actual_acquisition_count_before = await ccd.get_acquisition_count()
 
-            ccd.set_acquisition_count(expected_acquisition_count_after)
+            await ccd.set_acquisition_count(expected_acquisition_count_after)
             actual_acquisition_count_after = await ccd.get_acquisition_count()
 
             assert actual_acquisition_count_before == expected_acquisition_count_before
@@ -313,10 +313,10 @@ async def test_ccd_clean_count(event_loop):  # noqa: ARG001
             expected_clean_count_after = 2
 
             # act
-            ccd.set_clean_count(expected_clean_count_before)
+            await ccd.set_clean_count(expected_clean_count_before)
             actual_clean_count_before = await ccd.get_clean_count()
 
-            ccd.set_clean_count(expected_clean_count_after)
+            await ccd.set_clean_count(expected_clean_count_after)
             actual_clean_count_after = await ccd.get_clean_count()
 
             assert actual_clean_count_before == expected_clean_count_before
