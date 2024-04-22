@@ -8,7 +8,7 @@ from loguru import logger
 from horiba_sdk.core.gain import Gain
 from horiba_sdk.core.speed import Speed
 from horiba_sdk.devices.device_manager import DeviceManager
-from horiba_sdk.devices.single_devices.charge_coupled_device import ChargeCoupledDevice
+from horiba_sdk.devices.single_devices.ccd import ChargeCoupledDevice
 
 
 # Tell pytest to run this test only if called from the scope of this module. If any other pytest scope calls this test,
@@ -57,7 +57,7 @@ async def test_ccd_functionality(event_loop):  # noqa: ARG001
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-def test_ccd_speed(event_loop):  # noqa: ARG001
+async def test_ccd_speed(event_loop):  # noqa: ARG001
     # arrange
     device_manager = DeviceManager()
     try:
@@ -81,7 +81,7 @@ def test_ccd_speed(event_loop):  # noqa: ARG001
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-def test_ccd_gain(event_loop):  # noqa: ARG001
+async def test_ccd_gain(event_loop):  # noqa: ARG001
     # arrange
     device_manager = DeviceManager()
     try:
@@ -105,7 +105,7 @@ def test_ccd_gain(event_loop):  # noqa: ARG001
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-def test_ccd_resolution(event_loop):  # noqa: ARG001
+async def test_ccd_resolution(event_loop):  # noqa: ARG001
     # arrange
     device_manager = DeviceManager()
     try:
@@ -124,7 +124,7 @@ def test_ccd_resolution(event_loop):  # noqa: ARG001
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-def test_ccd_temperature(event_loop):  # noqa: ARG001
+async def test_ccd_temperature(event_loop):  # noqa: ARG001
     # arrange
     device_manager = DeviceManager()
     try:
@@ -141,7 +141,7 @@ def test_ccd_temperature(event_loop):  # noqa: ARG001
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-def test_ccd_fit_parameters(event_loop):  # noqa: ARG001
+async def test_ccd_fit_parameters(event_loop):  # noqa: ARG001
     # arrange
     device_manager = DeviceManager()
     try:
@@ -166,7 +166,7 @@ def test_ccd_fit_parameters(event_loop):  # noqa: ARG001
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-def test_ccd_timer_resolution(event_loop):  # noqa: ARG001
+async def test_ccd_timer_resolution(event_loop):  # noqa: ARG001
     # arrange
     device_manager = DeviceManager()
     try:
@@ -191,7 +191,7 @@ def test_ccd_timer_resolution(event_loop):  # noqa: ARG001
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-def test_ccd_exposure_time(event_loop):  # noqa: ARG001
+async def test_ccd_exposure_time(event_loop):  # noqa: ARG001
     # arrange
     device_manager = DeviceManager()
     try:
@@ -217,7 +217,7 @@ def test_ccd_exposure_time(event_loop):  # noqa: ARG001
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-def test_ccd_roi(event_loop):  # noqa: ARG001
+async def test_ccd_roi(event_loop):  # noqa: ARG001
     # arrange
     device_manager = DeviceManager()
     try:
@@ -254,7 +254,7 @@ def test_ccd_roi(event_loop):  # noqa: ARG001
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-def test_ccd_x_axis_conversion_type(event_loop):  # noqa: ARG001
+async def test_ccd_x_axis_conversion_type(event_loop):  # noqa: ARG001
     # arrange
     device_manager = DeviceManager()
     try:
@@ -278,7 +278,7 @@ def test_ccd_x_axis_conversion_type(event_loop):  # noqa: ARG001
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-def test_ccd_acquisition_count(event_loop):  # noqa: ARG001
+async def test_ccd_acquisition_count(event_loop):  # noqa: ARG001
     # arrange
     device_manager = DeviceManager()
     try:
@@ -302,7 +302,7 @@ def test_ccd_acquisition_count(event_loop):  # noqa: ARG001
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-def test_ccd_clean_count(event_loop):  # noqa: ARG001
+async def test_ccd_clean_count(event_loop):  # noqa: ARG001
     # arrange
     device_manager = DeviceManager()
     try:
@@ -326,7 +326,7 @@ def test_ccd_clean_count(event_loop):  # noqa: ARG001
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-def test_ccd_trigger_in(event_loop):  # noqa: ARG001
+async def test_ccd_trigger_in(event_loop):  # noqa: ARG001
     # arrange
     device_manager = DeviceManager()
     try:
