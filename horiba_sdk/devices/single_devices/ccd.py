@@ -6,9 +6,13 @@ from loguru import logger
 from overrides import override
 
 from horiba_sdk.communication import AbstractCommunicator, Response
-from horiba_sdk.core.gain import Gain
+from horiba_sdk.core.acquisition_format import AcquisitionFormat
+from horiba_sdk.core.clean_count_mode import CleanCountMode
+from horiba_sdk.core.gain import GainType
 from horiba_sdk.core.resolution import Resolution
-from horiba_sdk.core.speed import Speed
+from horiba_sdk.core.speed import SpeedType
+from horiba_sdk.core.timer_resolution import TimerResolution
+from horiba_sdk.core.x_axis_conversion_type import XAxisConversionType
 from horiba_sdk.icl_error import AbstractErrorDB
 
 from .abstract_device import AbstractDevice
@@ -21,37 +25,6 @@ class ChargeCoupledDevice(AbstractDevice):
     This class should not be instanced by the end user. Instead, the :class:`horiba_sdk.devices.DeviceManager`
     should be used to access the detected CCDs on the system.
     """
-
-    @final
-    class TimerResolution(Enum):
-        """
-        .. note:: The timer resolution value of 1 microsecond is not supported by all CCDs.
-        """
-
-        _1000_MICROSECONDS = 0
-        _1_MICROSECOND = 1
-
-    @final
-    class AcquisitionFormat(Enum):
-        SPECTRA = 0
-        IMAGE = 1
-        CROP = 2
-        FAST_KINETICS = 3
-
-    @final
-    class CleanCountMode(Enum):
-        Mode1 = 238
-
-    @final
-    class XAxisConversionType(Enum):
-        """
-        Enumeration of possible XAxisConversionTypes
-        None = 0, CCD-Firmware = 1, ICL ini settings file = 2
-        """
-
-        NONE = 0
-        FROM_CCD_FIRMWARE = 1
-        FROM_ICL_SETTINGS_INI = 2
 
     def __init__(self, device_id: int, communicator: AbstractCommunicator, error_db: AbstractErrorDB) -> None:
         super().__init__(device_id, communicator, error_db)
@@ -121,42 +94,42 @@ class ChargeCoupledDevice(AbstractDevice):
         response: Response = await super()._execute_command('ccd_getConfig', {'index': self._id})
         return response.results['configuration']
 
-    async def get_gain(self, gain_model: Gain) -> Gain:
+    async def get_gain(self, gain_type: GainType) -> Enum:
         """Returns the gain of the CCD
 
-        .. todo:: gain_model is temporary, as soon as we know all device types, this will be internal
+        .. todo:: gain_type is temporary, as soon as we know all device types, this will be internal
 
         Args:
-            gain_model (Gain): Gain type of the specific CCD model (i.e. Gain.SyncerityOE)
+            gain_type (GainType): GainType type of the specific CCD model (i.e. Gain.SyncerityOE)
 
         Returns:
-            Gain: The gain of the gain_model
+            GainType: The gain of the gain_type
 
         Raises:
             Exception: When an error occurred on the device side
         """
         response: Response = await super()._execute_command('ccd_getGain', {'index': self._id})
         gain: int = int(response.results['token'])
-        for member in gain_model:
+        for member in gain_type:
             if member.value == gain:
                 return member
-        raise ValueError(f'Gain {gain} not found in {gain_model} enum')
+        raise Exception(f'Gain {gain} not found in {gain_type} enum')
 
-    async def set_gain(self, gain: Gain) -> None:
+    async def set_gain(self, gain: GainType) -> None:
         """Sets the gain of the CCD
 
         Args:
-            gain (Gain): Gain
+            gain (GainType): Gain
 
         Raises:
             Exception: When an error occurred on the device side
         """
         await super()._execute_command('ccd_setGain', {'index': self._id, 'token': gain.value})
 
-    async def get_speed(self, speed_model: Speed) -> Speed:
+    async def get_speed(self, speed_type: SpeedType) -> Enum:
         """Returns the speed of the CCD
 
-        .. todo:: speed_model is temporary, as soon as we know all device types, this will be internal
+        .. todo:: speed_type is temporary, as soon as we know all device types, this will be internal
 
         Returns:
             Speed: Speed model of the specific CCD model (i.e. Speed.SyncerityOE)
@@ -166,12 +139,12 @@ class ChargeCoupledDevice(AbstractDevice):
         """
         response: Response = await super()._execute_command('ccd_getSpeed', {'index': self._id})
         speed: int = int(response.results['token'])
-        for member in speed_model:
+        for member in speed_type:
             if member.value == speed:
                 return member
-        raise ValueError(f'Speed {speed} not found in {speed_model} enum')
+        raise Exception(f'Speed {speed} not found in {speed_type} enum')
 
-    async def set_speed(self, speed: Speed) -> None:
+    async def set_speed(self, speed: SpeedType) -> None:
         """Sets the speed of the CCD
 
         Args:
@@ -220,9 +193,9 @@ class ChargeCoupledDevice(AbstractDevice):
         timer_resolution: int = int(response.results['resolution'])
         # TODO: this is temporary, as soon as the resolution is returned as 0,1 we can remove this
         if timer_resolution == 1000:
-            return self.TimerResolution._1000_MICROSECONDS
+            return TimerResolution._1000_MICROSECONDS
         elif timer_resolution == 1:
-            return self.TimerResolution._1_MICROSECOND
+            return TimerResolution._1_MICROSECOND
         else:
             raise Exception(f'Unknown timer resolution {timer_resolution}')
 
@@ -318,7 +291,7 @@ class ChargeCoupledDevice(AbstractDevice):
         2 = Mono Wavelength parameters contained in the icl_settings.ini file
         """
         response: Response = await super()._execute_command('ccd_getXAxisConversionType', {'index': self._id})
-        return self.XAxisConversionType(self.XAxisConversionType(response.results['type']))
+        return XAxisConversionType(response.results['type'])
 
     async def set_acquisition_count(self, count: int) -> None:
         """Sets the number of acquisition measurements to be performed sequentially by the hardware.
@@ -341,7 +314,7 @@ class ChargeCoupledDevice(AbstractDevice):
         """Gets the clean count mode of the CCD and the according mode"""
         response: Response = await super()._execute_command('ccd_getCleanCount', {'index': self._id})
         count: int = int(response.results['count'])
-        mode: ChargeCoupledDevice.CleanCountMode = self.CleanCountMode(response.results['mode'])
+        mode: CleanCountMode = CleanCountMode(response.results['mode'])
         return count, mode
 
     async def set_clean_count(self, count: int, mode: CleanCountMode) -> None:

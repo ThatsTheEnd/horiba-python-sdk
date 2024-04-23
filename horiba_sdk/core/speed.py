@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import final
+from typing import Union, final
 
 
 @final
@@ -49,3 +49,16 @@ class Speed:
         _50_KHZ_MS = 3
         _1_MHZ_MS = 4
         _3_MHZ_MS = 5
+
+
+SpeedType = Union[
+    type[Speed.SyncerityOE],
+    type[Speed.SyncerityNIR],
+    type[Speed.SyncerityUVVis],
+    type[Speed.Synapse2CCD],
+    type[Speed.Symphony2CCD],
+    type[Speed.Synapse2IGA],
+    type[Speed.Symphony2IGA],
+    type[Speed.SynapsePlus],
+    type[Speed.SynapseEM],
+]

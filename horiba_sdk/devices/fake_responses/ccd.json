@@ -317,12 +317,37 @@
     "errors": [],
     "id": 0,
     "results": {
-      "addressWhere": -1,
-      "eventWhen": -1,
-      "sigTypeHow": -1
+      "address": -1,
+      "event": -1,
+      "signalType": -1
     }
   },
   "ccd_setTriggerIn": {},
-  "ccd_getSignalOut": {},
-  "ccd_setSignalOut": {}
+  "ccd_getSignalOut": {
+    "command": "ccd_getSignalOut",
+    "errors": [],
+    "id": 1234,
+    "results": {
+      "address": 0,
+      "event": 0,
+      "signalType":0
+    }
+  },
+  "ccd_setSignalOut": {},
+  "ccd_getAcquisitionReady": {
+    "command": "ccd_getAcquisitionReady",
+    "errors": [],
+    "id": 1234,
+    "results": {
+      "ready": true
+    }
+  },
+  "ccd_getAcquisitionBusy": {
+    "command": "ccd_getAcquisitionBusy",
+    "errors": [],
+    "id": 1234,
+    "results": {
+      "isBusy": false
+    }
+  }
 }
