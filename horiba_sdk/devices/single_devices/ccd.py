@@ -337,11 +337,12 @@ class ChargeCoupledDevice(AbstractDevice):
         response: Response = await super()._execute_command('ccd_getAcqCount', {'index': self._id})
         return int(response.results['count'])
 
-    async def get_clean_count(self) -> str:
+    async def get_clean_count(self) -> tuple[int, CleanCountMode]:
         """Gets the clean count mode of the CCD and the according mode"""
         response: Response = await super()._execute_command('ccd_getCleanCount', {'index': self._id})
-        answer: str = 'count: ' + str(response.results['count']) + ' ' + 'mode: ' + str(response.results['mode'])
-        return answer
+        count: int = int(response.results['count'])
+        mode: ChargeCoupledDevice.CleanCountMode = self.CleanCountMode(response.results['mode'])
+        return count, mode
 
     async def set_clean_count(self, count: int, mode: CleanCountMode) -> None:
         """Sets the clean count mode of the CCD and the according mode
@@ -446,7 +447,7 @@ class ChargeCoupledDevice(AbstractDevice):
         event = int(response.results['event'])
         signal_type = int(response.results['signalType'])
         enabled = address > -1 and event > -1 and signal_type > -1
-        return (enabled, address, event, signal_type)
+        return enabled, address, event, signal_type
 
     async def set_trigger_input(self, enabled: bool, address: int, event: int, signal_type: int) -> None:
         """This command is used to enable or disable the trigger input.
@@ -482,13 +483,13 @@ class ChargeCoupledDevice(AbstractDevice):
         if not found_triggers:
             raise Exception(f'Trigger address {address} not found in the configuration')
 
-        found_events = [event for event in found_triggers[0]['Events'] if event['Token'] == event]
+        found_events = [
+            trigger_event for trigger_event in found_triggers[0]['Events'] if trigger_event['Token'] == event
+        ]
         if not found_events:
             raise Exception(f'Trigger event {event} not found in the configuration')
 
-        found_signal_types = [
-            signal_type for signal_type in found_events[0]['SignalTypes'] if signal_type['Token'] == signal_type
-        ]
+        found_signal_types = [signal for signal in found_events[0]['Types'] if signal['Token'] == signal_type]
         if not found_signal_types:
             raise Exception(f'Trigger signal type {signal_type} not found in the configuration')
 
@@ -524,7 +525,7 @@ class ChargeCoupledDevice(AbstractDevice):
         event = int(response.results['event'])
         signal_type = int(response.results['signalType'])
         enabled = address > -1 and event > -1 and signal_type > -1
-        return (enabled, address, event, signal_type)
+        return enabled, address, event, signal_type
 
     async def set_signal_output(self, enabled: bool, address: int, event: int, signal_type: int) -> None:
         """This command is used to enable or disable the signal output.
@@ -558,13 +559,13 @@ class ChargeCoupledDevice(AbstractDevice):
         if not found_triggers:
             raise Exception(f'Signal address {address} not found in the configuration')
 
-        found_events = [event for event in found_triggers[0]['Events'] if event['Token'] == event]
+        found_events = [
+            trigger_event for trigger_event in found_triggers[0]['Events'] if trigger_event['Token'] == event
+        ]
         if not found_events:
             raise Exception(f'Signal event {event} not found in the configuration')
 
-        found_signal_types = [
-            signal_type for signal_type in found_events[0]['Types'] if signal_type['Token'] == signal_type
-        ]
+        found_signal_types = [signal for signal in found_events[0]['Types'] if signal['Token'] == signal_type]
         if not found_signal_types:
             raise Exception(f'Signal type {signal_type} not found in the configuration')
 
