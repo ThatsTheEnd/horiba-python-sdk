@@ -2,7 +2,7 @@ import time
 from queue import Queue
 from threading import Thread
 from types import TracebackType
-from typing import Any, Callable, Optional, final
+from typing import Any, Callable, Dict, Optional, final
 
 import websockets
 from loguru import logger
@@ -28,7 +28,7 @@ class WebsocketCommunicator(AbstractCommunicator):
         self.listen_thread: Optional[Thread] = None
         self.running_binary_message_handling_thread: bool = False
         self.binary_message_handling_thread: Optional[Thread] = None
-        self.json_message_queue: Queue[str] = Queue()
+        self.json_message_dict: Dict[int, JSONResponse] = {}
         self.binary_message_queue: Queue[bytes] = Queue()
         self.binary_message_callback: Optional[Callable[[bytes], Any]] = None
         self.icl_info: dict[str, Any] = {}
@@ -99,7 +99,7 @@ class WebsocketCommunicator(AbstractCommunicator):
         """
         return self.websocket is not None
 
-    def response(self) -> Response:
+    def response(self, command_id: int) -> Response:
         """Fetches the next response
 
         Returns:
@@ -108,13 +108,17 @@ class WebsocketCommunicator(AbstractCommunicator):
         Raises:
             CommunicationException: When the connection terminated with an error
         """
-        if not self.json_message_queue or self.json_message_queue.empty():
-            raise CommunicationException(None, 'No message to be received.')
+        if not self.json_message_dict or len(self.json_message_dict) == 0:
+            raise CommunicationException(None, 'no message to be received.')
 
-        logger.debug(f'#{self.json_message_queue.qsize()} messages in the queue, taking first')
-        response: str = self.json_message_queue.get()
-        logger.debug('retrieved message in queue')
-        return JSONResponse(response)
+        if self.json_message_dict.get(command_id) is None:
+            raise CommunicationException(None, f'no response with id {command_id}')
+
+        logger.debug(f'#{len(self.json_message_dict)} messages, taking the one with id:{command_id}')
+        response: JSONResponse = self.json_message_dict[command_id]
+        del self.json_message_dict[command_id]
+        logger.debug('retrieved message in dict')
+        return response
 
     @override
     def close(self) -> None:
@@ -166,7 +170,8 @@ class WebsocketCommunicator(AbstractCommunicator):
                 for message in self.websocket:
                     logger.debug(f'Received message: {message!r}')
                     if isinstance(message, str):
-                        self.json_message_queue.put(message)
+                        response: JSONResponse = JSONResponse(message)
+                        self.json_message_dict[response.id] = response
                     elif isinstance(message, bytes) and self.binary_message_callback:
                         self.binary_message_queue.put(message)
                     else:
@@ -207,6 +212,10 @@ class WebsocketCommunicator(AbstractCommunicator):
         self.send(command)
         logger.debug('sent command, waiting for response')
         time.sleep(time_to_wait_for_response_in_s)
-        response: Response = self.response()
+        response: Response = self.response(command.id)
+
+        if response.id != command.id:
+            logger.error(f'got wrong response id: {response.id}, command id: {command.id}')
+            raise Exception('got wrong response id')
 
         return response

@@ -27,7 +27,8 @@ async def test_ccd_functionality(event_loop):  # noqa: ARG001
             chip_size = await ccd.get_chip_size()
             assert chip_size.width > 0 and chip_size.height > 0
 
-            new_exposure_time = random.randint(1000, 5000)
+            await ccd.set_timer_resolution(TimerResolution._1000_MICROSECONDS)
+            new_exposure_time = random.randint(1, 5)
             await ccd.set_exposure_time(new_exposure_time)
             assert await ccd.get_exposure_time() == new_exposure_time
 

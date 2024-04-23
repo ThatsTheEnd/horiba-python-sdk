@@ -61,7 +61,7 @@ def test_websocket_can_send_and_receive(fake_sync_icl_exe, fake_icl_uri_fixture)
     command: Command = Command('test_command', {'test': 'some_test'})
     websocket_communicator.send(command)
     time.sleep(0.1)
-    response: Response = websocket_communicator.response()
+    response: Response = websocket_communicator.response(command.id)
 
     # assert
     assert response is not None and response.command == command.command

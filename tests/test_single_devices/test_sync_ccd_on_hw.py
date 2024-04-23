@@ -21,7 +21,6 @@ def device_manager_instance():
     device_manager = DeviceManager(start_icl=True)
 
     device_manager.start()
-    time.sleep(0.5)
 
     yield device_manager
 
@@ -73,8 +72,9 @@ def test_ccd_opens(device_manager_instance):  # noqa: ARG001
     # arrange
     with device_manager_instance.charge_coupled_devices[0] as ccd:
         # act
+        is_open = ccd.is_open()
         # assert
-        assert ccd.is_open() is True
+        assert is_open is True
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
@@ -272,10 +272,10 @@ def test_ccd_clean_count(device_manager_instance):  # noqa: ARG001
 
         # act
         ccd.set_clean_count(expected_clean_count_before, CleanCountMode.Mode1)
-        actual_clean_count_before = ccd.get_clean_count()
+        actual_clean_count_before, _ignored_mode_before = ccd.get_clean_count()
 
         ccd.set_clean_count(expected_clean_count_after, CleanCountMode.Mode1)
-        actual_clean_count_after = ccd.get_clean_count()
+        actual_clean_count_after, _ignored_mode_after = ccd.get_clean_count()
 
         # assert
         assert actual_clean_count_before == expected_clean_count_before
@@ -384,9 +384,8 @@ def test_ccd_acquisition_abort(device_manager_instance):  # noqa: ARG001
             time.sleep(0.2)  # Wait a short period for the acquisition to start
 
             acquisition_busy_before_abort = ccd.get_acquisition_busy()
-            time.sleep(0.2)
             ccd.set_acquisition_abort()
-            time.sleep(0.2)
+            time.sleep(0.8)
             acquisition_busy_after_abort = ccd.get_acquisition_busy()
 
             assert acquisition_busy_before_abort

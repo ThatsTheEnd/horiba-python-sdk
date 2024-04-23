@@ -2,6 +2,9 @@ import time
 
 from loguru import logger
 
+from horiba_sdk.core.acquisition_format import AcquisitionFormat
+from horiba_sdk.core.timer_resolution import TimerResolution
+from horiba_sdk.core.x_axis_conversion_type import XAxisConversionType
 from horiba_sdk.sync.devices import DeviceManager
 
 
@@ -21,11 +24,21 @@ def main():
 
     resolution = ccd.get_chip_size()
     print(f'Resolution {resolution.width} x {resolution.height} pixels')
+
+    ccd.set_exposure_time(5)
     print(f'Exposure time: {ccd.get_exposure_time()}')
-    ccd.set_exposure_time(5000)
-    print(f'Exposure time: {ccd.get_exposure_time()}')
+
+    ccd.set_acquisition_format(1, AcquisitionFormat.SPECTRA)
+    ccd.set_acquisition_count(1)
+    ccd.set_x_axis_conversion_type(XAxisConversionType.FROM_ICL_SETTINGS_INI)
+    ccd.set_timer_resolution(TimerResolution._1000_MICROSECONDS)
+    ccd.set_region_of_interest()  # Set default ROI, if you want a custom ROI, pass the parameters
+
     ccd.set_acquisition_start(open_shutter=False)
-    time.sleep(6)
+    while ccd.get_acquisition_busy():
+        time.sleep(1)
+        logger.info('acquisition busy, sleeping 1s')
+
     data = ccd.get_acquisition_data()
     print(f'Acquisition data: {data}')
     time.sleep(1)

@@ -84,7 +84,7 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side
         """
-        super()._execute_command('ccd_restart', {'index': self._id})
+        super()._execute_command('ccd_restart', {'index': self._id}, 2.5)
 
     def get_configuration(self) -> dict[str, Any]:
         """Returns the configuration of the CCD
@@ -157,7 +157,7 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side
         """
-        super()._execute_command('ccd_setSpeed', {'index': self._id, 'token': speed.value})
+        super()._execute_command('ccd_setSpeed', {'index': self._id, 'token': speed.value}, 0.7)
 
     def get_fit_parameters(self) -> list[int]:
         """Returns the fit parameters of the CCD
@@ -578,9 +578,9 @@ class ChargeCoupledDevice(AbstractDevice):
         response: Response = super()._execute_command('ccd_getAcquisitionBusy', {'index': self._id})
         return bool(response.results['isBusy'])
 
-    def set_acquisition_abort(self) -> None:
+    def set_acquisition_abort(self, reset_port: bool = True) -> None:
         """Stops the acquisition of the CCD"""
-        super()._execute_command('ccd_setAcquisitionAbort', {'index': self._id})
+        super()._execute_command('ccd_setAcquisitionAbort', {'index': self._id, 'resetPort': reset_port})
 
     def get_acquisition_data(self) -> dict[Any, Any]:
         """Retrieves data from the last acquisition.
