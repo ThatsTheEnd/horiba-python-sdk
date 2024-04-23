@@ -21,6 +21,7 @@ def device_manager_instance():
     device_manager = DeviceManager(start_icl=True)
 
     device_manager.start()
+    time.sleep(0.5)
 
     yield device_manager
 
@@ -228,24 +229,19 @@ def test_ccd_roi(device_manager_instance):  # noqa: ARG001
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
 def test_ccd_x_axis_conversion_type(device_manager_instance):  # noqa: ARG001
     # arrange
-    try:
-        device_manager_instance.start()
+    with device_manager_instance.charge_coupled_devices[0] as ccd:
+        expected_x_axis_conversion_type_before = XAxisConversionType.NONE
+        expected_x_axis_conversion_type_after = XAxisConversionType.FROM_CCD_FIRMWARE
 
-        with device_manager_instance.charge_coupled_devices[0] as ccd:
-            expected_x_axis_conversion_type_before = XAxisConversionType.NONE
-            expected_x_axis_conversion_type_after = XAxisConversionType.FROM_CCD_FIRMWARE
+        # act
+        ccd.set_x_axis_conversion_type(expected_x_axis_conversion_type_before)
+        actual_x_axis_conversion_type_before = ccd.get_x_axis_conversion_type()
 
-            # act
-            ccd.set_x_axis_conversion_type(expected_x_axis_conversion_type_before)
-            actual_x_axis_conversion_type_before = ccd.get_x_axis_conversion_type()
+        ccd.set_x_axis_conversion_type(expected_x_axis_conversion_type_after)
+        actual_x_axis_conversion_type_after = ccd.get_x_axis_conversion_type()
 
-            ccd.set_x_axis_conversion_type(expected_x_axis_conversion_type_after)
-            actual_x_axis_conversion_type_after = ccd.get_x_axis_conversion_type()
-
-            assert actual_x_axis_conversion_type_before == expected_x_axis_conversion_type_before
-            assert actual_x_axis_conversion_type_after == expected_x_axis_conversion_type_after
-    finally:
-        device_manager_instance.stop()
+        assert actual_x_axis_conversion_type_before == expected_x_axis_conversion_type_before
+        assert actual_x_axis_conversion_type_after == expected_x_axis_conversion_type_after
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
