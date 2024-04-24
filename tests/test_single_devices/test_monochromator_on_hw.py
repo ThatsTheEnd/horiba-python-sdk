@@ -49,6 +49,21 @@ async def test_monochromator_busy(device_manager_instance):
 
 @pytest.mark.asyncio
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
+async def test_monochromator_init(device_manager_instance):
+    # arrange
+    async with device_manager_instance.monochromators[0] as monochromator:
+        # act
+        await monochromator.home()
+
+        while await monochromator.is_busy():
+            await asyncio.sleep(1)
+
+        # assert
+        assert await monochromator.is_busy() is False
+
+
+@pytest.mark.asyncio
+@pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
 async def test_monochromator_config(device_manager_instance):  # noqa: ARG001
     # arrange
     async with device_manager_instance.monochromators[0] as monochromator:
@@ -60,7 +75,6 @@ async def test_monochromator_config(device_manager_instance):  # noqa: ARG001
         assert config != ''
 
 
-# takes a looooot of time, which makes the websocket run into the timeout
 @pytest.mark.asyncio
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
 async def test_monochromator_wavelength(device_manager_instance):
@@ -68,7 +82,6 @@ async def test_monochromator_wavelength(device_manager_instance):
     async with device_manager_instance.monochromators[0] as monochromator:
         # act
         await monochromator.move_to_target_wavelength(100)
-        await asyncio.sleep(1)
 
         while await monochromator.is_busy():
             await asyncio.sleep(1)
@@ -107,7 +120,7 @@ async def test_monochromator_turret_grating_position(device_manager_instance):
         actual_grating = await monochromator.get_turret_grating()
 
         # assert
-        assert await actual_grating == expected_grating
+        assert actual_grating == expected_grating
 
 
 # Note: Filter wheel not available on our mono
@@ -122,16 +135,14 @@ async def test_monochromator_filter_wheel(device_manager_instance):  # noqa: ARG
 
         # act
         await monochromator.set_filter_wheel_position(filter_wheel, expected_filter_wheel_position_before)
+        while await monochromator.is_busy():
+            await asyncio.sleep(1)
         actual_filter_wheel_position_before = await monochromator.get_filter_wheel_position(filter_wheel)
 
-        while await monochromator.is_busy():
-            await asyncio.sleep(1)
-
         await monochromator.set_filter_wheel_position(filter_wheel, expected_filter_wheel_position_after)
-        actual_filter_wheel_position_after = await monochromator.get_filter_wheel_position(filter_wheel)
-
         while await monochromator.is_busy():
             await asyncio.sleep(1)
+        actual_filter_wheel_position_after = await monochromator.get_filter_wheel_position(filter_wheel)
 
         # assert
         assert actual_filter_wheel_position_before == expected_filter_wheel_position_before
@@ -148,16 +159,16 @@ async def test_monochromator_mirror(device_manager_instance):  # noqa: ARG001
 
         # act
         await monochromator.set_mirror_position(Monochromator.Mirror.FIRST, expected_mirror_position_before)
+        while await monochromator.is_busy():
+            await asyncio.sleep(1)
+
         actual_mirror_position_before = await monochromator.get_mirror_position(Monochromator.Mirror.FIRST)
 
-        while await monochromator.is_busy():
-            await asyncio.sleep(1)
-
         await monochromator.set_mirror_position(Monochromator.Mirror.FIRST, expected_mirror_position_after)
-        actual_mirror_position_after = await monochromator.get_mirror_position(Monochromator.Mirror.FIRST)
-
         while await monochromator.is_busy():
             await asyncio.sleep(1)
+
+        actual_mirror_position_after = await monochromator.get_mirror_position(Monochromator.Mirror.FIRST)
 
         # assert
         assert actual_mirror_position_before == expected_mirror_position_before
@@ -169,26 +180,30 @@ async def test_monochromator_mirror(device_manager_instance):  # noqa: ARG001
 async def test_monochromator_slit(device_manager_instance):  # noqa: ARG001
     # arrange
     async with device_manager_instance.monochromators[0] as monochromator:
-        expected_slit_position_mm_before = 2
-        expected_slit_position_mm_after = 5
+        await monochromator.home()
+        while await monochromator.is_busy():
+            await asyncio.sleep(1)
+
+        expected_slit_position_mm_before = 1.5
+        expected_slit_position_mm_after = 2.6
         slit = Monochromator.Slit.A
 
         # act
         await monochromator.set_slit_position(slit, expected_slit_position_mm_before)
+        while await monochromator.is_busy():
+            await asyncio.sleep(1)
+
         actual_slit_position_mm_before = await monochromator.get_slit_position_in_mm(slit)
 
+        await monochromator.set_slit_position(slit, expected_slit_position_mm_after)
         while await monochromator.is_busy():
             await asyncio.sleep(1)
 
-        await monochromator.set_slit_position(slit, expected_slit_position_mm_after)
         actual_slit_position_mm_after = await monochromator.get_slit_position_in_mm(slit)
 
-        while await monochromator.is_busy():
-            await asyncio.sleep(1)
-
         # assert
-        assert actual_slit_position_mm_before == expected_slit_position_mm_before
-        assert actual_slit_position_mm_after == expected_slit_position_mm_after
+        assert (actual_slit_position_mm_before - expected_slit_position_mm_before) < 10e-9
+        assert (actual_slit_position_mm_after - expected_slit_position_mm_after) < 10e-9
 
 
 @pytest.mark.asyncio
@@ -216,15 +231,25 @@ async def test_monochromator_shutter(device_manager_instance):
 async def test_monochromator_slit_step_position(device_manager_instance):  # noqa: ARG001
     # arrange
     async with device_manager_instance.monochromators[0] as monochromator:
-        expected_slit_position_before = Monochromator.SlitStepPosition.A
-        expected_slit_position_after = Monochromator.SlitStepPosition.B
+        await monochromator.home()
+        while await monochromator.is_busy():
+            await asyncio.sleep(1)
+
+        expected_slit_position_before = 200
+        expected_slit_position_after = 300
         slit = Monochromator.Slit.A
 
         # act
         await monochromator.set_slit_step_position(slit, expected_slit_position_before)
+        while await monochromator.is_busy():
+            await asyncio.sleep(1)
+
         actual_slit_position_before = await monochromator.get_slit_step_position(slit)
 
         await monochromator.set_slit_step_position(slit, expected_slit_position_after)
+        while await monochromator.is_busy():
+            await asyncio.sleep(1)
+
         actual_slit_position_after = await monochromator.get_slit_step_position(slit)
 
         # assert

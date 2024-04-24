@@ -147,7 +147,7 @@ async def test_monochromator_get_slit_step_position(fake_device_manager, fake_ic
     async with fake_device_manager.monochromators[0] as monochromator:
         # act
         # assert
-        assert await monochromator.get_slit_step_position(Monochromator.Slit.A) == Monochromator.SlitStepPosition.A
+        assert await monochromator.get_slit_step_position(Monochromator.Slit.A) == 0
 
 
 @pytest.mark.asyncio
@@ -155,9 +155,9 @@ async def test_monochromator_set_slit_step_position(fake_device_manager, fake_ic
     # arrange
     async with fake_device_manager.monochromators[0] as monochromator:
         # act
-        await monochromator.set_slit_step_position(Monochromator.Slit.A, Monochromator.SlitStepPosition.A)
+        await monochromator.set_slit_step_position(Monochromator.Slit.A, 0)
         # assert
-        assert await monochromator.get_slit_step_position(Monochromator.Slit.A) == Monochromator.SlitStepPosition.A
+        assert await monochromator.get_slit_step_position(Monochromator.Slit.A) == 0
 
 
 @pytest.mark.asyncio
