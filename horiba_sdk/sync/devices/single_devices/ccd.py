@@ -84,7 +84,7 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side
         """
-        super()._execute_command('ccd_restart', {'index': self._id}, 2.5)
+        super()._execute_command('ccd_restart', {'index': self._id})
 
     def get_configuration(self) -> dict[str, Any]:
         """Returns the configuration of the CCD
@@ -157,7 +157,7 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side
         """
-        super()._execute_command('ccd_setSpeed', {'index': self._id, 'token': speed.value}, 0.7)
+        super()._execute_command('ccd_setSpeed', {'index': self._id, 'token': speed.value})
 
     def get_fit_parameters(self) -> list[int]:
         """Returns the fit parameters of the CCD

@@ -44,9 +44,7 @@ class AbstractDevice(ABC):
         """
         pass
 
-    def _execute_command(
-        self, command_name: str, parameters: dict[Any, Any], time_to_wait_for_response_in_s: float = 0.1
-    ) -> Response:
+    def _execute_command(self, command_name: str, parameters: dict[Any, Any], timeout_in_s: float = 5) -> Response:
         """
         Creates a command from the command name, and it's parameters
         Executes a command and handles the response.
@@ -54,7 +52,7 @@ class AbstractDevice(ABC):
         Args:
             command_name (str): The name of the command to execute.
             parameters (dict): The parameters for the command.
-            time_to_wait_for_response_in_s (float, optional): The time to wait for the response. Defaults to 0.1
+            timeout_in_s (float, optional): The timeout in seconds.
 
         Returns:
             Response: The response from the device.
@@ -62,9 +60,7 @@ class AbstractDevice(ABC):
         Raises:
             Exception: When an error occurred on the device side.
         """
-        response: Response = self._communicator.request_with_response(
-            Command(command_name, parameters), time_to_wait_for_response_in_s
-        )
+        response: Response = self._communicator.request_with_response(Command(command_name, parameters), timeout_in_s)
         if response.errors:
             self._handle_errors(response.errors)
         return response

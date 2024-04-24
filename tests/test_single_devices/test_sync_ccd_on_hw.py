@@ -78,24 +78,6 @@ def test_ccd_opens(device_manager_instance):  # noqa: ARG001
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-def test_ccd_speed(device_manager_instance):  # noqa: ARG001
-    # arrange
-    with device_manager_instance.charge_coupled_devices[0] as ccd:
-        # act
-        ccd.set_speed(Speed.SyncerityOE._45_KHZ)
-        speed_before = ccd.get_speed(Speed.SyncerityOE)
-
-        ccd.set_speed(Speed.SyncerityOE._1_MHZ)
-        speed_after = ccd.get_speed(Speed.SyncerityOE)
-
-        # assert
-        assert speed_before == Speed.SyncerityOE._45_KHZ
-        assert speed_before != Speed.SynapsePlus._50_KHZ_HS
-        assert speed_after == Speed.SyncerityOE._1_MHZ
-        assert speed_after != Speed.SynapsePlus._50_KHZ_HS
-
-
-@pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
 def test_ccd_gain(device_manager_instance):  # noqa: ARG001
     # arrange
     with device_manager_instance.charge_coupled_devices[0] as ccd:
@@ -111,6 +93,24 @@ def test_ccd_gain(device_manager_instance):  # noqa: ARG001
         assert gain_after == Gain.SyncerityOE.HIGH_LIGHT
         assert gain_before != Gain.SynapsePlus.ULTIMATE_SENSITIVITY
         assert gain_after != Gain.SynapsePlus.ULTIMATE_SENSITIVITY
+
+
+@pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
+def test_ccd_speed(device_manager_instance):  # noqa: ARG001
+    # arrange
+    with device_manager_instance.charge_coupled_devices[0] as ccd:
+        # act
+        ccd.set_speed(Speed.SyncerityOE._45_KHZ)
+        speed_before = ccd.get_speed(Speed.SyncerityOE)
+
+        ccd.set_speed(Speed.SyncerityOE._1_MHZ)
+        speed_after = ccd.get_speed(Speed.SyncerityOE)
+
+        # assert
+        assert speed_before == Speed.SyncerityOE._45_KHZ
+        assert speed_before != Speed.SynapsePlus._50_KHZ_HS
+        assert speed_after == Speed.SyncerityOE._1_MHZ
+        assert speed_after != Speed.SynapsePlus._50_KHZ_HS
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
@@ -355,21 +355,6 @@ def test_ccd_signal_out(device_manager_instance):  # noqa: ARG001
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
-def test_ccd_restart(device_manager_instance):  # noqa: ARG001
-    # arrange
-    with device_manager_instance.charge_coupled_devices[0] as ccd:
-        is_open_before = ccd.is_open()
-
-        # act
-        ccd.restart()
-        time.sleep(0.3)
-        is_open_after = ccd.is_open()
-
-        assert is_open_before
-        assert is_open_after
-
-
-@pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
 def test_ccd_acquisition_abort(device_manager_instance):  # noqa: ARG001
     with device_manager_instance.charge_coupled_devices[0] as ccd:
         # act
@@ -385,8 +370,23 @@ def test_ccd_acquisition_abort(device_manager_instance):  # noqa: ARG001
 
             acquisition_busy_before_abort = ccd.get_acquisition_busy()
             ccd.set_acquisition_abort()
-            time.sleep(0.8)
+            time.sleep(1)
             acquisition_busy_after_abort = ccd.get_acquisition_busy()
 
             assert acquisition_busy_before_abort
             assert not acquisition_busy_after_abort
+
+
+@pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
+def test_ccd_restart(device_manager_instance):  # noqa: ARG001
+    # arrange
+    with device_manager_instance.charge_coupled_devices[0] as ccd:
+        is_open_before = ccd.is_open()
+
+        # act
+        ccd.restart()
+        time.sleep(0.3)
+        is_open_after = ccd.is_open()
+
+        assert is_open_before
+        assert is_open_after
