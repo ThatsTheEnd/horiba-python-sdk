@@ -206,9 +206,9 @@ class Monochromator(AbstractDevice):
     async def get_turret_grating(self) -> Grating:
         """Current grating of the turret.
 
-        .. note:: Prior to the initialization of the grating turret, this value may not reflect the actual position of
-                  the turret. To read the current position of the grating turret, please run home() prior to running
-                  this command.
+        .. note:: Prior to the initialization of the grating turret, this value may not reflect the actual position
+                  of the turret. To read the current position of the grating turret, please run
+                  :func:`Monochromator.home()` prior to running this command.
 
         Returns:
             Grating: current grating of turret. See :class:`Monochromator.Grating` for possible values.

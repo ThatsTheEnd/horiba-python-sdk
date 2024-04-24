@@ -55,14 +55,17 @@ class FakeICLServer:
                 websocket.send(message)
                 continue
             if command['command'].startswith('icl_'):
-                response = json.dumps(self.icl_responses[command['command']])
-                websocket.send(response)
+                response = self.icl_responses[command['command']]
+                response['id'] = command['id']
+                websocket.send(json.dumps(response))
             elif command['command'].startswith('mono_'):
-                response = json.dumps(self.monochromator_responses[command['command']])
-                websocket.send(response)
+                response = self.monochromator_responses[command['command']]
+                response['id'] = command['id']
+                websocket.send(json.dumps(response))
             elif command['command'].startswith('ccd_'):
-                response = json.dumps(self.ccd_responses[command['command']])
-                websocket.send(response)
+                response = self.ccd_responses[command['command']]
+                response['id'] = command['id']
+                websocket.send(json.dumps(response))
             else:
                 logger.info('unknown command, responding with message')
                 websocket.send(message)

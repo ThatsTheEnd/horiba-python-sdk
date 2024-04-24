@@ -40,8 +40,7 @@ class ChargeCoupledDevice(AbstractDevice):
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
     ) -> None:
-        is_open = self.is_open()
-        if not is_open:
+        if not self.is_open():
             logger.debug('CCD is already closed')
             return
 

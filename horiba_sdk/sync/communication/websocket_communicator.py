@@ -2,7 +2,7 @@ import time
 from queue import Queue
 from threading import Thread
 from types import TracebackType
-from typing import Any, Callable, Dict, Optional, final
+from typing import Any, Callable, Optional, final
 
 import websockets
 from loguru import logger
@@ -28,7 +28,7 @@ class WebsocketCommunicator(AbstractCommunicator):
         self.listen_thread: Optional[Thread] = None
         self.running_binary_message_handling_thread: bool = False
         self.binary_message_handling_thread: Optional[Thread] = None
-        self.json_message_dict: Dict[int, JSONResponse] = {}
+        self.json_message_dict: dict[int, JSONResponse] = {}
         self.binary_message_queue: Queue[bytes] = Queue()
         self.binary_message_callback: Optional[Callable[[bytes], Any]] = None
         self.icl_info: dict[str, Any] = {}
@@ -112,8 +112,8 @@ class WebsocketCommunicator(AbstractCommunicator):
         Raises:
             CommunicationException: When the connection terminated with an error
         """
-        waited_time_in_s = 0
-        sleep_time_in_s = 0.1
+        waited_time_in_s: float = 0.0
+        sleep_time_in_s: float = 0.1
         while waited_time_in_s < timeout_s and (
             not self.json_message_dict
             or len(self.json_message_dict) == 0
