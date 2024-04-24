@@ -20,6 +20,13 @@ class Monochromator(AbstractDevice):
     """
 
     @final
+    class Shutter(Enum):
+        """Shutters installed in the monochromator."""
+
+        FIRST = 0
+        SECOND = 1
+
+    @final
     class ShutterPosition(Enum):
         """Position of the shutter."""
 
@@ -33,6 +40,18 @@ class Monochromator(AbstractDevice):
         FIRST = 0
         SECOND = 1
         THIRD = 2
+
+    @final
+    class FilterWheel(Enum):
+        """Filter wheels installed in the monochromator.
+
+        .. note:: the filter wheel is an optional module
+
+        """
+
+        # TODO: clarify naming of filter wheel
+        FIRST = 0
+        SECOND = 1
 
     @final
     class FilterWheelPosition(Enum):
@@ -52,7 +71,6 @@ class Monochromator(AbstractDevice):
     class Mirror(Enum):
         """Mirrors installed in the monochromator"""
 
-        # TODO: clarify how the mirrors are called
         FIRST = 0
         SECOND = 1
 
@@ -60,9 +78,8 @@ class Monochromator(AbstractDevice):
     class MirrorPosition(Enum):
         """Possible positions of the mirrors"""
 
-        # TODO: clarify what possible position there are
-        A = 0
-        B = 1
+        AXIAL = 0
+        LATERAL = 1
 
     @final
     class Slit(Enum):
@@ -78,7 +95,7 @@ class Monochromator(AbstractDevice):
     class SlitStepPosition(Enum):
         """Slits steps available on the monochromator."""
 
-        # TODO: clarify how the slits are called
+        # TODO: clarify what positions are available
         A = 0
         B = 1
         C = 2
@@ -155,7 +172,7 @@ class Monochromator(AbstractDevice):
             str: configuration of the monochromator
         """
         response: Response = await super()._execute_command('mono_getConfig', {'index': self._id, 'compact': False})
-        return response.results
+        return response.results['configuration']
 
     async def get_current_wavelength(self) -> float:
         """Current wavelength of the monochromator's position in nm.
@@ -194,7 +211,7 @@ class Monochromator(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side
         """
-        await super()._execute_command('mono_moveToPosition', {'index': self._id, 'wavelength': wavelength}, 60)
+        await super()._execute_command('mono_moveToPosition', {'index': self._id, 'wavelength': wavelength}, 180)
 
     async def get_turret_grating(self) -> Grating:
         """Current grating of the turret
@@ -219,7 +236,7 @@ class Monochromator(AbstractDevice):
         """
         await super()._execute_command('mono_moveGrating', {'index': self._id, 'position': grating.value})
 
-    async def get_filter_wheel_position(self) -> FilterWheelPosition:
+    async def get_filter_wheel_position(self, filter_wheel: FilterWheel) -> FilterWheelPosition:
         """Current position of the filter wheel.
 
         Returns:
@@ -229,14 +246,12 @@ class Monochromator(AbstractDevice):
         Raises:
             Exception: When an error occured on the device side
         """
-        # TODO: refactor in case there can be more than one filter wheel. What should be done if no filter wheel is
-        # installed?
         response: Response = await super()._execute_command(
-            'mono_getFilterWheelPosition', {'index': self._id, 'type': 1}
+            'mono_getFilterWheelPosition', {'index': self._id, 'type': filter_wheel.value}
         )
         return self.FilterWheelPosition(response.results['position'])
 
-    async def set_filter_wheel_position(self, position: FilterWheelPosition) -> None:
+    async def set_filter_wheel_position(self, filter_wheel: FilterWheel, position: FilterWheelPosition) -> None:
         """Sets the current position of the filter wheel.
 
         Returns:
@@ -246,10 +261,8 @@ class Monochromator(AbstractDevice):
         Raises:
             Exception: When an error occured on the device side
         """
-        # TODO: refactor in case there can be more than one filter wheel. What should be done if no filter wheel is
-        # installed?
         await super()._execute_command(
-            'mono_moveFilterWheel', {'index': self._id, 'type': 1, 'position': position.value}
+            'mono_moveFilterWheel', {'index': self._id, 'type': filter_wheel.value, 'position': position.value}
         )
 
     async def get_mirror_position(self, mirror: Mirror) -> MirrorPosition:
@@ -382,7 +395,7 @@ class Monochromator(AbstractDevice):
         """
         await super()._execute_command('mono_shutterClose', {'index': self._id})
 
-    async def get_shutter_position(self) -> ShutterPosition:
+    async def get_shutter_position(self, shutter: Shutter) -> ShutterPosition:
         """Returns the shutter position.
 
         Returns:
@@ -392,5 +405,11 @@ class Monochromator(AbstractDevice):
             Exception: When an error occurred on the device side
         """
         response: Response = await super()._execute_command('mono_getShutterStatus', {'index': self._id})
-        # TODO: what is the actual response format?
-        return self.ShutterPosition(response.results['shutter 1'])
+        # TODO: How many shutters are there?
+        if shutter == self.Shutter.FIRST:
+            return self.ShutterPosition(response.results['shutter 1'])
+        elif shutter == self.Shutter.SECOND:
+            return self.ShutterPosition(response.results['shutter 2'])
+        else:
+            logger.error(f'shutter {shutter} not implemented')
+            raise Exception('shutter not implemented')
