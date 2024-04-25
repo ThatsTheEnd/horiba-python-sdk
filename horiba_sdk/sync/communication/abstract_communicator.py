@@ -26,14 +26,13 @@ class AbstractCommunicator(ABC):
         pass
 
     @abstractmethod
-    def request_with_response(self, command: Command, time_to_wait_for_response_in_s: float = 0.1) -> Response:
+    def request_with_response(self, command: Command, response_timeout_s: float = 5) -> Response:
         """
         Abstract method to fetch a response from a command.
 
         Args:
             command (Command): Command for which a response is desired
-            time_to_wait_for_response_in_s (float, optional): Time, in seconds, to wait between request and response.
-            Defaults to 0.1s
+            response_timeout_s (float, optional): Timeout in seconds. Defaults to 5.
 
         Returns:
             Response: The response corresponding to the sent command.

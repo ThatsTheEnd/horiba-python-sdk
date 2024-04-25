@@ -1,5 +1,6 @@
+from enum import Enum
 from types import TracebackType
-from typing import Optional, final
+from typing import Any, Optional, final
 
 from loguru import logger
 from overrides import override
@@ -17,6 +18,78 @@ class Monochromator(AbstractDevice):
     This class should not be instanced by the end user. Instead, the :class:`horiba_sdk.sync.devices.DeviceManager`
     should be used to access the detected Monochromators on the system.
     """
+
+    @final
+    class Shutter(Enum):
+        """Shutters installed in the monochromator."""
+
+        FIRST = 0
+        SECOND = 1
+
+    @final
+    class ShutterPosition(Enum):
+        """Position of the shutter."""
+
+        CLOSED = 0
+        OPENED = 1
+
+    @final
+    class Grating(Enum):
+        """Gratings installed in the monochromator"""
+
+        FIRST = 0
+        SECOND = 1
+        THIRD = 2
+
+    @final
+    class FilterWheel(Enum):
+        """Filter wheels installed in the monochromator.
+
+        .. note:: the filter wheel is an optional module
+
+        """
+
+        # TODO: clarify naming of filter wheel
+        FIRST = 0
+        SECOND = 1
+
+    @final
+    class FilterWheelPosition(Enum):
+        """Positions of the filter wheel installed in the monochromator.
+
+        .. note:: the filter wheel is an optional module
+
+        """
+
+        # TODO: clarify naming of filter wheel positions
+        RED = 0
+        GREEN = 1
+        BLUE = 2
+        YELLOW = 3
+
+    @final
+    class Mirror(Enum):
+        """Mirrors installed in the monochromator"""
+
+        FIRST = 0
+        SECOND = 1
+
+    @final
+    class MirrorPosition(Enum):
+        """Possible positions of the mirrors"""
+
+        AXIAL = 0
+        LATERAL = 1
+
+    @final
+    class Slit(Enum):
+        """Slits available on the monochromator."""
+
+        # TODO: clarify how the slits are called
+        A = 0
+        B = 1
+        C = 2
+        D = 3
 
     def __init__(self, device_id: int, communicator: AbstractCommunicator, error_db: AbstractErrorDB) -> None:
         super().__init__(device_id, communicator, error_db)
@@ -45,7 +118,7 @@ class Monochromator(AbstractDevice):
             Exception: When an error occured on the device side
         """
         super().open()
-        super()._execute_command('mono_open', {'index': self._id}, 0.5)
+        super()._execute_command('mono_open', {'index': self._id})
 
     @override
     def close(self) -> None:
@@ -65,7 +138,6 @@ class Monochromator(AbstractDevice):
         response: Response = super()._execute_command('mono_isOpen', {'index': self._id})
         return bool(response.results['open'])
 
-    @property
     def is_busy(self) -> bool:
         """Checks if the monochromator is busy.
 
@@ -85,9 +157,20 @@ class Monochromator(AbstractDevice):
         """
         super()._execute_command('mono_init', {'index': self._id})
 
-    @property
-    def wavelength(self) -> float:
+    def configuration(self) -> dict[str, Any]:
+        """Returns the configuration of the monochromator.
+
+        Returns:
+            str: configuration of the monochromator
+        """
+        response: Response = super()._execute_command('mono_getConfig', {'index': self._id, 'compact': False})
+        return response.results['configuration']
+
+    def get_current_wavelength(self) -> float:
         """Current wavelength of the monochromator's position in nm.
+
+        Returns:
+            float: The current wavelength in nm
 
         Raises:
             Exception: When an error occured on the device side
@@ -95,55 +178,213 @@ class Monochromator(AbstractDevice):
         response = super()._execute_command('mono_getPosition', {'index': self._id})
         return float(response.results['wavelength'])
 
-    def set_current_wavelength(self, wavelength: int) -> None:
+    def calibrate_wavelength(self, wavelength: float) -> None:
         """This command sets the wavelength value of the current grating position of the monochromator.
 
         .. warning:: This could potentially uncalibrate the monochromator and report an incorrect wavelength compared to
                      the actual output wavelength.
 
         Args:
-            wavelength (nm): wavelength
+            wavelength (float): wavelength in nm
 
         Raises:
             Exception: When an error occured on the device side
         """
         super()._execute_command('mono_setPosition', {'index': self._id, 'wavelength': wavelength})
 
-    def move_to_wavelength(self, wavelength_nm: float) -> None:
+    def move_to_target_wavelength(self, wavelength_nm: float) -> None:
         """Orders the monochromator to move to the requested wavelength.
 
         Use :func:`Monochromator.is_busy()` to know if the operation is still taking place.
 
         Args:
-            wavelength_nm (float): wavelength
+            wavelength_nm (float): wavelength in nm
 
         Raises:
             Exception: When an error occured on the device side
         """
-        super()._execute_command('mono_moveToPosition', {'index': self._id, 'wavelength': wavelength_nm})
+        super()._execute_command('mono_moveToPosition', {'index': self._id, 'wavelength': wavelength_nm}, 180)
 
-    @property
-    def turret_grating_position(self) -> int:
-        """Grating turret position.
+    def get_turret_grating(self) -> Grating:
+        """Current grating of the turret.
+
+        .. note:: Prior to the initialization of the grating turret, this value may not reflect the actual position
+                  of the turret. To read the current position of the grating turret, please run
+                  :func:`Monochromator.home()` prior to running this command.
 
         Returns:
-            int: current grating turret position
+            Grating: current grating of turret. See :class:`Monochromator.Grating` for possible values.
 
         Raises:
-            Exception: When an error occured on the device side
+            Exception: When an error occurred on the device side
         """
         response: Response = super()._execute_command('mono_getGratingPosition', {'index': self._id})
-        return int(response.results['position'])
+        return self.Grating(response.results['position'])
 
-    def move_turret_to_grating(self, position: int) -> None:
-        """Move turret to grating position
+    def set_turret_grating(self, grating: Grating) -> None:
+        """Select turret grating
 
-        .. todo:: Get more information about how it works and clarify veracity of returned data
+        .. note:: Note: The turret sensor does not re-read the position each time it is moved, therefore the position
+                  may not be accurate prior to initialization. See note for get_turret_grating().
 
         Args:
-            position (int): new grating position
+            grating (Grating): new grating of the turret. See :class:`Monochromator.Grating` for possible values.
 
         Raises:
-            Exception: When an error occured on the device side
+            Exception: When an error occurred on the device side
         """
-        super()._execute_command('mono_getPosition', {'index': self._id, 'position': position})
+        super()._execute_command('mono_moveGrating', {'index': self._id, 'position': grating.value})
+
+    def get_filter_wheel_position(self, filter_wheel: FilterWheel) -> FilterWheelPosition:
+        """Current position of the filter wheel.
+
+        Returns:
+            FilterWheelPosition: current position of the filter wheel. See :class:`Monochromator.FilterWheelPosition`
+            for possible values.
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        response: Response = super()._execute_command(
+            'mono_getFilterWheelPosition', {'index': self._id, 'type': filter_wheel.value}
+        )
+        return self.FilterWheelPosition(response.results['position'])
+
+    def set_filter_wheel_position(self, filter_wheel: FilterWheel, position: FilterWheelPosition) -> None:
+        """Sets the current position of the filter wheel.
+
+        Returns:
+            FilterWheelPosition: current position of the filter wheel. See :class:`Monochromator.FilterWheelPosition`,
+            for possible values.
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        super()._execute_command(
+            'mono_moveFilterWheel', {'index': self._id, 'type': filter_wheel.value, 'position': position.value}
+        )
+
+    def get_mirror_position(self, mirror: Mirror) -> MirrorPosition:
+        """Position of the selected mirror.
+
+        .. todo:: Get more information about possible values and explain elements contained in monochromator at top
+           of this class.
+
+        Args:
+            mirror (Mirror): desired mirror to get the position from.
+
+        Returns:
+            MirrorPosition: current mirror position. See :class:`Monochromator.MirrorPosition` for possible values
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        response: Response = super()._execute_command(
+            'mono_getMirrorPosition', {'index': self._id, 'type': mirror.value}
+        )
+        return self.MirrorPosition(response.results['position'])
+
+    def set_mirror_position(self, mirror: Mirror, position: MirrorPosition) -> None:
+        """Sets the position of the selected mirror.
+
+        .. todo:: Get more information about possible values and explain elements contained in monochromator at top
+           of this class.
+
+        Args:
+            mirror (Mirror): desired mirror to set the position.
+            position (MirrorPosition): position to set. See :class:`Monochromator.MirrorPosition` for possible values
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        super()._execute_command('mono_moveMirror', {'index': self._id, 'id': mirror.value, 'position': position.value})
+
+    def get_slit_position_in_mm(self, slit: Slit) -> float:
+        """Returns the position in millimeters [mm] of the selected slit.
+
+        Args:
+            slit (Slit): desired slit to get the position from. See :class:`Monochromator.Slit` for possible
+
+        Returns:
+            float: position in mm
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+
+        response: Response = super()._execute_command('mono_getSlitPositionInMM', {'index': self._id, 'id': slit.value})
+        return float(response.results['position'])
+
+    def set_slit_position(self, slit: Slit, position_in_mm: float) -> None:
+        """Sets the position of the selected slit.
+
+        Args:
+            slit (Slit): desired slit to set the position. See :class:`Monochromator.Slit` for possible values.
+            position_in_mm (float): position to set in millimeters [mm].
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        super()._execute_command('mono_moveSlitMM', {'index': self._id, 'id': slit.value, 'position': position_in_mm})
+
+    def get_slit_step_position(self, slit: Slit) -> int:
+        """Returns the position of the specified slit in steps.
+
+        Args:
+            slit (Slit): desired slit to get the position from. See :class:`Monochromator.Slit` for possible
+        Returns:
+            int: step position.
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+
+        response: Response = super()._execute_command('mono_getSlitStepPosition', {'index': self._id, 'id': slit.value})
+        return int(response.results['position'])
+
+    def set_slit_step_position(self, slit: Slit, step_position: int) -> None:
+        """Moves the specified slit to the position in steps.
+
+        Args:
+            slit (Slit): desired slit to set the step position. See :class:`Monochromator.Slit` for possible values.
+            step_position (int): the step position.
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        super()._execute_command('mono_moveSlit', {'index': self._id, 'id': slit.value, 'position': step_position})
+
+    def open_shutter(self) -> None:
+        """Opens the shutter.
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        super()._execute_command('mono_shutterOpen', {'index': self._id})
+
+    def close_shutter(self) -> None:
+        """Closes the shutter.
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        super()._execute_command('mono_shutterClose', {'index': self._id})
+
+    def get_shutter_position(self, shutter: Shutter) -> ShutterPosition:
+        """Returns the shutter position.
+
+        Returns:
+            ShutterPosition: OPEN or CLOSED
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        response: Response = super()._execute_command('mono_getShutterStatus', {'index': self._id})
+        # TODO: How many shutters are there?
+        if shutter == self.Shutter.FIRST:
+            return self.ShutterPosition(response.results['shutter 1'])
+        elif shutter == self.Shutter.SECOND:
+            return self.ShutterPosition(response.results['shutter 2'])
+        else:
+            logger.error(f'shutter {shutter} not implemented')
+            raise Exception('shutter not implemented')

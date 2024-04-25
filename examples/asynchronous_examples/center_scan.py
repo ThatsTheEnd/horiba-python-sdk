@@ -4,6 +4,9 @@ import asyncio
 import matplotlib.pyplot as plt
 from loguru import logger
 
+from horiba_sdk.core.acquisition_format import AcquisitionFormat
+from horiba_sdk.core.timer_resolution import TimerResolution
+from horiba_sdk.core.x_axis_conversion_type import XAxisConversionType
 from horiba_sdk.devices.device_manager import DeviceManager
 
 
@@ -33,11 +36,13 @@ async def main():
         await wait_for_mono(mono)
 
         # ccd configuration
+        await ccd.set_acquisition_format(1, AcquisitionFormat.SPECTRA)
         await ccd.set_acquisition_count(1)
-        await ccd.set_x_axis_conversion_type(ccd.XAxisConversionType(0))
-        await ccd.set_exposure_time(1000)
+        await ccd.set_x_axis_conversion_type(XAxisConversionType.FROM_ICL_SETTINGS_INI)
+        await ccd.set_timer_resolution(TimerResolution._1000_MICROSECONDS)
+        await ccd.set_exposure_time(2)
         await ccd.set_region_of_interest()  # Set default ROI, if you want a custom ROI, pass the parameters
-        xy_data_str = '[[0,0]]'
+        xy_data = [[0], [0]]
 
         if await ccd.get_acquisition_ready():
             await ccd.set_acquisition_start(open_shutter=True)
@@ -46,14 +51,9 @@ async def main():
 
             raw_data = await ccd.get_acquisition_data()
             print(raw_data)
-            # json data is invalid, we cannot do this:
-            # json_data = json.loads(raw_data['data'])
-            # center_scan_data = json_data['xyData']
-
-            # Extracting xyData the hard way
-            start_index = raw_data['data'].find('"xyData": [')
-            end_index = raw_data['data'].find(']]', start_index) + 1
-            xy_data_str = raw_data['data'][start_index + 10 : end_index + 1]
+            xy_data = raw_data[0]['roi'][0]['xyData']
+            # for AcquisitionFormat.IMAGE:
+            # xy_data = [raw_data[0]['roi'][0]['xData'][0], raw_data[0]['roi'][0]['yData'][0]]
     finally:
         await ccd.close()
         logger.info('Waiting before closing Monochromator')
@@ -62,13 +62,15 @@ async def main():
 
     await device_manager.stop()
 
-    await plot_values(target_wavelength, xy_data_str)
+    await plot_values(target_wavelength, xy_data)
 
 
-async def plot_values(target_wavelength, xy_data_str):
-    center_scan_data = eval(xy_data_str)
-    x_values = [point[0] for point in center_scan_data]
-    y_values = [point[1] for point in center_scan_data]
+async def plot_values(target_wavelength, xy_data):
+    x_values = [data[0] for data in xy_data]
+    y_values = [data[1] for data in xy_data]
+    # for AcquisitionFormat.IMAGE:
+    # x_values = xy_data[0]
+    # y_values = xy_data[1]
     # Plotting the data
     plt.plot(x_values, y_values, linestyle='-')
     plt.title(f'Wavelength ({target_wavelength}[nm]) vs. Intensity')
@@ -82,7 +84,7 @@ async def wait_for_ccd(ccd):
     acquisition_busy = True
     while acquisition_busy:
         acquisition_busy = await ccd.get_acquisition_busy()
-        await asyncio.sleep(0.3)
+        await asyncio.sleep(1)
         logger.info('Acquisition busy')
 
 

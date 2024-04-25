@@ -28,7 +28,7 @@ class WebsocketCommunicator(AbstractCommunicator):
         self.listen_thread: Optional[Thread] = None
         self.running_binary_message_handling_thread: bool = False
         self.binary_message_handling_thread: Optional[Thread] = None
-        self.json_message_queue: Queue[str] = Queue()
+        self.json_message_dict: dict[int, JSONResponse] = {}
         self.binary_message_queue: Queue[bytes] = Queue()
         self.binary_message_callback: Optional[Callable[[bytes], Any]] = None
         self.icl_info: dict[str, Any] = {}
@@ -99,8 +99,12 @@ class WebsocketCommunicator(AbstractCommunicator):
         """
         return self.websocket is not None
 
-    def response(self) -> Response:
-        """Fetches the next response
+    def response(self, command_id: int, timeout_s: float = 5.0) -> Response:
+        """Fetches the response belonging to the command_id.
+
+        Args:
+            command_id (int): The command id of the command.
+            timeout_s (float): The timeout in seconds.
 
         Returns:
             Response: The response from the server
@@ -108,13 +112,27 @@ class WebsocketCommunicator(AbstractCommunicator):
         Raises:
             CommunicationException: When the connection terminated with an error
         """
-        if not self.json_message_queue or self.json_message_queue.empty():
-            raise CommunicationException(None, 'No message to be received.')
+        waited_time_in_s: float = 0.0
+        sleep_time_in_s: float = 0.1
+        while waited_time_in_s < timeout_s and (
+            not self.json_message_dict
+            or len(self.json_message_dict) == 0
+            or self.json_message_dict.get(command_id) is None
+        ):
+            time.sleep(sleep_time_in_s)
+            waited_time_in_s += sleep_time_in_s
 
-        logger.debug(f'#{self.json_message_queue.qsize()} messages in the queue, taking first')
-        response: str = self.json_message_queue.get()
-        logger.debug('retrieved message in queue')
-        return JSONResponse(response)
+        if not self.json_message_dict or len(self.json_message_dict) == 0:
+            raise CommunicationException(None, 'no message to be received.')
+
+        if self.json_message_dict.get(command_id) is None:
+            raise CommunicationException(None, f'no response with id {command_id}')
+
+        logger.debug(f'#{len(self.json_message_dict)} messages, taking the one with id:{command_id}')
+        response: JSONResponse = self.json_message_dict[command_id]
+        del self.json_message_dict[command_id]
+        logger.debug('retrieved message in dict')
+        return response
 
     @override
     def close(self) -> None:
@@ -166,7 +184,8 @@ class WebsocketCommunicator(AbstractCommunicator):
                 for message in self.websocket:
                     logger.debug(f'Received message: {message!r}')
                     if isinstance(message, str):
-                        self.json_message_queue.put(message)
+                        response: JSONResponse = JSONResponse(message)
+                        self.json_message_dict[response.id] = response
                     elif isinstance(message, bytes) and self.binary_message_callback:
                         self.binary_message_queue.put(message)
                     else:
@@ -192,21 +211,22 @@ class WebsocketCommunicator(AbstractCommunicator):
             self.binary_message_callback(binary_message)
 
     @override
-    def request_with_response(self, command: Command, time_to_wait_for_response_in_s: float = 0.1) -> Response:
+    def request_with_response(self, command: Command, response_timeout_s: float = 5) -> Response:
         """
         Concrete method to fetch a response from a command.
 
         Args:
             command (Command): Command for which a response is desired
-            time_to_wait_for_response_in_s (float, optional): Time, in seconds, to wait between request and response.
-            Defaults to 0.1s
+            response_timeout_s (float, optional): Timeout in seconds. Defaults to 5.
 
         Returns:
             Response: The response corresponding to the sent command.
         """
         self.send(command)
-        logger.debug('sent command, waiting for response')
-        time.sleep(time_to_wait_for_response_in_s)
-        response: Response = self.response()
+        response: Response = self.response(command.id, response_timeout_s)
+
+        if response.id != command.id:
+            logger.error(f'got wrong response id: {response.id}, command id: {command.id}')
+            raise Exception('got wrong response id')
 
         return response
