@@ -12,8 +12,8 @@ async def main():
         await device_manager.stop()
         return
 
-    with device_manager.charge_coupled_devices[0] as ccd:
-        configuration = ccd.get_configuration()
+    async with device_manager.charge_coupled_devices[0] as ccd:
+        configuration = await ccd.get_configuration()
 
     await device_manager.stop()
 

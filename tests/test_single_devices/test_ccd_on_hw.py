@@ -33,7 +33,7 @@ async def test_ccd_functionality(event_loop):  # noqa: ARG001
             temperature = await ccd.get_temperature()
             assert temperature < 0
 
-            _ignored_speed = await ccd.get_speed()
+            _ignored_speed = await ccd.get_speed_token()
 
             await ccd.set_acquisition_format(1, AcquisitionFormat.IMAGE)
             await ccd.set_region_of_interest()
