@@ -94,6 +94,10 @@ class ChargeCoupledDevice(AbstractDevice):
     async def get_gain_token(self) -> int:
         """Returns the current gain token.
 
+        .. note:: The CCD can have different sensors installed, which can have different gain values. This is why only
+        the token to the gain is returned. You need to first check what gain values are available for the CCD using the
+        get_configuration function. Please see the according "Gain and Speed" documentation.
+
         Returns:
             int: Gain token of the ccd
 
@@ -105,7 +109,11 @@ class ChargeCoupledDevice(AbstractDevice):
         return gain
 
     async def set_gain(self, gain_token: int) -> None:
-        """Sets the gain of the CCD
+        """Sets the gain of the CCD.
+
+        .. note:: The CCD can have different sensors installed, which can have different gain values. Therefore you need
+        to first check what gain values are available for the CCD using the get_configuration function. Please see the
+        according "Gain and Speed" documentation.
 
         Args:
             gain_token (int): Token of the desired gain
@@ -117,6 +125,10 @@ class ChargeCoupledDevice(AbstractDevice):
 
     async def get_speed_token(self) -> int:
         """Returns the speed token.
+
+        .. note:: The CCD can have different sensors installed, which can have different speed values. This is why only
+        the token to the speed is returned. You need to first check what speed values are available for the CCD using
+        the get_configuration function. Please see the according "Gain and Speed" documentation.
 
         Returns:
             int: Speed token of the CCD.
@@ -130,6 +142,10 @@ class ChargeCoupledDevice(AbstractDevice):
 
     async def set_speed(self, speed_token: int) -> None:
         """Sets the speed of the CCD
+
+        .. note:: The CCD can have different sensors installed, which can have different speed values. Therefore you
+        need to first check what speed values are available for the CCD using the get_configuration function. Please
+        see the according "Gain and Speed" documentation.
 
         Args:
             speed_token (int): Token of the desired speed.
