@@ -2,7 +2,8 @@
 Gain and Speed
 ==============
 
-The gain and speed of the CCD depend which sensor model is installed in the them.
+The gain and speed of the CCD depend which sensor model is installed in the camera. 
+In essence, only the camera itself knows which speed and gain settings it supports.
 
 In order to determine the available gains and speeds of the CCD, the config of the ccd has to be retrieved:
 
@@ -72,8 +73,7 @@ Based on this information you can create your own gain and speed classes as foll
           _1_MHZ_ULTRA = 2
           _500_KHZ_WRAP = 127
 
-.. important:: You need to give the correct values to the enums based on the information retrieved from the config of
-   the CCD.
+.. important:: You need to give the correct values to the enums based on the information retrieved from the config of the CCD.
 
 You can then call the speed and gain functions as follows:
 
