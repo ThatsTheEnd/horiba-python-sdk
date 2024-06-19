@@ -138,8 +138,8 @@ async def test_ccd_resolution(event_loop):  # noqa: ARG001
             config = await ccd.get_configuration()
 
             # assert
-            assert resolution.width == int(config['ChipWidth'])
-            assert resolution.height == int(config['ChipHeight'])
+            assert resolution.width == int(config['chipWidth'])
+            assert resolution.height == int(config['chipHeight'])
     finally:
         await device_manager.stop()
 
@@ -336,15 +336,15 @@ async def test_ccd_clean_count(event_loop):  # noqa: ARG001
             expected_clean_count_after = 2
 
             # act
-            await ccd.set_clean_count(expected_clean_count_before, CleanCountMode.Mode1)
+            await ccd.set_clean_count(expected_clean_count_before, CleanCountMode.UNKNOWN)
             actual_clean_count_before = await ccd.get_clean_count()
 
-            await ccd.set_clean_count(expected_clean_count_after, CleanCountMode.Mode1)
+            await ccd.set_clean_count(expected_clean_count_after, CleanCountMode.UNKNOWN)
             actual_clean_count_after = await ccd.get_clean_count()
 
             # assert
-            assert actual_clean_count_before == expected_clean_count_before
-            assert actual_clean_count_after == expected_clean_count_after
+            assert actual_clean_count_before == (expected_clean_count_before, CleanCountMode.UNKNOWN)
+            assert actual_clean_count_after == (expected_clean_count_after, CleanCountMode.UNKNOWN)
     finally:
         await device_manager.stop()
 
