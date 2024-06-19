@@ -191,7 +191,9 @@ class ChargeCoupledDevice(AbstractDevice):
         Raises:
             Exception: When an error occurred on the device side
         """
-        super()._execute_command('ccd_setTimerResolution', {'index': self._id, 'resolutionToken': timer_resolution.value})
+        super()._execute_command(
+            'ccd_setTimerResolution', {'index': self._id, 'resolutionToken': timer_resolution.value}
+        )
 
     def set_acquisition_format(self, number_of_rois: int, acquisition_format: AcquisitionFormat) -> None:
         """Sets the acquisition format and the number of ROIs (Regions of Interest) or areas.
