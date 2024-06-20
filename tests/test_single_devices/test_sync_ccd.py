@@ -109,7 +109,7 @@ def test_ccd_clean_count(fake_sync_icl_exe, fake_sync_device_manager):  # noqa: 
 
         # assert
         assert clean_count == 1
-        assert clean_count_mode == CleanCountMode.Mode1
+        assert clean_count_mode == CleanCountMode.UNKNOWN
 
 
 def test_ccd_acquisition_data(fake_sync_icl_exe, fake_sync_device_manager):  # noqa: ARG001

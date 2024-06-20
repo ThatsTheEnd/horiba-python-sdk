@@ -58,117 +58,181 @@
     "id": 1234,
     "results": {
       "configuration": {
-        "CenterWavelength": 0,
-        "ChipHSpacing": "260",
-        "ChipHeight": "256",
-        "ChipName": "CCD30-11-1-275",
-        "ChipSerialNumber": "20091-22-21",
-        "ChipVSpacing": "260",
-        "ChipWidth": "1024",
-        "DeviceType": "HORIBA Scientific Syncerity",
-        "FitParameters": [0,1,0,0,0],
-        "Gains": [
-          {"Info": "Best Dynamic Range","Token":1},
-          {"Info": "High Sensitivity","Token":2},
-          {"Info": "High Light","Token":0}
+        "centerWavelength": 0,
+        "chipHSpacing": 260,
+        "chipHeight": 256,
+        "chipName": "CCD30-11-1-275",
+        "chipSerialNumber": "20091-22-21",
+        "chipVSpacing": 260,
+        "chipWidth": 1024,
+        "deviceType": "HORIBA Scientific Syncerity",
+        "fitParameters": [
+          0,
+          1,
+          0,
+          0,
+          0
         ],
-        "HardwareAvgAvailable": "False",
-        "LineScan": "False",
-        "ProductId": "13",
-        "SerialNumber": "Camera SN:  2244",
-        "Signals": [
+        "gains": [
           {
-            "Events":
-            [
+            "info": "High Sensitivity",
+            "token": 2
+          },
+          {
+            "info": "High Light",
+            "token": 0
+          },
+          {
+            "info": "Best Dynamic Range",
+            "token": 1
+          }
+        ],
+        "hardwareAvgAvailable": "false",
+        "lineScan": "false",
+        "productId": "13",
+        "serialNumber": "Camera SN:  2244",
+        "signals": [
+          {
+            "events": [
               {
-                "Name": "Ready For Trigger",
-                "Token": 1,
-                "Types": [
-                  {"Name": "TTL Active Low", "Token": 1},
-                  {"Name": "TTL Active High", "Token": 0}
+                "name": "Reserved-DO NOT USE",
+                "token": 2,
+                "types": [
+                  {
+                    "name": "TTL Active High",
+                    "token": 0
+                  },
+                  {
+                    "name": "TTL Active Low",
+                    "token": 1
+                  }
                 ]
               },
               {
-                "Name": "Reserved-DO NOT USE",
-                "Token": 2,
-                "Types": [
-                  {"Name": "TTL Active Low", "Token": 1},
-                  {"Name": "TTL Active High", "Token":0}
+                "name": "Shutter Open",
+                "token": 3,
+                "types": [
+                  {
+                    "name": "TTL Active High",
+                    "token": 0
+                  },
+                  {
+                    "name": "TTL Active Low",
+                    "token": 1
+                  }
                 ]
               },
               {
-                "Name": "Shutter Open",
-                "Token": 3,
-                "Types": [
-                  {"Name": "TTL Active Low","Token":1},
-                  {"Name": "TTL Active High","Token":0}
+                "name": "Start Experiment",
+                "token": 0,
+                "types": [
+                  {
+                    "name": "TTL Active High",
+                    "token": 0
+                  },
+                  {
+                    "name": "TTL Active Low",
+                    "token": 1
+                  }
                 ]
               },
               {
-                "Name": " Start Experiment",
-                "Token": 0,
-                "Types": [
-                  {"Name": "TTL Active Low","Token":1},
-                  {"Name": "TTL Active High","Token":0}
+                "name": "Ready For Trigger",
+                "token": 1,
+                "types": [
+                  {
+                    "name": "TTL Active High",
+                    "token": 0
+                  },
+                  {
+                    "name": "TTL Active Low",
+                    "token": 1
+                  }
                 ]
               }
             ],
-            "Name": "Signal Output","Token":0
-          }],
-          "Speeds": [
-            {"Info": " 1 MHz       ","Token":1},
-            {"Info": " 1 MHz Ultra ","Token":2},
-            {"Info": "500 kHz Wrap","Token":127},
-            {"Info": "45 kHz       ","Token":0}
-          ],
-          "SupportedFeatures": {
-            "CF_3PositionSlit": "False",
-            "CF_CMOSOffsetCorrection": "False",
-            "CF_Cleaning": "True",
-            "CF_DSP": "False",
-            "CF_DSPBin2X": "False",
-            "CF_DelayAfterTrigger": "False",
-            "CF_Delays": "False",
-            "CF_EMCCD": "False",
-            "CF_EShutter": "False",
-            "CF_HDR": "False",
-            "CF_Image": "True",
-            "CF_MemorySlots": "True",
-            "CF_Metadata": "False",
-            "CF_MultipleExposeTimes": "False",
-            "CF_MultipleSensors": "False",
-            "CF_PulseSummation": "False",
-            "CF_ROIs": "True",
-            "CF_Signals": "True",
-            "CF_Spectra": "True",
-            "CF_TriggerQualifier": "False",
-            "CF_Triggers": "True"
+            "name": "Signal Output",
+            "token": 0
+          }
+        ],
+        "speeds": [
+          {
+            "info": " 1 MHz Ultra ",
+            "token": 2
           },
-          "Triggers": [
-            {
-              "Events": [
-                {
-                  "Name": "Each - For Each Acq",
-                  "Token":1,
-                  "Types": [
-                    {"Name": "TTL Rising  Edge", "Token": 1},
-                    {"Name": "TTL Falling Edge", "Token": 0}
-                  ]
-                },
-                {
-                  "Name": "Once - Start All",
-                  "Token":0,
-                  "Types": [
-                    {"Name": "TTL Rising  Edge", "Token": 1},
-                    {"Name": "TTL Falling Edge", "Token": 0}
-                  ]
-                }
-              ],
-              "Name": "Trigger Input",
-              "Token":0
-            }
-          ],
-          "Version": "Syncerity Ver 1.001.7.1"
+          {
+            "info": "500 kHz Wrap",
+            "token": 127
+          },
+          {
+            "info": "45 kHz       ",
+            "token": 0
+          },
+          {
+            "info": " 1 MHz       ",
+            "token": 1
+          }
+        ],
+        "supportedFeatures": {
+          "cf_3PositionSlit": "false",
+          "cf_CMOSOffsetCorrection": "false",
+          "cf_Cleaning": "true",
+          "cf_DSP": "false",
+          "cf_DSPBin2X": "false",
+          "cf_DelayAfterTrigger": "false",
+          "cf_Delays": "false",
+          "cf_EMCCD": "false",
+          "cf_EShutter": "false",
+          "cf_HDR": "false",
+          "cf_Image": "true",
+          "cf_MemorySlots": "true",
+          "cf_Metadata": "false",
+          "cf_MultipleExposeTimes": "false",
+          "cf_MultipleSensors": "false",
+          "cf_PulseSummation": "false",
+          "cf_ROIs": "true",
+          "cf_Signals": "true",
+          "cf_Spectra": "true",
+          "cf_TriggerQualifier": "false",
+          "cf_Triggers": "true"
+        },
+        "triggers": [
+          {
+            "events": [
+              {
+                "name": "Once - Start All",
+                "token": 0,
+                "types": [
+                  {
+                    "name": "TTL Falling Edge",
+                    "token": 0
+                  },
+                  {
+                    "name": "TTL Rising  Edge",
+                    "token": 1
+                  }
+                ]
+              },
+              {
+                "name": "Each - For Each Acq",
+                "token": 1,
+                "types": [
+                  {
+                    "name": "TTL Falling Edge",
+                    "token": 0
+                  },
+                  {
+                    "name": "TTL Rising  Edge",
+                    "token": 1
+                  }
+                ]
+              }
+            ],
+            "name": "Trigger Input",
+            "token": 0
+          }
+        ],
+        "version": "Syncerity Ver 1.001.7.1"
       }
     }
   },
@@ -216,7 +280,7 @@
     "command": "ccd_getFitParams",
     "errors": [],
     "results": {
-      "params": "0,1,0,0,0"
+      "fitParameters": [0,1,0,0,0]
     }
   },
   "ccd_setFitParams": {},
@@ -234,7 +298,7 @@
     "command": "ccd_getTimerResolution",
     "errors": [],
     "results": {
-      "resolution": 1000
+      "resolutionToken": 0
     }
   },
   "ccd_setTimerResolution": {},

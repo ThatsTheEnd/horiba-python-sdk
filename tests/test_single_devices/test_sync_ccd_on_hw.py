@@ -42,7 +42,7 @@ def test_ccd_functionality(device_manager_instance):  # noqa: ARG001
         temperature = ccd.get_temperature()
         assert temperature < 0
 
-        _ignored_speed = ccd.get_speed()
+        _ignored_speed = ccd.get_speed_token()
 
         ccd.set_acquisition_format(1, AcquisitionFormat.IMAGE)
         ccd.set_region_of_interest()
@@ -122,8 +122,8 @@ def test_ccd_resolution(device_manager_instance):  # noqa: ARG001
         config = ccd.get_configuration()
 
         # assert
-        assert resolution.width == int(config['ChipWidth'])
-        assert resolution.height == int(config['ChipHeight'])
+        assert resolution.width == int(config['chipWidth'])
+        assert resolution.height == int(config['chipHeight'])
 
 
 @pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
@@ -271,10 +271,10 @@ def test_ccd_clean_count(device_manager_instance):  # noqa: ARG001
         expected_clean_count_after = 2
 
         # act
-        ccd.set_clean_count(expected_clean_count_before, CleanCountMode.Mode1)
+        ccd.set_clean_count(expected_clean_count_before, CleanCountMode.UNKNOWN)
         actual_clean_count_before, _ignored_mode_before = ccd.get_clean_count()
 
-        ccd.set_clean_count(expected_clean_count_after, CleanCountMode.Mode1)
+        ccd.set_clean_count(expected_clean_count_after, CleanCountMode.UNKNOWN)
         actual_clean_count_after, _ignored_mode_after = ccd.get_clean_count()
 
         # assert
