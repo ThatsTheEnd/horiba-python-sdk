@@ -156,19 +156,33 @@ async def test_monochromator_mirror(device_manager_instance):  # noqa: ARG001
     async with device_manager_instance.monochromators[0] as monochromator:
         expected_mirror_position_before = Monochromator.MirrorPosition.LATERAL
         expected_mirror_position_after = Monochromator.MirrorPosition.AXIAL
-
+        timeout_s = 120
+        await monochromator.home()
+        current_time = 0
+        while await monochromator.is_busy() and current_time < timeout_s:
+            await asyncio.sleep(1)
+            if current_time >= timeout_s:
+                assert False, 'Timeout error'
         # act
-        await monochromator.set_mirror_position(Monochromator.Mirror.FIRST, expected_mirror_position_before)
-        while await monochromator.is_busy():
+        await monochromator.set_mirror_position(Monochromator.Mirror.ENTRANCE, expected_mirror_position_before)
+        current_time = 0
+        while await monochromator.is_busy() and current_time < timeout_s:
             await asyncio.sleep(1)
+            current_time += 1
+            if current_time >= timeout_s:
+                assert False, 'Timeout error'
 
-        actual_mirror_position_before = await monochromator.get_mirror_position(Monochromator.Mirror.FIRST)
+        actual_mirror_position_before = await monochromator.get_mirror_position(Monochromator.Mirror.ENTRANCE)
 
-        await monochromator.set_mirror_position(Monochromator.Mirror.FIRST, expected_mirror_position_after)
-        while await monochromator.is_busy():
+        await monochromator.set_mirror_position(Monochromator.Mirror.ENTRANCE, expected_mirror_position_after)
+        current_time = 0
+        while await monochromator.is_busy() and current_time < timeout_s:
             await asyncio.sleep(1)
+            current_time += 1
+            if current_time >= timeout_s:
+                assert False, 'Timeout error'
 
-        actual_mirror_position_after = await monochromator.get_mirror_position(Monochromator.Mirror.FIRST)
+        actual_mirror_position_after = await monochromator.get_mirror_position(Monochromator.Mirror.ENTRANCE)
 
         # assert
         assert actual_mirror_position_before == expected_mirror_position_before
@@ -180,9 +194,13 @@ async def test_monochromator_mirror(device_manager_instance):  # noqa: ARG001
 async def test_monochromator_slit(device_manager_instance):  # noqa: ARG001
     # arrange
     async with device_manager_instance.monochromators[0] as monochromator:
+        timeout_s = 120
         await monochromator.home()
-        while await monochromator.is_busy():
+        current_time = 0
+        while await monochromator.is_busy() and current_time < timeout_s:
             await asyncio.sleep(1)
+            if current_time >= timeout_s:
+                assert False, 'Timeout error'
 
         expected_slit_position_mm_before = 1.5
         expected_slit_position_mm_after = 2.6
@@ -190,14 +208,20 @@ async def test_monochromator_slit(device_manager_instance):  # noqa: ARG001
 
         # act
         await monochromator.set_slit_position(slit, expected_slit_position_mm_before)
-        while await monochromator.is_busy():
+        current_time = 0
+        while await monochromator.is_busy() and current_time < timeout_s:
             await asyncio.sleep(1)
+            if current_time >= timeout_s:
+                assert False, 'Timeout error'
 
         actual_slit_position_mm_before = await monochromator.get_slit_position_in_mm(slit)
 
         await monochromator.set_slit_position(slit, expected_slit_position_mm_after)
-        while await monochromator.is_busy():
+        current_time = 0
+        while await monochromator.is_busy() and current_time < timeout_s:
             await asyncio.sleep(1)
+            if current_time >= timeout_s:
+                assert False, 'Timeout error'
 
         actual_slit_position_mm_after = await monochromator.get_slit_position_in_mm(slit)
 

@@ -97,16 +97,16 @@ def test_monochromator_mirror_position(fake_sync_icl_exe, fake_sync_device_manag
     with fake_sync_device_manager.monochromators[0] as monochromator:
         # act
         # assert
-        assert monochromator.get_mirror_position(Monochromator.Mirror.FIRST) == Monochromator.MirrorPosition.AXIAL
+        assert monochromator.get_mirror_position(Monochromator.Mirror.ENTRANCE) == Monochromator.MirrorPosition.AXIAL
 
 
 def test_monochromator_change_mirror_position(fake_sync_icl_exe, fake_sync_device_manager):  # noqa: ARG001
     # arrange
     with fake_sync_device_manager.monochromators[0] as monochromator:
         # act
-        monochromator.set_mirror_position(Monochromator.Mirror.FIRST, Monochromator.MirrorPosition.AXIAL)
+        monochromator.set_mirror_position(Monochromator.Mirror.ENTRANCE, Monochromator.MirrorPosition.AXIAL)
         # assert
-        assert monochromator.get_mirror_position(Monochromator.Mirror.FIRST) == Monochromator.MirrorPosition.AXIAL
+        assert monochromator.get_mirror_position(Monochromator.Mirror.ENTRANCE) == Monochromator.MirrorPosition.AXIAL
 
 
 def test_monochromator_get_slit_position(fake_sync_icl_exe, fake_sync_device_manager):  # noqa: ARG001

@@ -142,17 +142,17 @@ def test_monochromator_mirror(device_manager_instance):  # noqa: ARG001
         expected_mirror_position_after = Monochromator.MirrorPosition.AXIAL
 
         # act
-        monochromator.set_mirror_position(Monochromator.Mirror.FIRST, expected_mirror_position_before)
+        monochromator.set_mirror_position(Monochromator.Mirror.ENTRANCE, expected_mirror_position_before)
         while monochromator.is_busy():
             time.sleep(1)
 
-        actual_mirror_position_before = monochromator.get_mirror_position(Monochromator.Mirror.FIRST)
+        actual_mirror_position_before = monochromator.get_mirror_position(Monochromator.Mirror.ENTRANCE)
 
-        monochromator.set_mirror_position(Monochromator.Mirror.FIRST, expected_mirror_position_after)
+        monochromator.set_mirror_position(Monochromator.Mirror.ENTRANCE, expected_mirror_position_after)
         while monochromator.is_busy():
             time.sleep(1)
 
-        actual_mirror_position_after = monochromator.get_mirror_position(Monochromator.Mirror.FIRST)
+        actual_mirror_position_after = monochromator.get_mirror_position(Monochromator.Mirror.ENTRANCE)
 
         # assert
         assert actual_mirror_position_before == expected_mirror_position_before
