@@ -45,6 +45,7 @@ def test_monochromator_init(device_manager_instance):
         # act
         monochromator.home()
 
+        time.sleep(0.3)
         while monochromator.is_busy():
             time.sleep(1)
 
@@ -71,6 +72,7 @@ def test_monochromator_wavelength(device_manager_instance):
         # act
         monochromator.move_to_target_wavelength(100)
 
+        time.sleep(0.3)
         while monochromator.is_busy():
             time.sleep(1)
 
@@ -100,6 +102,7 @@ def test_monochromator_turret_grating_position(device_manager_instance):
         # act
         monochromator.set_turret_grating(expected_grating)
 
+        time.sleep(0.3)
         while monochromator.is_busy():
             time.sleep(1)
 
@@ -120,11 +123,13 @@ def test_monochromator_filter_wheel(device_manager_instance):  # noqa: ARG001
 
         # act
         monochromator.set_filter_wheel_position(filter_wheel, expected_filter_wheel_position_before)
+        time.sleep(0.3)
         while monochromator.is_busy():
             time.sleep(1)
         actual_filter_wheel_position_before = monochromator.get_filter_wheel_position(filter_wheel)
 
         monochromator.set_filter_wheel_position(filter_wheel, expected_filter_wheel_position_after)
+        time.sleep(0.3)
         while monochromator.is_busy():
             time.sleep(1)
         actual_filter_wheel_position_after = monochromator.get_filter_wheel_position(filter_wheel)
@@ -143,12 +148,14 @@ def test_monochromator_mirror(device_manager_instance):  # noqa: ARG001
 
         # act
         monochromator.set_mirror_position(Monochromator.Mirror.ENTRANCE, expected_mirror_position_before)
+        time.sleep(0.3)
         while monochromator.is_busy():
             time.sleep(1)
 
         actual_mirror_position_before = monochromator.get_mirror_position(Monochromator.Mirror.ENTRANCE)
 
         monochromator.set_mirror_position(Monochromator.Mirror.ENTRANCE, expected_mirror_position_after)
+        time.sleep(0.3)
         while monochromator.is_busy():
             time.sleep(1)
 
