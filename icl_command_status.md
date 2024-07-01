@@ -2,7 +2,7 @@
 
 ## ICL Version
 
-2.0.0.134.05b4bc48
+2.0.0.135.eba97d98
 
 ## Generic Commands
 
@@ -33,7 +33,7 @@
 | mono_getFilterWheelPosition |      ✅     |     ⛔ |      ⚠️ |                more info needed about all possible filter wheel setups |
 | mono_moveFilterWheel        |      ✅     |     ⛔ |      ⚠️ |                more info needed about all possible filter wheel setups |
 | mono_getMirrorPosition      |      ✅     |     ✅ |     ✅ |                                                                        |
-| mono_moveMirror             |      ✅     |     ✅ |     ✅ |                                                                        |
+| mono_moveMirror             |      ✅     |     ✅ |     ⛔ | mono gets stuck (isBusy=True) when executing other commands beforehand |
 | mono_getSlitPositionInMM    |      ✅     |     ✅ |     ✅ |                                                                        |
 | mono_moveSlitMM             |      ✅     |     ✅ |     ✅ |                                                                        |
 | mono_shutterOpen            |      ✅     |      ⚠️ |      ⚠️ |   cannot test and implemenation will depend on future of shutterSelect |

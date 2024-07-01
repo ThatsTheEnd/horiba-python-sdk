@@ -71,8 +71,8 @@ class Monochromator(AbstractDevice):
     class Mirror(Enum):
         """Mirrors installed in the monochromator"""
 
-        FIRST = 0
-        SECOND = 1
+        ENTRANCE = 0
+        EXIT = 1
 
     @final
     class MirrorPosition(Enum):
@@ -244,7 +244,7 @@ class Monochromator(AbstractDevice):
             Exception: When an error occurred on the device side
         """
         response: Response = await super()._execute_command(
-            'mono_getFilterWheelPosition', {'index': self._id, 'type': filter_wheel.value}
+            'mono_getFilterWheelPosition', {'index': self._id, 'locationId': filter_wheel.value}
         )
         return self.FilterWheelPosition(response.results['position'])
 
@@ -259,7 +259,7 @@ class Monochromator(AbstractDevice):
             Exception: When an error occurred on the device side
         """
         await super()._execute_command(
-            'mono_moveFilterWheel', {'index': self._id, 'type': filter_wheel.value, 'position': position.value}
+            'mono_moveFilterWheel', {'index': self._id, 'locationId': filter_wheel.value, 'position': position.value}
         )
 
     async def get_mirror_position(self, mirror: Mirror) -> MirrorPosition:
@@ -278,7 +278,7 @@ class Monochromator(AbstractDevice):
             Exception: When an error occurred on the device side
         """
         response: Response = await super()._execute_command(
-            'mono_getMirrorPosition', {'index': self._id, 'type': mirror.value}
+            'mono_getMirrorPosition', {'index': self._id, 'locationId': mirror.value}
         )
         return self.MirrorPosition(response.results['position'])
 
@@ -296,7 +296,7 @@ class Monochromator(AbstractDevice):
             Exception: When an error occurred on the device side
         """
         await super()._execute_command(
-            'mono_moveMirror', {'index': self._id, 'id': mirror.value, 'position': position.value}
+            'mono_moveMirror', {'index': self._id, 'locationId': mirror.value, 'position': position.value}
         )
 
     async def get_slit_position_in_mm(self, slit: Slit) -> float:
@@ -313,7 +313,7 @@ class Monochromator(AbstractDevice):
         """
 
         response: Response = await super()._execute_command(
-            'mono_getSlitPositionInMM', {'index': self._id, 'id': slit.value}
+            'mono_getSlitPositionInMM', {'index': self._id, 'locationId': slit.value}
         )
         return float(response.results['position'])
 
@@ -328,7 +328,7 @@ class Monochromator(AbstractDevice):
             Exception: When an error occurred on the device side
         """
         await super()._execute_command(
-            'mono_moveSlitMM', {'index': self._id, 'id': slit.value, 'position': position_in_mm}
+            'mono_moveSlitMM', {'index': self._id, 'locationId': slit.value, 'position': position_in_mm}
         )
 
     async def get_slit_step_position(self, slit: Slit) -> int:
@@ -344,7 +344,7 @@ class Monochromator(AbstractDevice):
         """
 
         response: Response = await super()._execute_command(
-            'mono_getSlitStepPosition', {'index': self._id, 'id': slit.value}
+            'mono_getSlitStepPosition', {'index': self._id, 'locationId': slit.value}
         )
         return int(response.results['position'])
 
@@ -359,7 +359,7 @@ class Monochromator(AbstractDevice):
             Exception: When an error occurred on the device side
         """
         await super()._execute_command(
-            'mono_moveSlit', {'index': self._id, 'id': slit.value, 'position': step_position}
+            'mono_moveSlit', {'index': self._id, 'locationId': slit.value, 'position': step_position}
         )
 
     async def open_shutter(self) -> None:
