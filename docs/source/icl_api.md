@@ -18,7 +18,7 @@ This document describes the remote command and data API provided by the ICL.
     - [icl\_info](#icl_info)
     - [icl\_shutdown](#icl_shutdown)
     - [icl\_binMode](#icl_binmode)
-  - [Monochromater Module Commands](#monochromater-module-commands)
+  - [Monochromator Module Commands](#monochromator-module-commands)
     - [mono\_discover](#mono_discover)
     - [mono\_list](#mono_list)
     - [mono\_listCount](#mono_listcount)
@@ -27,8 +27,8 @@ This document describes the remote command and data API provided by the ICL.
     - [mono\_isOpen](#mono_isopen)
     - [mono\_isBusy](#mono_isbusy)
     - [mono\_init](#mono_init)
+    - [mono\_isInitialized](#mono_isinitialized)
     - [mono\_getConfig](#mono_getconfig)
-    - [mono\_setConfig](#mono_setconfig)
     - [mono\_getPosition](#mono_getposition)
     - [mono\_setPosition](#mono_setposition)
     - [mono\_moveToPosition](#mono_movetoposition)
@@ -40,16 +40,9 @@ This document describes the remote command and data API provided by the ICL.
     - [mono\_moveMirror](#mono_movemirror)
     - [mono\_getSlitPositionInMM](#mono_getslitpositioninmm)
     - [mono\_moveSlitMM](#mono_moveslitmm)
-    - [mono\_shutterSelect](#mono_shutterselect)
     - [mono\_shutterOpen](#mono_shutteropen)
     - [mono\_shutterClose](#mono_shutterclose)
     - [mono\_getShutterStatus](#mono_getshutterstatus)
-    - [mono\_enableLaser](#mono_enablelaser)
-    - [mono\_getLaserStatus](#mono_getlaserstatus)
-    - [mono\_setLaserPower](#mono_setlaserpower)
-    - [mono\_getLaserPower](#mono_getlaserpower)
-    - [mono\_getLidStatus](#mono_getlidstatus)
-    - [mono\_getSwitchStatus](#mono_getswitchstatus)
   - [CCD Module Commands](#ccd-module-commands)
     - [ccd\_discover](#ccd_discover)
     - [ccd\_list](#ccd_list)
@@ -61,14 +54,11 @@ This document describes the remote command and data API provided by the ICL.
     - [ccd\_getConfig](#ccd_getconfig)
     - [ccd\_getChipSize](#ccd_getchipsize)
     - [ccd\_getChipTemperature](#ccd_getchiptemperature)
-    - [ccd\_getNumberOfAvgs](#ccd_getnumberofavgs)
-    - [ccd\_setNumberOfAvgs](#ccd_setnumberofavgs)
     - [ccd\_getGain](#ccd_getgain)
     - [ccd\_setGain](#ccd_setgain)
     - [ccd\_getSpeed](#ccd_getspeed)
     - [ccd\_setSpeed](#ccd_setspeed)
     - [ccd\_getFitParams](#ccd_getfitparams)
-    - [ccd\_setFitParams](#ccd_setfitparams)
     - [ccd\_getExposureTime](#ccd_getexposuretime)
     - [ccd\_setExposureTime](#ccd_setexposuretime)
     - [ccd\_getTimerResolution](#ccd_gettimerresolution)
@@ -77,8 +67,6 @@ This document describes the remote command and data API provided by the ICL.
     - [ccd\_setRoi](#ccd_setroi)
     - [ccd\_getXAxisConversionType](#ccd_getxaxisconversiontype)
     - [ccd\_setXAxisConversionType](#ccd_setxaxisconversiontype)
-    - [ccd\_getDataRetrievalMethod](#ccd_getdataretrievalmethod)
-    - [ccd\_setDataRetrievalMethod](#ccd_setdataretrievalmethod)
     - [ccd\_getAcqCount](#ccd_getacqcount)
     - [ccd\_setAcqCount](#ccd_setacqcount)
     - [ccd\_getCleanCount](#ccd_getcleancount)
@@ -91,8 +79,9 @@ This document describes the remote command and data API provided by the ICL.
     - [ccd\_getAcquisitionReady](#ccd_getacquisitionready)
     - [ccd\_setAcquisitionStart](#ccd_setacquisitionstart)
     - [ccd\_getAcquisitionBusy](#ccd_getacquisitionbusy)
-    - [ccd\_setAcquisitionAbort](#ccd_setacquisitionabort)
     - [ccd\_getAcquisitionData](#ccd_getacquisitiondata)
+    - [ccd\_setCenterWavelength](#ccd_setcenterwavelength)
+
   - [SpectrAcq3 - Single Channel Detector Interface](#spectracq3---single-channel-detector-interface)
     - [scd\_discover](#scd_discover)
     - [scd\_list](#scd_list)
@@ -112,7 +101,7 @@ The ICL is a Windows console application that can be executed:
 
 1. From the command line in a terminal.
 2. From the Windows Explorer by double clicking the icl.exe file.
-3. Automaticaly started by adding a shortcut to the Windows startup folder.
+3. Automatically started by adding a shortcut to the Windows startup folder.
 4. ...
 
 ## Connecting to ICL
@@ -146,7 +135,7 @@ The text based payload of a websocket message uses JSON formatting.
 }
 ```
 
-**id** optional field. An integer number that can be used to line-up/sync-up outgoing commands with incoming asyncrounous response.  _May remove._  
+**id** optional field. An integer number that can be used to line-up/sync-up outgoing commands with incoming asynchronous response.  _May remove._  
 **command** is a string indicating the command to execute.  
 **parameters**: optional - depends on command.  Can be used to pass in 1 or more parameters.  The key/value parameters (JSON object(s)) can be strings, number (int or float) booleans (true or false) and array - as described in the individual commands.  
 
@@ -313,7 +302,7 @@ Command to control if binary messages are to be sent to this client. Binary mess
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
 
-## Monochromater Module Commands
+## Monochromator Module Commands
 
 ### <a id="mono_discover"></a>mono_discover
 
@@ -356,7 +345,7 @@ Attempts to find supported monos connected and powered on the USB bus.
 
 ### <a id="mono_list"></a>mono_list
 
-Returns a formated list of discovered mono devices.
+Returns a formatted list of discovered mono devices.
 
 **Command parameters:**
 >| parameter  | description   |
@@ -445,7 +434,7 @@ Opens communications with the monochromator indicated by the index command param
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which mono to target. See _mono_list_ command|
+>| index | Integer. Used to identify which mono to target. See [mono_list](#mono_list) command|
 
 **Response results:**
 >| results | description |
@@ -486,7 +475,7 @@ Closes communications with the monochromator indicated by the index.
 **Command Parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which mono to target. See _mono_list_ command|
+>| index | Integer. Used to identify which mono to target. See [mono_list](#mono_list) command|
 
 **Response Results:**
 >| results | description |
@@ -521,17 +510,17 @@ Closes communications with the monochromator indicated by the index.
 
 ### <a id="mono_isopen"></a>mono_isOpen
 
-Returns _true_ if selected monochromater is open.  
+Returns _true_ if selected monochromator is open.  
 
 **Command Parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which mono to target. See _mono_list_ command|
+>| index | Integer. Used to identify which mono to target. See [mono_list](#mono_list) command|
 
 **Return Results:**
 >| results | description |
 >|---|---|
->|open|boolean. true = open|
+>| open | Boolean. True = open |
 
 **Example command:**
 
@@ -564,17 +553,17 @@ Returns _true_ if selected monochromater is open.
 
 ### <a id="mono_isbusy"></a>mono_isBusy
 
-Returns _true_ if selected monochromater is busy.  
+Returns _true_ if selected monochromator is busy.  
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which mono to target. See _mono_list_ command|
+>| index | Integer. Used to identify which mono to target. See [mono_list](#mono_list) command|
 
 **Response results:**
 >| results | description |
 >|---|---|
->|busy|boolean. true = busy|
+>| busy | Boolean. True = busy |
 
 **Example command:**
 
@@ -602,17 +591,19 @@ Returns _true_ if selected monochromater is busy.
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
 
+
 ### <a id="mono_init"></a>mono_init
 
-Starts the monochromator initialization process (homing...). This is a "long-running" asynchronous command. Use the _mono_isBusy_ command to know when initialization has completed.
+Starts the monochromator initialization process (homing...). This is a "long-running" asynchronous command. Use the [mono_isBusy](#mono_isbusy) command to know when initialization has completed.
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+>| index | Integer. Used to identify which mono to control. See [mono_list](#mono_list) command|
 >| force | Boolean. Force starts the initialization process.
 
 **Response results:**
@@ -650,6 +641,52 @@ Start the initialization process of the first mono.
 <p></p>
 
 
+### <a id="mono_isinitialized"></a>mono_isInitialized
+
+This command returns _true_ when the mono is initialized. Otherwise it returns _false_.
+
+_Note:_ This command may also return false when the mono is busy with another command.
+
+**Command parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which mono to control. See [mono_list](#mono_list) command |
+
+**Response results:**
+>| results | description |
+>|---|---|
+>|initialized | Boolean. True when the mono is initialized, otherwise false |
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "mono_isInitialized",
+    "parameters":{
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "mono_isInitialized",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "initialized": true
+    }
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
 ### <a id="mono_getconfig"></a>mono_getConfig
 
 This command returns the monochromator configuration.
@@ -657,12 +694,18 @@ This command returns the monochromator configuration.
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+>| index | Integer. Used to identify which mono to control. See [mono_list](#mono_list) command|
 
 **Response results:**
 >| results | description |
 >|---|---|
 >|configuration| String. Mono device configuration.|
+
+**Port Descriptions:**
+>| parameter | description |
+>|---|---|
+>| locationId | Integer. Used to identify the slit location. <br> 1 = Front entrance (axial) <br> 2 = Side entrance (lateral) <br> 3 = Front exit (axial) <br> 4 = Side exit (lateral) |
+>| slitType | Integer. Used to identify the slit size. <br> 1 = 2mm slit <br> 2 = 7mm slit |
 
 **Example command:**
 
@@ -687,10 +730,10 @@ This command returns the monochromator configuration.
         "configuration": {
             "filterWheels": [
                 {
-                    "location": 1
+                    "locationId": 1
                 },
                 {
-                    "location": 2
+                    "locationId": 2
                 }
             ],
             "gratings": [
@@ -702,7 +745,41 @@ This command returns the monochromator configuration.
                 {
                     "blaze": 0,
                     "grooveDensity": 300,
-                    "positionIndex": 1...
+                    "positionIndex": 1
+                },
+                {
+                    "blaze": 0,
+                    "grooveDensity": 150,
+                    "positionIndex": 2
+                }
+            ],
+            "mirrors": [
+                {
+                    "locationId": 1
+                },
+                {
+                    "locationId": 2
+                }
+            ],
+            "model": "iHR320",
+            "ports": [
+                {
+                    "locationId": 1,
+                    "slitType": 1
+                },
+                {
+                    "locationId": 2,
+                    "slitType": 1
+                },
+                {
+                    "locationId": 4,
+                    "slitType": 1
+                }
+            ],
+            "productId": "257",
+            "serialNumber": ""
+        }
+    }
 }
 ```
 
@@ -711,14 +788,14 @@ This command returns the monochromator configuration.
 <p></p>
 
 
-### mono_getPosition
+### <a id="mono_getposition"></a>mono_getPosition
 
 Returns the wavelength value, in nm, of the monochromator's current position.  
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+>| index | Integer. Used to identify which mono to control. See [mono_list](#mono_list) command|
 
 **Response results:**
 >| results | description |
@@ -751,17 +828,19 @@ Returns the wavelength value, in nm, of the monochromator's current position.
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
 
+
 ### <a id="mono_setposition"></a>mono_setPosition
 
-This command sets the wavelength value of the current grating position of the monochromator. This could potentially uncalibrate the monochromator and report an incorrect wavelength compared to the actual output wavelength.  
+This command sets the wavelength value of the current grating position of the monochromator. This could potentially un-calibrate the monochromator and report an incorrect wavelength compared to the actual output wavelength.  
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+>| index | Integer. Used to identify which mono to control. See [mono_list](#mono_list) command|
 >|wavelength| Float. Set the wavelength of the mono at the current position.|
 
 **Response results:**
@@ -799,12 +878,12 @@ Sets the position wavelength value to 320nm.
 
 ### <a id="mono_movetoposition"></a>mono_moveToPosition
 
-This command starts the monochromater moving to the requested wavelength in nm. This is an asynchronous command. Use the _mono_isBusy_ command to know when the move has completed.  
+This command starts the monochromator moving to the requested wavelength in nm. This is an asynchronous command. Use the [mono_isBusy](#mono_isbusy) command to know when the move has completed.  
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+>| index | Integer. Used to identify which mono to control. See [mono_list](#mono_list) command|
 >|wavelength| Float. Move to wavelength.|
 
 **Response results:**
@@ -846,12 +925,12 @@ Sets the position wavelength value to 320nm.
 
 Returns the current grating turret position.
 
-Note: Prior to the initialization of the grating turret, this value may not reflect the actual position of the turret. To read the current position of the grating turret, please run [mono_init](#mono_init) prior to running this command.
+_Note:_ Prior to the initialization of the grating turret, this value may not reflect the actual position of the turret. To read the current position of the grating turret, please run [mono_init](#mono_init) prior to running this command.
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+>| index | Integer. Used to identify which mono to control. See [mono_list](#mono_list) command|
 
 **Response results:**
 >| results | description |
@@ -893,12 +972,12 @@ Note: Prior to the initialization of the grating turret, this value may not refl
 
 Moves the grating turret to the specified position.
 
-Note: The turret sensor does not re-read the position each time it is moved, therefore the position may not be accurate prior to initialization. See note for [mono_getGratingPosition](#mono_getgratingposition).
+_Note:_ The turret sensor does not re-read the position each time it is moved, therefore the position may not be accurate prior to initialization. See note for [mono_getGratingPosition](#mono_getgratingposition).
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+>| index | Integer. Used to identify which mono to control. See [mono_list](#mono_list) command|
 >|position| Integer. Position to move the grating turret.|
 
 **Response results:**
@@ -931,22 +1010,25 @@ Move grating turret to position 1.
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
 
+
 ### <a id="mono_getfilterwheelposition"></a>mono_getFilterWheelPosition
 
-Returns the current filterwheel position.  
+Returns the current filter wheel position.  
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| type | Integer. Identifies which filterwheel. TODO possible values.|
+>| index | Integer. Used to identify which mono to control. See [mono_list](#mono_list) command|
+>| locationId | Integer. Specifies the filter wheel location. <br> 0 = Filter wheel 1 (Internal) <br> 1 = Filter wheel 2 (External) |
 
 **Response results:**
 >| results | description |
 >|---|---|
->|position|Integer. TODO - possible positions|
+>|position|Integer. Current filter wheel position|
 
 **Example command:**
 
@@ -955,7 +1037,8 @@ Returns the current filterwheel position.
     "id": 1234,
     "command": "mono_getFilterWheelPosition",
     "parameters":{
-        "type": 1
+        "index": 0,
+        "locationId": 0
     }
 }
 ```
@@ -963,29 +1046,31 @@ Returns the current filterwheel position.
 **Example response:**
 
 ```json
-{  
-    "id": 1234,
+{
     "command": "mono_getFilterWheelPosition",
-    "results":{
-        "position": 1
-    }  
-    "errors": [
-    ]  
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "position": 2
+    }
 }
 ```
+
 
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
 
+
 ### <a id="mono_movefilterwheel"></a>mono_moveFilterWheel
 
-Move the filterwheel to a position.  
+Move the filter wheel to a position.  
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->|type| Integer. Identifies which filterwheel.|
->|position| Integer. Position to move to.|
+>| index | Integer. Used to identify which mono to control. See [mono_list](#mono_list) command |
+>| locationId | Integer. Specifies which filter wheel to move. <br> 0 = Filter wheel 1 (Internal) <br> 1 = Filter wheel 2 (External) |
+>|position| Integer. Position to move the filter wheel. |
 
 **Response results:**
 >| results | description |
@@ -993,15 +1078,16 @@ Move the filterwheel to a position.
 >|_none_||
 
 **Example command:**
-Move filterwheel to position 1.
+Move the internal filter wheel to position 2.
 
 ```json
 {
     "id": 1234,
     "command": "mono_moveFilterWheel",
-    "parameters":{
-        "type": 0,
-        "position": 1
+    "parameters": {
+        "index": 0,
+        "locationId": 0,
+        "position": 2
     }
 }
 ```
@@ -1009,30 +1095,33 @@ Move filterwheel to position 1.
 **Example response:**
 
 ```json
-{  
-    "id": 1234,
+{
     "command": "mono_moveFilterWheel",
-    "errors": [
-    ]  
+    "errors": [],
+    "id": 1234,
+    "results": {}
 }
 ```
+
 
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
 
+
 ### <a id="mono_getmirrorposition"></a>mono_getMirrorPosition
 
-Returns the position of the mirror.  
+Returns the position of the specified mirror.  
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| type | Integer. Identifies which mirror. TODO possible values.|
+>| index | Integer. Used to identify which mono to control. See [mono_list](#mono_list) command |
+>| locationId | Integer. Identifies which mirror to get the position from. <br> 0 = Mirror 1 (Entrance) <br> 1 = Mirror 2 (Exit) |
 
 **Response results:**
 >| results | description |
 >|---|---|
->|position|Integer. TODO - possible positions|
+>|position|Integer. Position of the specified mirror. <br> 0 = Axial <br> 1 = Lateral |
 
 **Example command:**
 
@@ -1040,8 +1129,9 @@ Returns the position of the mirror.
 {
     "id": 1234,
     "command": "mono_getMirrorPosition",
-    "parameters":{
-        "type": 1
+    "parameters": {
+        "index": 0,
+        "locationId": 1
     }
 }
 ```
@@ -1049,14 +1139,13 @@ Returns the position of the mirror.
 **Example response:**
 
 ```json
-{  
-    "id": 1234,
+{
     "command": "mono_getMirrorPosition",
-    "results":{
-        "position": 1
-    }  
-    "errors": [
-    ]  
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "position": 0
+    }
 }
 ```
 
@@ -1067,14 +1156,14 @@ Returns the position of the mirror.
 
 ### <a id="mono_movemirror"></a>mono_moveMirror
 
-Moves the mirror to a position.
+Moves the specified mirror to a position.
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which mono to control. See _mono_list_ command|
->|id| Integer. Identifies which mirror to move (zero-based). <br> 0 - Mirror 1 <br> 1 - Mirror 2|
->|position| Integer. Position to move to. <br> 0 - Axial <br> 1 - Lateral|
+>| index | Integer. Used to identify which mono to control. See [mono_list](#mono_list) command|
+>| locationId | Integer. Identifies which mirror to move (zero-based). <br> 0 = Mirror 1 (Entrance) <br> 1 = Mirror 2 (Exit) |
+>| position | Integer. Position to move to. <br> 0 = Axial <br> 1 = Lateral |
 
 **Response results:**
 >| results | description |
@@ -1090,7 +1179,7 @@ Move mirror 2 to position 1.
     "command": "mono_moveMirror",
     "parameters":{
         "index": 0,
-        "id": 1,
+        "locationId": 1,
         "position": 1
     }
 }
@@ -1114,20 +1203,40 @@ Move mirror 2 to position 1.
 
 ### <a id="mono_getslitpositioninmm"></a>mono_getSlitPositionInMM
 
-Returns the position of the specified slit in millimeters.
+Returns the position of the specified slit in millimeters. The location id of each configured slit can be found under the ports section of the mono configuration. See [mono_getConfig](#mono_getconfig) for additional information.
+
+**For example:**
+```json
+"ports": [
+    {
+        "locationId": 1,
+        "slitType": 1
+    },
+    {
+        "locationId": 2,
+        "slitType": 1
+    },
+    {
+        "locationId": 4,
+        "slitType": 1
+    }
+]
+```
+
+_Note:_ The "locationId" parameter found in the mono configuration is 1-based. However, the mono_getSlitPositionInMM command uses a 0-based "locationId".
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which mono to control. See _mono_list_ command|
->| id | Integer. Slit index (zero-based) |
+>| index | Integer. Used to identify which mono to control. See [mono_list](#mono_list) command|
+>| locationId | Integer. Slit location (zero-based) |
 
 **Response results:**
 >| results | description |
 >|---|---|
 >| position | Float. Slit position in millimeters|
 
-**Example command:**
+**Example command:** Get position of slit in port 4
 
 ```json
 {
@@ -1135,7 +1244,7 @@ Returns the position of the specified slit in millimeters.
     "command": "mono_getSlitPositionInMM",
     "parameters":{
         "index": 0,
-        "id": 3
+        "locationId": 3
     }
 }
 ```
@@ -1160,13 +1269,33 @@ Returns the position of the specified slit in millimeters.
 
 ### <a id="mono_moveslitmm"></a>mono_moveSlitMM
 
-Moves the specified slit to the position in millimeters.
+Moves the specified slit to the position in millimeters. The location id of each configured slit can be found under the ports section of the mono configuration. See [mono_getConfig](#mono_getconfig) for additional information.
+
+**For example:**
+```json
+"ports": [
+    {
+        "locationId": 1,
+        "slitType": 1
+    },
+    {
+        "locationId": 2,
+        "slitType": 1
+    },
+    {
+        "locationId": 4,
+        "slitType": 1
+    }
+]
+```
+
+_Note:_ The "locationId" parameter found in the mono configuration is 1-based. However, the mono_moveSlitMM command uses a 0-based "locationId".
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which mono to control. See _mono_list_ command|
->| id | Integer. Slit index (zero-based) |
+>| index | Integer. Used to identify which mono to control. See [mono_list](#mono_list) command|
+>| locationId | Integer. Slit location (zero-based) |
 >| position | Float. Position in millimeters |
 
 **Response results:**
@@ -1174,7 +1303,7 @@ Moves the specified slit to the position in millimeters.
 >|---|---|
 >|_none_||
 
-**Example command:**
+**Example command:** Move slit in port 2 to 1.5mm position
 
 ```json
 {
@@ -1182,7 +1311,7 @@ Moves the specified slit to the position in millimeters.
     "command": "mono_moveSlitMM",
     "parameters":{
         "index": 0,
-        "id": 1,
+        "locationId": 1,
         "position": 1.5
     }
 }
@@ -1204,62 +1333,16 @@ Moves the specified slit to the position in millimeters.
 <p></p>
 
 
-### <a id="mono_shutterselect"></a>mono_shutterSelect
-
-Used to select the active internal shutter (zero-based).
-
-Note: To set the active shutter the device must be configured for internal shutter mode. The shutter solenoids will not be activated in External (Bypass) Mode.
-
-**Command parameters:**
->| parameter  | description   |
->|---|---|
->| index | Integer. Used to identify which mono to control. See _mono_list_ command|
->| shutter | Integer. Shutter selection <br> 0 - Shutter 1 <br> 1 - Shutter 2|
-
-**Response results:**
->| results | description |
->|---|---|
->|_none_||
-
-**Example command:**
-
-```json
-{
-    "id": 1234,
-    "command": "mono_shutterSelect",
-    "parameters":{
-        "index": 0,
-        "shutter": 1
-    }
-}
-```
-
-**Example response:**
-
-```json
-{  
-    "id": 1234,
-    "command": "mono_shutterSelect",
-    "errors": [
-    ]  
-}
-```
-
-
-<div style="page-break-before:always">&nbsp;</div>
-<p></p>
-
-
 ### <a id="mono_shutteropen"></a>mono_shutterOpen
 
 Activates the currently selected shutter solenoid.
 
-Note: The device must be configured for interal shutter mode. The shutter solenoid will not respond in External (Bypass) mode.
+_Note:_ The device must be configured for internal shutter mode. The shutter solenoid will not respond in External (Bypass) mode.
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+>| index | Integer. Used to identify which mono to control. See [mono_list](#mono_list) command|
 
 **Response results:**
 >| results | description |
@@ -1298,12 +1381,12 @@ Note: The device must be configured for interal shutter mode. The shutter soleno
 
 Deactivates the currently selected shutter solenoid.
 
-Note: The device must be configured for interal shutter mode. The shutter solenoid will not respond in External (Bypass) mode.
+_Note:_ The device must be configured for internal shutter mode. The shutter solenoid will not respond in External (Bypass) mode.
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+>| index | Integer. Used to identify which mono to control. See [mono_list](#mono_list) command|
 
 **Response results:**
 >| results | description |
@@ -1342,17 +1425,18 @@ Note: The device must be configured for interal shutter mode. The shutter soleno
 
 Returns the status of the currently selected shutter.
 
-Note: To view the status of the shutter solenoid the device must be configured for internal shutter mode.
+_Note:_ To view the status of the shutter solenoid the device must be configured for internal shutter mode.
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which mono to control. See _mono_list_ command|
+>| index | Integer. Used to identify which mono to control. See [mono_list](#mono_list) command|
 
 **Response results:**
 >| results | description |
 >|---|---|
->| shutter 1 <br> shutter 2 | Integer. Shutter position. <br> 0 - Closed <br> 1 - Open
+>| shutterIndex | Integer. Index of the currently selected shutter.
+>| shutterStatus | Integer. Shutter position status. <br> 0 = Closed <br> 1 = Open
 
 **Example command:**
 
@@ -1374,28 +1458,11 @@ Note: To view the status of the shutter solenoid the device must be configured f
     "command": "mono_getShutterStatus",
     "errors": [],
     "results": {
-        "shutter 1": 0
-        "shutter 2": 1
+        "shutterIndex": 1,
+        "shutterPosition": 0
     }  
 }
 ```
-
-
-<div style="page-break-before:always">&nbsp;</div>
-<p></p>
-
-
-### mono_enableLaser
-
-### mono_getLaserStatus
-
-### mono_setLaserPower
-
-### mono_getLaserPower
-
-### mono_getLidStatus
-
-### mono_getSwitchStatus
 
 
 <div style="page-break-before:always">&nbsp;</div>
@@ -1550,7 +1617,7 @@ This command initializes the CCD and gets it’s the CCD configuration from the 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
 
 **Response results:**
 >| results | description |
@@ -1592,7 +1659,7 @@ Closes communications with the CCD indicated by the index.
 **Command Parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
 
 **Response Results:**
 >| results | description |
@@ -1633,7 +1700,7 @@ Returns _true_ if selected CCD is open.
 **Command Parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
 
 **Return Results:**
 >| results | description |
@@ -1672,6 +1739,41 @@ Returns _true_ if selected CCD is open.
 
 ### <a id="ccd_restart"></a>ccd_restart
 
+Performs a restart on the CCD.  
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>|_none_| |
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_restart",
+    "parameters": {
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_restart",
+    "errors": [],
+    "id": 1234,
+    "results": {}
+}
+```
+
 
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
@@ -1684,7 +1786,7 @@ Returns the CCD device configuration.
 **Command Parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
 
 **Return Results:**
 >| results | description |
@@ -1712,181 +1814,181 @@ Returns the CCD device configuration.
     "id": 1234,
     "results": {
         "configuration": {
-            "CenterWavelength": 0,
-            "ChipHSpacing": "140",
-            "ChipHeight": "70",
-            "ChipName": "S10420",
-            "ChipSerialNumber": "FAH23 098",
-            "ChipVSpacing": "140",
-            "ChipWidth": "2048",
-            "DeviceType": "HORIBA Scientific Syncerity",
-            "FitParameters": [
+            "centerWavelength": 0,
+            "chipHSpacing": "140",
+            "chipHeight": "70",
+            "chipName": "S10420",
+            "chipSerialNumber": "FAH23 098",
+            "chipVSpacing": "140",
+            "chipWidth": "2048",
+            "deviceType": "HORIBA Scientific Syncerity",
+            "fitParameters": [
                 0,
                 1,
                 0,
                 0,
                 0
             ],
-            "Gains": [
+            "gains": [
                 {
-                    "Info": "Best Dynamic Range",
-                    "Token": 1
+                    "info": "Best Dynamic Range",
+                    "token": 1
                 },
                 {
-                    "Info": "High Sensitivity",
-                    "Token": 2
+                    "info": "High Sensitivity",
+                    "token": 2
                 },
                 {
-                    "Info": "High Light",
-                    "Token": 0
+                    "info": "High Light",
+                    "token": 0
                 }
             ],
-            "HardwareAvgAvailable": "False",
-            "LineScan": "False",
-            "ProductId": "13",
-            "SerialNumber": "Camera SN:  5128",
-            "Signals": [
+            "hardwareAvgAvailable": false,
+            "lineScan": false,
+            "productId": "13",
+            "serialNumber": "Camera SN:  5128",
+            "signals": [
                 {
-                    "Events": [
+                    "events": [
                         {
-                            "Name": "Ready For Trigger",
-                            "Token": 1,
-                            "Types": [
+                            "name": "Ready For Trigger",
+                            "token": 1,
+                            "types": [
                                 {
-                                    "Name": "TTL Active Low",
-                                    "Token": 1
+                                    "name": "TTL Active Low",
+                                    "token": 1
                                 },
                                 {
-                                    "Name": "TTL Active High",
-                                    "Token": 0
+                                    "name": "TTL Active High",
+                                    "token": 0
                                 }
                             ]
                         },
                         {
-                            "Name": "Not Readout",
-                            "Token": 2,
-                            "Types": [
+                            "name": "Not Readout",
+                            "token": 2,
+                            "types": [
                                 {
-                                    "Name": "TTL Active Low",
-                                    "Token": 1
+                                    "name": "TTL Active Low",
+                                    "token": 1
                                 },
                                 {
-                                    "Name": "TTL Active High",
-                                    "Token": 0
+                                    "name": "TTL Active High",
+                                    "token": 0
                                 }
                             ]
                         },
                         {
-                            "Name": "Shutter Open",
-                            "Token": 3,
-                            "Types": [
+                            "name": "Shutter Open",
+                            "token": 3,
+                            "types": [
                                 {
-                                    "Name": "TTL Active Low",
-                                    "Token": 1
+                                    "name": "TTL Active Low",
+                                    "token": 1
                                 },
                                 {
-                                    "Name": "TTL Active High",
-                                    "Token": 0
+                                    "name": "TTL Active High",
+                                    "token": 0
                                 }
                             ]
                         },
                         {
-                            "Name": "Start Experiment",
-                            "Token": 0,
-                            "Types": [
+                            "name": "Start Experiment",
+                            "token": 0,
+                            "types": [
                                 {
-                                    "Name": "TTL Active Low",
-                                    "Token": 1
+                                    "name": "TTL Active Low",
+                                    "token": 1
                                 },
                                 {
-                                    "Name": "TTL Active High",
-                                    "Token": 0
+                                    "name": "TTL Active High",
+                                    "token": 0
                                 }
                             ]
                         }
                     ],
-                    "Name": "Signal Output",
-                    "Token": 0
+                    "name": "Signal Output",
+                    "token": 0
                 }
             ],
-            "Speeds": [
+            "speeds": [
                 {
-                    "Info": "500 kHz ",
-                    "Token": 1
+                    "info": "500 kHz ",
+                    "token": 1
                 },
                 {
-                    "Info": "500 kHz Ultra",
-                    "Token": 2
+                    "info": "500 kHz Ultra",
+                    "token": 2
                 },
                 {
-                    "Info": "500 kHz Wrap",
-                    "Token": 127
+                    "info": "500 kHz Wrap",
+                    "token": 127
                 },
                 {
-                    "Info": " 45 kHz ",
-                    "Token": 0
+                    "info": " 45 kHz ",
+                    "token": 0
                 }
             ],
-            "SupportedFeatures": {
-                "CF_3PositionSlit": "False",
-                "CF_CMOSOffsetCorrection": "False",
-                "CF_Cleaning": "True",
-                "CF_DSP": "False",
-                "CF_DSPBin2X": "False",
-                "CF_DelayAfterTrigger": "False",
-                "CF_Delays": "False",
-                "CF_EMCCD": "False",
-                "CF_EShutter": "False",
-                "CF_HDR": "False",
-                "CF_Image": "True",
-                "CF_MemorySlots": "True",
-                "CF_Metadata": "False",
-                "CF_MultipleExposeTimes": "False",
-                "CF_MultipleSensors": "False",
-                "CF_PulseSummation": "False",
-                "CF_ROIs": "True",
-                "CF_Signals": "True",
-                "CF_Spectra": "True",
-                "CF_TriggerQualifier": "False",
-                "CF_Triggers": "True"
+            "supportedFeatures": {
+                "cf_3PositionSlit": false,
+                "cf_CMOSOffsetCorrection": false,
+                "cf_Cleaning": true,
+                "cf_DSP": false,
+                "cf_DSPBin2X": false,
+                "cf_DelayAfterTrigger": false,
+                "cf_Delays": false,
+                "cf_EMCCD": false,
+                "cf_EShutter": false,
+                "cf_HDR": false,
+                "cf_Image": true,
+                "cf_MemorySlots": true,
+                "cf_Metadata": false,
+                "cf_MultipleExposeTimes": false,
+                "cf_MultipleSensors": false,
+                "cf_PulseSummation": false,
+                "cf_ROIs": true,
+                "cf_Signals": true,
+                "cf_Spectra": true,
+                "cf_TriggerQualifier": false,
+                "cf_Triggers": true"
             },
-            "Triggers": [
+            "triggers": [
                 {
-                    "Events": [
+                    "events": [
                         {
-                            "Name": "Each - For Each Acq",
-                            "Token": 1,
-                            "Types": [
+                            "name": "Each - For Each Acq",
+                            "token": 1,
+                            "types": [
                                 {
-                                    "Name": "TTL Rising  Edge",
-                                    "Token": 1
+                                    "name": "TTL Rising  Edge",
+                                    "token": 1
                                 },
                                 {
-                                    "Name": "TTL Falling Edge",
-                                    "Token": 0
+                                    "name": "TTL Falling Edge",
+                                    "token": 0
                                 }
                             ]
                         },
                         {
-                            "Name": "Once - Start All",
-                            "Token": 0,
-                            "Types": [
+                            "name": "Once - Start All",
+                            "token": 0,
+                            "types": [
                                 {
-                                    "Name": "TTL Rising  Edge",
-                                    "Token": 1
+                                    "name": "TTL Rising  Edge",
+                                    "token": 1
                                 },
                                 {
-                                    "Name": "TTL Falling Edge",
-                                    "Token": 0
+                                    "name": "TTL Falling Edge",
+                                    "token": 0
                                 }
                             ]
                         }
                     ],
-                    "Name": "Trigger Input",
-                    "Token": 0
+                    "name": "Trigger Input",
+                    "token": 0
                 }
             ],
-            "Version": "Syncerity Ver 1.002.9"
+            "version": "Syncerity Ver 1.002.9"
         }
     }
 }
@@ -1902,7 +2004,7 @@ Returns the chip sensor’s pixel width and height size.
 **Command Parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
 
 **Return Results:**
 >| results | description |
@@ -1936,39 +2038,372 @@ Returns the chip sensor’s pixel width and height size.
 }
 ```
 
-<div style="page-break-before:always">&nbsp;</div>
-<p></p>
-
-### ccd_getChipTemperature
-
-### ccd_getNumberOfAvgs
-
-### ccd_setNumberOfAvgs
-
-### ccd_getGain
-
-### ccd_setGain
-
-### ccd_getSpeed
-
-### ccd_setSpeed
-
-### ccd_getFitParams
-
-### ccd_setFitParams
-
-### ccd_getExposureTime
-
 
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
 
 
-### <a id="ccd_setexposuretime"></a>ccd_setExposureTime
+### <a id="ccd_getchiptemperature"></a>ccd_getChipTemperature
 
-Sets the exposure time (expressed in Timer Resolution units).
+Returns the temperature of the chip sensor in degrees C.
 
-_\*Note: To check the current Timer Resolution value see [ccd_getTimerResolution](#ccd_gettimerresolution). Alternatively the Timer Resolution value can be set using [ccd_setTimerResolution](#ccd_settimerresolution)._
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| temperature | Float. Chip sensor temperature in degrees C. |
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_getChipTemperature",
+    "parameters": {
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_getChipTemperature",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "temperature": -50.15999984741211
+    }
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="ccd_getgain"></a>ccd_getGain
+
+Gets the current gain token and the associated description information for the gain token. Gain tokens and their descriptions are part of the CCD configuration information. See [ccd_getConfig](#ccd_getconfig) command. <br> **For example:** <br>
+```json
+"gains": [
+            {
+                "info": "Best Dynamic Range",
+                "token": 1
+            },
+            {
+                "info": "High Sensitivity",
+                "token": 2
+            },
+            {
+                "info": "High Light",
+                "token": 0
+            }
+]
+```
+
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| info | String. Description of the current gain token. |
+>| token | Integer. Current gain token. |
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_getGain",
+    "parameters": {
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_getGain",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "info": "Best Dynamic Range",
+        "token": 1
+    }
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="ccd_setgain"></a>ccd_setGain
+
+Sets the CCD gain token. A list of supported gain tokens can be found in the CCD configuration. See [ccd_getConfig](#ccd_getconfig) command. <br> **For example:** <br>
+```json
+"gains": [
+            {
+                "info": "Best Dynamic Range",
+                "token": 1
+            },
+            {
+                "info": "High Sensitivity",
+                "token": 2
+            },
+            {
+                "info": "High Light",
+                "token": 0
+            }
+]
+```
+
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+>| token | Integer. Gain token from CCD config. |
+
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| _none_ | |
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_setGain",
+    "parameters": {
+        "index": 0,
+        "token": 1
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_setGain",
+    "errors": [],
+    "id": 1234,
+    "results": {}
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="ccd_getspeed"></a>ccd_getSpeed
+
+Gets the current speed token and the associated description information for the speed token. Speed tokens and their descriptions are part of the CCD configuration information. See [ccd_getConfig](#ccd_getconfig) command. <br> **For example:** <br>
+```json
+"speeds": [
+            {
+                "info": "500 kHz ",
+                "token": 1
+            },
+            {
+                "info": "500 kHz Ultra",
+                "token": 2
+            },
+            {
+                "info": "500 kHz Wrap",
+                "token": 127
+            },
+            {
+                "info": " 45 kHz ",
+                "token": 0
+            }
+]
+```
+
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| info | String. Description of the current speed token. |
+>| token | Integer. Current speed token. |
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_getSpeed",
+    "parameters": {
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_getSpeed",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "info": "500 kHz ",
+        "token": 1
+    }
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="ccd_setspeed"></a>ccd_setSpeed
+
+Sets the CCD speed token. A list of supported speed tokens can be found in the CCD configuration. See [ccd_getConfig](#ccd_getconfig) command. <br> **For example:** <br>
+```json
+"speeds": [
+            {
+                "info": "500 kHz ",
+                "token": 1
+            },
+            {
+                "info": "500 kHz Ultra",
+                "token": 2
+            },
+            {
+                "info": "500 kHz Wrap",
+                "token": 127
+            },
+            {
+                "info": " 45 kHz ",
+                "token": 0
+            }
+]
+```
+
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+>| token | Integer. Speed token from CCD config. |
+
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| _none_ | |
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_setSpeed",
+    "parameters": {
+        "index": 0,
+        "token": 1
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_setSpeed",
+    "errors": [],
+    "id": 1234,
+    "results": {}
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="ccd_getfitparams"></a>ccd_getFitParams
+
+Gets the FIT parameters contained in the CCD configuration.
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| fitParameters | Array. CCD FIT parameters. |
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_getFitParams",
+    "parameters":{
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_getFitParams",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "fitParameters": [
+            0,
+            1,
+            0,
+            0,
+            0
+        ]
+    }
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="ccd_getexposuretime"></a>ccd_getExposureTime
+
+Gets the exposure time (expressed in Timer Resolution units).
+
+_Note:_ To check the current Timer Resolution value see [ccd_getTimerResolution](#ccd_gettimerresolution). Alternatively the Timer Resolution value can be set using [ccd_setTimerResolution](#ccd_settimerresolution).
 
 **Example:** <br>
 If _Exposure Time_ is set to 50, and the _Timer Resolution_ value is 1000, the CCD exposure time (integration time) = 50 milliseconds. <br>
@@ -1979,7 +2414,60 @@ If _Exposure Time_ is set to 50, and the _Timer Resolution_ value is 1, the CCD 
 **Command Parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| time | Integer. Exposure time (expressed in Timer Resolution units).
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_getExposureTime",
+    "parameters": {
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_getExposureTime",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "time": 10
+    }
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="ccd_setexposuretime"></a>ccd_setExposureTime
+
+Sets the exposure time (expressed in Timer Resolution units).
+
+_Note:_ To check the current Timer Resolution value see [ccd_getTimerResolution](#ccd_gettimerresolution). Alternatively the Timer Resolution value can be set using [ccd_setTimerResolution](#ccd_settimerresolution).
+
+**Example:** <br>
+If _Exposure Time_ is set to 50, and the _Timer Resolution_ value is 1000, the CCD exposure time (integration time) = 50 milliseconds. <br>
+
+If _Exposure Time_ is set to 50, and the _Timer Resolution_ value is 1, the CCD exposure time (integration time) = 50 microseconds.
+
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
 >| time | Integer. Exposure time (expressed in Timer Resolution units).
 
 **Return Results:**
@@ -2018,18 +2506,18 @@ If _Exposure Time_ is set to 50, and the _Timer Resolution_ value is 1, the CCD 
 
 ### <a id="ccd_gettimerresolution"></a>ccd_getTimerResolution
 
-Gets the current timer resolution in microseconds.
+Gets the current timer resolution token.
 
 
 **Command Parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
 
 **Return Results:**
 >| results | description |
 >|---|---|
->| resolution | Integer. Timer resolution in microseconds.
+>| resolutionToken | Integer. Timer resolution token. <br> 0 - Timer resolution is set to 1000 microseconds <br> 1 - Timer resolution is set to 1 microsecond
 
 **Example command:**
 
@@ -2051,7 +2539,7 @@ Gets the current timer resolution in microseconds.
     "errors": [],
     "id": 1234,
     "results": {
-        "resolution": 1000
+        "resolutionToken": 1
     }
 }
 ```
@@ -2063,15 +2551,15 @@ Gets the current timer resolution in microseconds.
 
 ### <a id="ccd_settimerresolution"></a>ccd_setTimerResolution
 
-Sets the current timer resolution value.
-
-_\*Note: The timer resolution value of 1 microsecond is not supported by every CCD._
+Sets the current timer resolution token.
 
 **Command Parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
->| resolution | Integer. Timer resolution value. <br> 0 - Sets the timer resolution to 1000 microseconds <br> 1 - Sets the timer resolution to 1 microsecond
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+>| resolutionToken | Integer. Timer resolution token. <br> 0 - Sets the timer resolution to 1000 microseconds <br> 1 - Sets the timer resolution to 1 microsecond\*
+
+_\*Note:_ The timer resolution value of 1 microsecond is not supported by every CCD.
 
 **Return Results:**
 >| results | description |
@@ -2086,7 +2574,7 @@ _\*Note: The timer resolution value of 1 microsecond is not supported by every C
     "command": "ccd_setTimerResolution",
     "parameters": {
         "index": 0,
-        "resolution": 0
+        "resolutionToken": 0
     }
 }
 ```
@@ -2111,14 +2599,14 @@ _\*Note: The timer resolution value of 1 microsecond is not supported by every C
 
 Sets the acquisition format and the number of ROIs (Regions of Interest) or areas. After using this command to set the number of ROIs and format, the [ccd_setRoi](#ccd_setroi) command should be used to define each ROI.
 
-_\* Note: The Crop (2) and Fast Kinetics (3) acquisition formats are not supported by every CCD._
-
 **Command Parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
 >| numberOfRois | Integer. Number of ROIs (Regions of Interest / areas)
 >| format | Integer. The acquisition format. <br> 0 = Spectra <br> 1 = Image <br> 2 = Crop\* <br> 3 = Fast Kinetics\*
+
+_\* Note:_ The Crop (2) and Fast Kinetics (3) acquisition formats are not supported by every CCD.
 
 **Return Results:**
 >| results | description |
@@ -2157,17 +2645,19 @@ _\* Note: The Crop (2) and Fast Kinetics (3) acquisition formats are not support
 
 Sets a single (_roiIndex_) ROI (Region of Interest) or area as defined by the X and Y origin, size, and bin parameters. The number of ROIs may be set using the [ccd_setAcqFormat](#ccd_setacqformat) command. For Spectral acquisition format set yBin = ySize.
 
+_Note:_ All values must fall within the _x_ and _y_ limits of the chip sensor, see [ccd_getChipSize](#ccd_getchipsize). If the ROI is not valid, the device will not be properly setup for acquisition.
+
 **Command Parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
->| roiIndex | Integer. The region of interest’s index (one-based index)
->| xOrigin | Integer. The one-based starting pixel in the x direction
->| yOrigin | Integer. The one-based starting pixel in the y direction
->| xSize | Integer. The Number of pixels in the x direction
->| ySize | Integer. The Number of pixels in the y direction
->| xBin | Integer. The Number of pixels to “bin” (x pixels summed to 1 value)
->| yBin | Integer. The Number of pixels to “bin” (y pixels summed to 1 value)
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+>| roiIndex | Integer. The region of interest’s index (one-based)
+>| xOrigin | Integer. The starting pixel in the x direction (zero-based)
+>| yOrigin | Integer. The starting pixel in the y direction (zero-based)
+>| xSize | Integer. The number of pixels in the x direction (one-based)
+>| ySize | Integer. The number of pixels in the y direction (one-based)
+>| xBin | Integer. The number of pixels to “bin” (x pixels summed to 1 value)
+>| yBin | Integer. The number of pixels to “bin” (y pixels summed to 1 value)
 **Return Results:**
 >| results | description |
 >|---|---|
@@ -2182,8 +2672,8 @@ Sets a single (_roiIndex_) ROI (Region of Interest) or area as defined by the X 
     "parameters":{
         "index": 0,
         "roiIndex": 1,
-        "xOrigin": 1,
-        "yOrigin": 1,
+        "xOrigin": 0,
+        "yOrigin": 0,
         "xSize": 5,
         "ySize": 5,
         "xBin": 5,
@@ -2203,13 +2693,55 @@ Sets a single (_roiIndex_) ROI (Region of Interest) or area as defined by the X 
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
 
 ### <a id="ccd_getxaxisconversiontype"></a>ccd_getXAxisConversionType
 
+Gets the X axis pixel conversion type to be used when retrieving the acquisition data with the [ccd_getAcquisitionData](#ccd_getacquisitiondata) command. 
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| type | Integer. The X-axis pixel conversion type to be used. <br> 0 = None (default) <br> 1 = CCD FIT parameters contained in the CCD firmware <br> 2 = Mono Wavelength parameters contained in the icl_settings.ini file
+
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_getXAxisConversionType",
+    "parameters":{
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_getXAxisConversionType",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "type": 1
+    }
+}
+```
+
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
 
 ### <a id="ccd_setxaxisconversiontype"></a>ccd_setXAxisConversionType
 
@@ -2218,7 +2750,7 @@ Sets the X-axis pixel conversion type to be used when retrieving the acquisition
 **Command Parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
 >| type | Integer. The X-axis pixel conversion type to be used. <br> 0 = None (default) <br> 1 = CCD FIT parameters contained in the CCD firmware <br> 2 = Mono Wavelength parameters contained in the icl_settings.ini file
 
 **Return Results:**
@@ -2250,14 +2782,50 @@ Sets the X-axis pixel conversion type to be used when retrieving the acquisition
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
 
-### ccd_getDataRetrievalMethod
 
-### ccd_setDataRetrievalMethod
+### <a id="ccd_getacqcount"></a>ccd_getAcqCount
 
-### ccd_getAcqCount
+Gets the number of acquisition measurements to be perform sequentially by the hardware.
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| count | Integer. The number of acquisition measurements to be performed.
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_getAcqCount",
+    "parameters": {
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_getAcqCount",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "count": 1
+    }
+}
+```
 
 
 <div style="page-break-before:always">&nbsp;</div>
@@ -2271,7 +2839,7 @@ Sets the number of acquisition measurements to be performed sequentially by the 
 **Command Parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
 >| count | Integer. The number of acquisition measurements.
 
 **Return Results:**
@@ -2308,11 +2876,140 @@ Sets the number of acquisition measurements to be performed sequentially by the 
 <p></p>
 
 
-### ccd_getCleanCount
+### <a id="ccd_getcleancount"></a>ccd_getCleanCount
 
-### ccd_setCleanCount
+Gets the number of cleans to be performed prior to measurement.
 
-### ccd_getDataSize
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| count | Integer. Number of cleans. |
+>| mode | Integer. Specifies how the cleans will be performed. <br> 0 = Never <br> 1 = First Only <br> 2 = Between Only <br> 3 = Each |
+
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_getCleanCount",
+    "parameters": {
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_getCleanCount",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "count": 1,
+        "mode": 2
+    }
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="ccd_setcleancount"></a>ccd_setCleanCount
+
+Sets the number of cleans to be performed according to the specified mode setting.
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+>| count | Integer. Number of cleans. |
+>| mode | Integer. Specifies how the cleans will be performed. <br> 0 = Never <br> 1 = First Only <br> 2 = Between Only <br> 3 = Each |
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| _none_ | |
+
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_setCleanCount",
+    "parameters": {
+        "index": 0,
+        "count": 1,
+        "mode": 1
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_setCleanCount",
+    "errors": [],
+    "id": 1234,
+    "results": {}
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
+
+### <a id="ccd_getdatasize"></a>ccd_getDataSize
+
+Gets the number of pixels to be returned based on the current settings.
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| size | Integer. Byte data size for all ROIs and acquisitions. |
+
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_getDataSize",
+    "parameters": {
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_getDataSize",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "size": 2048
+    }
+}
+```
 
 
 <div style="page-break-before:always">&nbsp;</div>
@@ -2324,40 +3021,40 @@ Sets the number of acquisition measurements to be performed sequentially by the 
 This command is used to get the current setting of the input trigger. The _address_, _event_, and _signalType_ parameters are used to define the input trigger based on the supported options of that particular CCD. <br>
 The supported trigger options are retrieved using the [ccd_getConfig](#ccd_getconfig) command, and begin with the "Triggers" string contained in the configuration. <br> **For example:** <br>
 ```json
-"Triggers": [
+"triggers": [
     {
-        "Events": [
+        "events": [
             {
-                "Name": "Each - For Each Acq",
-                "Token": 1,
-                "Types": [
+                "name": "Each - For Each Acq",
+                "token": 1,
+                "types": [
                     {
-                        "Name": "TTL Rising Edge",
-                        "Token": 1
+                        "name": "TTL Rising Edge",
+                        "token": 1
                     },
                     {
-                        "Name": "TTL Falling Edge",
-                        "Token": 0
+                        "name": "TTL Falling Edge",
+                        "token": 0
                     }
                 ]
             },
             {
-                "Name": "Once - Start All",
-                "Token": 0,
-                "Types": [
+                "name": "Once - Start All",
+                "token": 0,
+                "types": [
                     {
-                        "Name": "TTL Rising Edge",
-                        "Token": 1
+                        "name": "TTL Rising Edge",
+                        "token": 1
                     },
                     {
-                        "Name": "TTL Falling Edge",
-                        "Token": 0
+                        "name": "TTL Falling Edge",
+                        "token": 0
                     }
                 ]
             }
         ],
-        "Name": "Trigger Input",
-        "Token": 0
+        "name": "Trigger Input",
+        "token": 0
     }
 ]
 ```
@@ -2371,9 +3068,9 @@ The supported trigger options are retrieved using the [ccd_getConfig](#ccd_getco
 **Return Results:**
 >| results | description |
 >|---|---|
->| address | Integer. Token used to specify _where_ the trigger is located. <br> (e.g. 0 = Trigger Input) <br> <br> Note: Trigger name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the input trigger is disabled |
->| event | Integer. Token used to specify _when_ the trigger event should occur. <br> (e.g. 0 = Once - Start All) <br> <br> Note: Event name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the input trigger is disabled |
->| signalType | Integer. Token used to specify _how_ the signal will cause the input trigger. <br> (e.g. 0 = TTL Falling Edge) <br> <br> Note: Signal type and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the input trigger is disabled |
+>| address | Integer. Token used to specify _where_ the trigger is located. <br> (e.g. 0 = Trigger Input) <br> <br> _Note:_ Trigger name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the input trigger is disabled |
+>| event | Integer. Token used to specify _when_ the trigger event should occur. <br> (e.g. 0 = Once - Start All) <br> <br> _Note:_ Event name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the input trigger is disabled |
+>| signalType | Integer. Token used to specify _how_ the signal will cause the input trigger. <br> (e.g. 0 = TTL Falling Edge) <br> <br> _Note:_ Signal type and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the input trigger is disabled |
 
 
 **Example command:**
@@ -2413,40 +3110,40 @@ The supported trigger options are retrieved using the [ccd_getConfig](#ccd_getco
 This command is used to enable or disable the trigger input. When enabling the trigger input, the _address_, _event_, and _signalType_ parameters are used to define the input trigger based on the supported options of that particular CCD. <br>
 The supported trigger options are retrieved using the [ccd_getConfig](#ccd_getconfig) command, and begin with the "Triggers" string contained in the configuration. <br> **For example:** <br>
 ```json
-"Triggers": [
+"triggers": [
     {
-        "Events": [
+        "events": [
             {
-                "Name": "Each - For Each Acq",
-                "Token": 1,
-                "Types": [
+                "name": "Each - For Each Acq",
+                "token": 1,
+                "types": [
                     {
-                        "Name": "TTL Rising Edge",
-                        "Token": 1
+                        "name": "TTL Rising Edge",
+                        "token": 1
                     },
                     {
-                        "Name": "TTL Falling Edge",
-                        "Token": 0
+                        "name": "TTL Falling Edge",
+                        "token": 0
                     }
                 ]
             },
             {
-                "Name": "Once - Start All",
-                "Token": 0,
-                "Types": [
+                "name": "Once - Start All",
+                "token": 0,
+                "types": [
                     {
-                        "Name": "TTL Rising Edge",
-                        "Token": 1
+                        "name": "TTL Rising Edge",
+                        "token": 1
                     },
                     {
-                        "Name": "TTL Falling Edge",
-                        "Token": 0
+                        "name": "TTL Falling Edge",
+                        "token": 0
                     }
                 ]
             }
         ],
-        "Name": "Trigger Input",
-        "Token": 0
+        "name": "Trigger Input",
+        "token": 0
     }
 ]
 ```
@@ -2455,10 +3152,10 @@ The supported trigger options are retrieved using the [ccd_getConfig](#ccd_getco
 >| parameter  | description   |
 >|---|---|
 >| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
->| enable | Boolean. Enables or disables the input trigger. <br> true = enable <br> false = disable <br> <br> Note: When disabling the input trigger, the _address_, _event_, and _signalType_ parameters are ignored.|
->| address | Integer. Token used to specify _where_ the trigger is located. <br> (e.g. 0 = Trigger Input) <br> <br> Note: Trigger name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
->| event | Integer. Token used to specify _when_ the trigger event should occur. <br> (e.g. 0 = Once - Start All) <br> <br> Note: Event name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
->| signalType | Integer. Token used to specify _how_ the signal will cause the input trigger. <br> (e.g. 0 = TTL Falling Edge) <br> <br> Note: Signal type and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
+>| enable | Boolean. Enables or disables the input trigger. <br> true = enable <br> false = disable <br> <br> _Note:_ When disabling the input trigger, the _address_, _event_, and _signalType_ parameters are ignored.|
+>| address | Integer. Token used to specify _where_ the trigger is located. <br> (e.g. 0 = Trigger Input) <br> <br> _Note:_ Trigger name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
+>| event | Integer. Token used to specify _when_ the trigger event should occur. <br> (e.g. 0 = Once - Start All) <br> <br> _Note:_ Event name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
+>| signalType | Integer. Token used to specify _how_ the signal will cause the input trigger. <br> (e.g. 0 = TTL Falling Edge) <br> <br> _Note:_ Signal type and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
 
 **Return Results:**
 >| results | description |
@@ -2502,40 +3199,40 @@ The supported trigger options are retrieved using the [ccd_getConfig](#ccd_getco
 This command is used to get the current setting of the signal output. The _address_, _event_, and _signalType_ parameters are used to define the signal based on the supported options of that particular CCD. <br>
 The supported signal options are retrieved using the [ccd_getConfig](#ccd_getconfig) command, and begin with the "Signals" string contained in the configuration. <br> **For example:** <br>
 ```json
-"Signals": [
+"signals": [
     {
-        "Events": [
+        "events": [
             {
-                "Name": "Shutter Open",
-                "Token": 3,
-                "Types": [
+                "name": "Shutter Open",
+                "token": 3,
+                "types": [
                     {
-                        "Name": "TTL Active Low",
-                        "Token": 1
+                        "name": "TTL Active Low",
+                        "token": 1
                     },
                     {
-                        "Name": "TTL Active High",
-                        "Token": 0
+                        "name": "TTL Active High",
+                        "token": 0
                     }
                 ]
             },
             {
-                "Name": "Start Experiment",
-                "Token": 0,
-                "Types": [
+                "name": "Start Experiment",
+                "token": 0,
+                "types": [
                     {
-                        "Name": "TTL Active Low",
-                        "Token": 1
+                        "name": "TTL Active Low",
+                        "token": 1
                     },
                     {
-                        "Name": "TTL Active High",
-                        "Token": 0
+                        "name": "TTL Active High",
+                        "token": 0
                     }
                 ]
             }
         ],
-        "Name": "Signal Output",
-        "Token": 0
+        "name": "Signal Output",
+        "token": 0
     }
 ]
 ```
@@ -2548,9 +3245,9 @@ The supported signal options are retrieved using the [ccd_getConfig](#ccd_getcon
 **Return Results:**
 >| results | description |
 >|---|---|
->| address | Integer. Token setting used to specify _where_ the signal is located. <br> (e.g. 0 = Signal Output) <br> <br> Note: Signal name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the signal output is disabled |
->| event | Integer. Token setting used to specify _when_ the signal event should occur. <br> (e.g. 3 = Shutter Open) <br> <br> Note: Event name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the signal output is disabled |
->| signalType | Integer. Token setting used to specify _how_ the signal will cause the event. <br> (e.g. 0 = TTL Active High) <br> <br> Note: Signal type and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the signal output is disabled |
+>| address | Integer. Token setting used to specify _where_ the signal is located. <br> (e.g. 0 = Signal Output) <br> <br> _Note:_ Signal name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the signal output is disabled |
+>| event | Integer. Token setting used to specify _when_ the signal event should occur. <br> (e.g. 3 = Shutter Open) <br> <br> _Note:_ Event name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the signal output is disabled |
+>| signalType | Integer. Token setting used to specify _how_ the signal will cause the event. <br> (e.g. 0 = TTL Active High) <br> <br> _Note:_ Signal type and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) <br> Value of -1 indicates that the signal output is disabled |
 
 **Example command:**
 
@@ -2589,40 +3286,40 @@ The supported signal options are retrieved using the [ccd_getConfig](#ccd_getcon
 This command is used to enable or disable the signal output. When enabling the signal output, the _address_, _event_, and _signalType_ parameters are used to define the signal based on the supported options of that particular CCD. <br>
 The supported signal options are retrieved using the [ccd_getConfig](#ccd_getconfig) command, and begin with the "Signals" string contained in the configuration. <br> **For example:** <br>
 ```json
-"Signals": [
+"signals": [
     {
-        "Events": [
+        "events": [
             {
-                "Name": "Shutter Open",
-                "Token": 3,
-                "Types": [
+                "name": "Shutter Open",
+                "token": 3,
+                "types": [
                     {
-                        "Name": "TTL Active Low",
-                        "Token": 1
+                        "name": "TTL Active Low",
+                        "token": 1
                     },
                     {
-                        "Name": "TTL Active High",
-                        "Token": 0
+                        "name": "TTL Active High",
+                        "token": 0
                     }
                 ]
             },
             {
-                "Name": "Start Experiment",
-                "Token": 0,
-                "Types": [
+                "name": "Start Experiment",
+                "token": 0,
+                "types": [
                     {
-                        "Name": "TTL Active Low",
-                        "Token": 1
+                        "name": "TTL Active Low",
+                        "token": 1
                     },
                     {
-                        "Name": "TTL Active High",
-                        "Token": 0
+                        "name": "TTL Active High",
+                        "token": 0
                     }
                 ]
             }
         ],
-        "Name": "Signal Output",
-        "Token": 0
+        "name": "Signal Output",
+        "token": 0
     }
 ]
 ```
@@ -2631,10 +3328,10 @@ The supported signal options are retrieved using the [ccd_getConfig](#ccd_getcon
 >| parameter  | description   |
 >|---|---|
 >| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
->| enable | Boolean. Enables or disables the signal. <br> true = enable <br> false = disable <br> <br> Note: When disabling the signal output, the _address_, _event_, and _signalType_ parameters are ignored.|
->| address | Integer. Token used to specify _where_ the signal is located. <br> (e.g. 0 = Signal Output) <br> <br> Note: Signal name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
->| event | Integer. Token used to specify _when_ the signal event should occur. <br> (e.g. 3 = Shutter Open) <br> <br> Note: Event name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
->| signalType | Integer. Token used to specify _how_ the signal will cause the event. <br> (e.g. 0 = TTL Active High) <br> <br> Note: Signal type and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
+>| enable | Boolean. Enables or disables the signal. <br> true = enable <br> false = disable <br> <br> _Note:_ When disabling the signal output, the _address_, _event_, and _signalType_ parameters are ignored.|
+>| address | Integer. Token used to specify _where_ the signal is located. <br> (e.g. 0 = Signal Output) <br> <br> _Note:_ Signal name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
+>| event | Integer. Token used to specify _when_ the signal event should occur. <br> (e.g. 3 = Shutter Open) <br> <br> _Note:_ Event name and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
+>| signalType | Integer. Token used to specify _how_ the signal will cause the event. <br> (e.g. 0 = TTL Active High) <br> <br> _Note:_ Signal type and token can be found in the CCD config, see [ccd_getConfig](#ccd_getconfig) |
 
 **Return Results:**
 >| results | description |
@@ -2673,7 +3370,47 @@ The supported signal options are retrieved using the [ccd_getConfig](#ccd_getcon
 <p></p>
 
 
-### ccd_getAcquisitionReady
+### <a id="ccd_getacquisitionready"></a>ccd_getAcquisitionReady
+
+This command is used to get the Acquisition Ready state. The Acquisition Ready state indicates whether the CCD has a sufficient number of parameters specified, and has been properly setup for acquiring data.
+
+_Note:_ To specify the acquisition parameters please see [ccd_setROI](#ccd_setroi) and [ccd_setXAxisConversionType](#ccd_setxaxisconversiontype). If there are no acquisition parameters set at the time of acquisition it may result in no data being generated.
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| ready | Boolean. Acquisition Ready state. <br> false = Not Ready <br> true = Ready
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_getAcquisitionReady",
+    "parameters":{
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_getAcquisitionReady",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "ready": true
+    }
+}
+```
 
 
 <div style="page-break-before:always">&nbsp;</div>
@@ -2684,12 +3421,12 @@ The supported signal options are retrieved using the [ccd_getConfig](#ccd_getcon
 
 Starts an acquisition that has been set up according to the previously defined acquisition parameters.
 
-Note: To specify the acquisiton parameters please see [ccd_setROI](#ccd_setroi) and [ccd_setXAxisConversionType](#ccd_setxaxisconversiontype). If there are no acquisition parameters set at the time of acquisition it may result in no data being generated.
+_Note:_ To specify the acquisition parameters please see [ccd_setROI](#ccd_setroi) and [ccd_setXAxisConversionType](#ccd_setxaxisconversiontype). If there are no acquisition parameters set at the time of acquisition it may result in no data being generated.
 
 **Command Parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
 >| open shutter | Boolean. Sets the state of the shutter during the acquisition. <br> True = open <br> False = close
 
 **Return Results:**
@@ -2721,15 +3458,55 @@ Note: To specify the acquisiton parameters please see [ccd_setROI](#ccd_setroi) 
 }
 ```
 
-<div style="page-break-before:always">&nbsp;</div>
-<p></p>
-
-### ccd_getAcquisitionBusy
-
-### ccd_setAcquisitionAbort
 
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
+
+### <a id="ccd_getacquisitionbusy"></a>ccd_getAcquisitionBusy
+
+Gets the current busy-state of an acquisition.
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| isBusy | Boolean. Acquisition busy state. <br> False = Not busy <br> True = Busy
+
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_getAcquisitionBusy",
+    "parameters": {
+        "index": 0
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_getAcquisitionBusy",
+    "errors": [],
+    "id": 1234,
+    "results": {
+        "isBusy": false
+    }
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
 
 ### <a id="ccd_getacquisitiondata"></a>ccd_getAcquisitionData
 
@@ -2744,12 +3521,12 @@ The acquisition description string consists of the following information:
 - ySize: ROI’s Y Size
 - xBinning: ROI’s X Bin
 - yBinning: ROI’s Y Bin
-- Timestamp: This is a timestamp that relates to the time when the all the programmed acquisitions have completed. The data from all programmed acquisitions are retrieve from the CCD after all acquisitions have completed, therefore the same timestamp is used for all acquisitions.
+- Timestamp: This is a timestamp that relates to the time when the all the programmed acquisitions have completed. The data from all programmed acquisitions are retrieved from the CCD after all acquisitions have completed, therefore the same timestamp is used for all acquisitions.
 
 **Command Parameters:**
 >| parameter  | description   |
 >|---|---|
->| index | Integer. Used to identify which CCD to target. See _ccd_list_ command|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
 
 **Return Results:**
 >| results | description |
@@ -2806,8 +3583,55 @@ The acquisition description string consists of the following information:
 }
 ```
 
+
 <div style="page-break-before:always">&nbsp;</div>
 <p></p>
+
+
+### <a id="ccd_setcenterwavelength"></a>ccd_setCenterWavelength
+
+Sets the center wavelength value to be used in the grating equation.
+
+**Command Parameters:**
+>| parameter  | description   |
+>|---|---|
+>| index | Integer. Used to identify which CCD to target. See [ccd_list](#ccd_list) command|
+>| wavelength | Float. Center wavelength. |
+
+**Return Results:**
+>| results | description |
+>|---|---|
+>| _none_ |
+
+
+**Example command:**
+
+```json
+{
+    "id": 1234,
+    "command": "ccd_setCenterWavelength",
+    "parameters": {
+        "index": 0,
+        "wavelength": 200.00
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "command": "ccd_setCenterWavelength",
+    "errors": [],
+    "id": 1234,
+    "results": {}
+}
+```
+
+
+<div style="page-break-before:always">&nbsp;</div>
+<p></p>
+
 
 ## SpectrAcq3 - Single Channel Detector Interface
 
@@ -2852,7 +3676,7 @@ Attempts to find SpectrAcq3 hardware connected and powered on the USB bus.
 
 ### <a id="scd_list"></a>scd_list
 
-Returns a formated list of strings identifying each unit found.
+Returns a formatted list of strings identifying each unit found.
 
 **Command parameters:**
 >| parameter  | description   |
@@ -3102,11 +3926,11 @@ ERR_CCD_UNSUPPORTED_ACQ_FORMAT  -322
 ERR_CCD_CMD_EXECUTION_EXCEPTION -323
 ERR_CCD_MISSING_PARAMETER       -324
 
-ERR_MONO_ALLREADY_INIT          -500
-ERR_MONO_ALLREADY_OPEN          -501
-ERR_MONO_ALLREADY_OPENING       -502
-ERR_MONO_ALLREADY_CLOSED        -503
-ERR_MONO_ALLREADY_UNINIT        -504
+ERR_MONO_ALREADY_INIT           -500
+ERR_MONO_ALREADY_OPEN           -501
+ERR_MONO_ALREADY_OPENING        -502
+ERR_MONO_ALREADY_CLOSED         -503
+ERR_MONO_ALREADY_UNINIT         -504
 ERR_MONO_NOT_INIT               -505
 ERR_MONO_NOT_OPEN               -506
 ERR_MONO_NOT_FOUND              -507
@@ -3136,7 +3960,7 @@ ERR_SCD_CMD_NOT_SUPPORTED       -600
 
 ## Production Commands
 
-- [Monochromater Module Commands](#monochromater-module-commands-prod)
+- [Monochromator Module Commands](#monochromator-module-commands-prod)
     - [mono\_moveSlit](#mono_moveslit)
     - [mono\_getSlitStepPosition](#mono_getslitstepposition)
 
@@ -3146,17 +3970,37 @@ ERR_SCD_CMD_NOT_SUPPORTED       -600
 <p></p>
 
 
-## <a id="monochromater-module-commands-prod"></a>Monochromater Module Commands
+## <a id="monochromator-module-commands-prod"></a>Monochromator Module Commands
 
 ### <a id="mono_moveslit"></a>mono_moveSlit
 
-Moves the specified slit to the position in steps.
+Moves the specified slit to the position in steps. The location id of each configured slit can be found under the ports section of the mono configuration. See [mono_getConfig](#mono_getconfig) for additional information.
+
+**For example:**
+```json
+"ports": [
+    {
+        "locationId": 1,
+        "slitType": 1
+    },
+    {
+        "locationId": 2,
+        "slitType": 1
+    },
+    {
+        "locationId": 4,
+        "slitType": 1
+    }
+]
+```
+
+_Note:_ The "locationId" parameter found in the mono configuration is 1-based. However, the mono_moveSlit command uses a 0-based "locationId".
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
 >| index | Integer. Used to identify which mono to control. See _mono_list_ command|
->| id | Integer. Slit index (zero-based) |
+>| locationId | Integer. Slit location (zero-based) |
 >| position | Integer. Position in steps |
 
 **Response results:**
@@ -3164,7 +4008,7 @@ Moves the specified slit to the position in steps.
 >|---|---|
 >|_none_||
 
-**Example command:**
+**Example command:** Move slit in port 2 to step position 250
 
 ```json
 {
@@ -3172,7 +4016,7 @@ Moves the specified slit to the position in steps.
     "command": "mono_moveSlit",
     "parameters":{
         "index": 0,
-        "id": 1,
+        "locationId": 1,
         "position": 250
     }
 }
@@ -3196,20 +4040,40 @@ Moves the specified slit to the position in steps.
 
 ### <a id="mono_getslitstepposition"></a>mono_getSlitStepPosition
 
-Returns the position of the specified slit in steps.
+Returns the position of the specified slit in steps. The location id of each configured slit can be found under the ports section of the mono configuration. See [mono_getConfig](#mono_getconfig) for additional information.
+
+**For example:**
+```json
+"ports": [
+    {
+        "locationId": 1,
+        "slitType": 1
+    },
+    {
+        "locationId": 2,
+        "slitType": 1
+    },
+    {
+        "locationId": 4,
+        "slitType": 1
+    }
+]
+```
+
+_Note:_ The "locationId" parameter found in the mono configuration is 1-based. However, the mono_getSlitStepPosition command uses a 0-based "locationId".
 
 **Command parameters:**
 >| parameter  | description   |
 >|---|---|
 >| index | Integer. Used to identify which mono to control. See _mono_list_ command|
->| id | Integer. Slit index (zero-based) |
+>| locationId | Integer. Slit location (zero-based) |
 
 **Response results:**
 >| results | description |
 >|---|---|
 >| position | Integer. Slit position in steps.|
 
-**Example command:**
+**Example command:** Get step position of slit in port 4
 
 ```json
 {
@@ -3217,7 +4081,7 @@ Returns the position of the specified slit in steps.
     "command": "mono_getSlitStepPosition",
     "parameters":{
         "index": 0,
-        "id": 3
+        "locationId": 3
     }
 }
 ```

@@ -109,7 +109,9 @@ async def test_monochromator_mirror_position(fake_device_manager, fake_icl_exe):
     async with fake_device_manager.monochromators[0] as monochromator:
         # act
         # assert
-        assert await monochromator.get_mirror_position(Monochromator.Mirror.ENTRANCE) == Monochromator.MirrorPosition.AXIAL
+        assert (
+            await monochromator.get_mirror_position(Monochromator.Mirror.ENTRANCE) == Monochromator.MirrorPosition.AXIAL
+        )
 
 
 @pytest.mark.asyncio
@@ -119,7 +121,9 @@ async def test_monochromator_change_mirror_position(fake_device_manager, fake_ic
         # act
         await monochromator.set_mirror_position(Monochromator.Mirror.ENTRANCE, Monochromator.MirrorPosition.AXIAL)
         # assert
-        assert await monochromator.get_mirror_position(Monochromator.Mirror.ENTRANCE) == Monochromator.MirrorPosition.AXIAL
+        assert (
+            await monochromator.get_mirror_position(Monochromator.Mirror.ENTRANCE) == Monochromator.MirrorPosition.AXIAL
+        )
 
 
 @pytest.mark.asyncio
