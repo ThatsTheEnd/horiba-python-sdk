@@ -112,13 +112,13 @@ ___
 
 ## 👩‍💻 First steps as contributor
 
-### Initialize your code
+### Clone and setup the repo
 
-1. Initialize `git` inside your repo:
+1. Clone the repo:
 
 ```bash
+git clone https://github.com/ThatsTheEnd/horiba-python-sdk.git
 cd horiba-python-sdk
-git init
 ```
 
 2. If you don't have `Poetry` installed run:
@@ -140,14 +140,12 @@ make pre-commit-install
 make codestyle
 ```
 
-5. Upload initial code to GitHub:
+5. To push local changes to the remote repository, run:
 
 ```bash
 git add .
-git commit -m ":tada: Initial commit"
-git branch -M main
-git remote add origin https://github.com/ThatsTheEnd/horiba-python-sdk.git
-git push -u origin main
+git commit -m "feat: add new feature xyz"
+git push
 ```
 
 <!-- ### Set up bots -->
@@ -295,7 +293,31 @@ make mypy
 
 Run `pytest`
 
+Unix:
+
 ```bash
+make test
+```
+
+Windows:
+
+```powershell
+poetry run pytest -c pyproject.toml --cov-report=html --cov=horiba_sdk tests/
+```
+
+For the hardware tests run the following:
+
+Windows:
+
+```powershell
+$env:HAS_HARDWARE="true"
+poetry run pytest -c pyproject.toml --cov-report=html --cov=horiba_sdk tests/
+```
+
+Unix:
+
+```bash
+HAS_HARDWARE="true"
 make test
 ```
 
