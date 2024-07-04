@@ -311,6 +311,9 @@ Windows:
 
 ```powershell
 $env:HAS_HARDWARE="true"
+# If you want a remote ICL be used for the tests
+# $env:TEST_ICL_IP="192.168.21.24"
+# $env:TEST_ICL_PORT="1234"
 poetry run pytest -c pyproject.toml --cov-report=html --cov=horiba_sdk tests/
 ```
 
@@ -318,6 +321,9 @@ Unix:
 
 ```bash
 HAS_HARDWARE="true"
+# If you want a remote ICL be used for the tests
+# TEST_ICL_IP="192.168.21.24"
+# TEST_ICL_PORT="1234"
 make test
 ```
 

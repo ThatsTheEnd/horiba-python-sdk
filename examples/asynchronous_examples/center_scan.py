@@ -31,17 +31,22 @@ async def main():
         await mono.home()
         await wait_for_mono(mono)
 
-        target_wavelength = 100.0
+        target_wavelength = 230.0
         await mono.move_to_target_wavelength(target_wavelength)
         await wait_for_mono(mono)
 
         # ccd configuration
+        mono_wavelength = await mono.get_current_wavelength()
+        logger.info(f'Mono wavelength {mono_wavelength}')
+        await ccd.set_center_wavelength(mono_wavelength)
+
+        await ccd.set_x_axis_conversion_type(XAxisConversionType.FROM_ICL_SETTINGS_INI)
         await ccd.set_acquisition_format(1, AcquisitionFormat.SPECTRA)
         await ccd.set_acquisition_count(1)
-        await ccd.set_x_axis_conversion_type(XAxisConversionType.FROM_ICL_SETTINGS_INI)
-        await ccd.set_timer_resolution(TimerResolution._1000_MICROSECONDS)
-        await ccd.set_exposure_time(2)
         await ccd.set_region_of_interest()  # Set default ROI, if you want a custom ROI, pass the parameters
+
+        await ccd.set_timer_resolution(TimerResolution._1000_MICROSECONDS)
+        await ccd.set_exposure_time(50)
         xy_data = [[0], [0]]
 
         if await ccd.get_acquisition_ready():

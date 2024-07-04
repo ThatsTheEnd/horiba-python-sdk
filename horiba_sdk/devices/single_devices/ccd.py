@@ -598,3 +598,19 @@ class ChargeCoupledDevice(AbstractDevice):
         """
         response: Response = await super()._execute_command('ccd_getAcquisitionData', {'index': self._id})
         return response.results['acquisition']
+
+    async def set_center_wavelength(self, center_wavelength: float) -> None:
+        """Sets the center wavelength value to be used in the grating equation.
+
+        Used when X axis conversion is XAxisConversionType.FROM_ICL_SETTINGS_INI
+
+        Args:
+            center_wavelength (float): Center wavelength
+
+        Raises:
+            Exception: When an error occurred on the device side
+        """
+        await super()._execute_command(
+            'ccd_setCenterWavelength',
+            {'index': self._id, 'wavelength': center_wavelength},
+        )
