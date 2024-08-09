@@ -9,6 +9,7 @@ from horiba_sdk.core.acquisition_format import AcquisitionFormat
 from horiba_sdk.core.clean_count_mode import CleanCountMode
 from horiba_sdk.core.timer_resolution import TimerResolution
 from horiba_sdk.core.x_axis_conversion_type import XAxisConversionType
+from horiba_sdk.devices.single_devices import Monochromator
 
 
 # Tell pytest to run this test only if called from the scope of this module. If any other pytest scope calls this test,
@@ -380,3 +381,29 @@ async def test_ccd_acquisition_abort(event_loop, async_device_manager_instance):
 
             assert acquisition_busy_before_abort
             assert not acquisition_busy_after_abort
+
+
+async def wait_mono(mono: Monochromator) -> None:
+    await asyncio.sleep(0.2)
+    while await mono.is_busy():
+        await asyncio.sleep(0.2)
+
+
+@pytest.mark.skipif(os.environ.get('HAS_HARDWARE') != 'true', reason='Hardware tests only run locally')
+async def test_ccd_range_mode_positions(event_loop, async_device_manager_instance):  # noqa: ARG001
+    # arrange
+    start_wavelength = 200.0
+    end_wavelength = 600.0
+
+    mono = async_device_manager_instance.monochromators[0]
+    async with async_device_manager_instance.charge_coupled_devices[0] as ccd:
+        # act
+        await mono.open()
+        await wait_mono(mono)
+
+        await ccd.set_x_axis_conversion_type(XAxisConversionType.FROM_ICL_SETTINGS_INI)
+        await ccd.set_acquisition_format(1, AcquisitionFormat.SPECTRA)
+        await ccd.set_region_of_interest()
+
+        center_wavelengths = await ccd.range_mode_center_wavelengths(mono.id(), start_wavelength, end_wavelength, 10)
+        assert center_wavelengths
