@@ -4,7 +4,7 @@ from loguru import logger
 from numpy import argsort, array, concatenate, dtype, interp, ndarray
 from overrides import override
 
-from horiba_sdk.core.spectra_stitch import SpectraStitch
+from examples.asynchronous_examples.spectra_stitch import SpectraStitch
 
 
 class LinearSpectraStitch(SpectraStitch):
